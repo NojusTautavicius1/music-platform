@@ -1,0 +1,77 @@
+import Link from "next/link";
+import Image from "next/image";
+import { Play } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type Props = {
+  id: string;
+  title: string;
+  subtitle: string;
+  coverUrl?: string | null;
+  size?: "sm" | "md" | "lg";
+  href?: string;
+};
+
+const SIZE_PX = { sm: 160, md: 180, lg: 240 } as const;
+
+export function PlaylistCard({
+  id,
+  title,
+  subtitle,
+  coverUrl,
+  size = "md",
+  href,
+}: Props) {
+  const px = SIZE_PX[size];
+  const dest = href ?? `/library/playlist/${id}`;
+
+  return (
+    <Link
+      href={dest}
+      className="group block rounded-xl p-3 hover:bg-white/5 transition-all duration-200 hover:-translate-y-0.5"
+      style={{ width: px }}
+    >
+      {/* Cover */}
+      <div
+        className="relative rounded-md overflow-hidden shrink-0"
+        style={{ width: px - 24, height: px - 24 }}
+      >
+        {coverUrl ? (
+          <Image
+            src={coverUrl}
+            alt={title}
+            fill
+            sizes={`${px}px`}
+            className="object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-[#8B5CF6]/40 to-[#EC4899]/40" />
+        )}
+
+        {/* Play button */}
+        <div
+          className={cn(
+            "absolute bottom-2 right-2 w-10 h-10 rounded-full",
+            "bg-gradient-to-br from-[#8B5CF6] to-[#EC4899]",
+            "flex items-center justify-center shadow-xl",
+            "opacity-0 translate-y-2",
+            "group-hover:opacity-100 group-hover:translate-y-0",
+            "transition-all duration-200"
+          )}
+        >
+          <Play size={16} fill="white" className="text-white ml-0.5" />
+        </div>
+      </div>
+
+      {/* Text */}
+      <div className="mt-3">
+        <p className="font-semibold text-zinc-100 line-clamp-1 text-sm leading-snug">
+          {title}
+        </p>
+        <p className="text-zinc-400 text-sm line-clamp-2 mt-0.5 leading-snug">
+          {subtitle}
+        </p>
+      </div>
+    </Link>
+  );
+}

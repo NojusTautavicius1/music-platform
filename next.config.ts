@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
     root: appRoot,
   },
   reactCompiler: true,
+  images: {
+    remotePatterns: [
+      { hostname: "picsum.photos" },
+      { hostname: "lh3.googleusercontent.com" },
+    ],
+  },
 };
 
 export default nextConfig;
