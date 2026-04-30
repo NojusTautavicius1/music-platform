@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { hostname: "picsum.photos" },
       { hostname: "lh3.googleusercontent.com" },
+      { hostname: "utfs.io" },
+      { hostname: "uploadthing.com" },
     ],
   },
 };

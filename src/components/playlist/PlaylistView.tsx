@@ -1,7 +1,11 @@
 "use client";
 
-import { useState, useOptimistic, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useOptimistic, useTransition } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { formatDistanceToNow } from "date-fns";
 import {
   Play,
@@ -12,9 +16,24 @@ import {
   Pause,
   ListPlus,
   PlusCircle,
+  Pencil,
+  Trash2,
+  ListMusic,
+  Link2,
+  User,
+  Loader2,
+  ImageUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,9 +46,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { formatDuration } from "@/lib/format";
+import { useUploadThing } from "@/lib/uploadthing";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
 import { toggleLike } from "@/app/actions/like";
-import { addSongToPlaylist, addSongToNewPlaylist } from "@/app/actions/playlist";
+import {
+  addSongToPlaylist,
+  addSongToNewPlaylist,
+  deletePlaylist,
+  removeSongFromPlaylist,
+  updatePlaylist,
+} from "@/app/actions/playlist";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,8 +77,22 @@ export type UserPlaylist = {
   name: string;
 };
 
+const editFormSchema = z.object({
+  name: z.string().min(1, "Name is required").max(60, "Max 60 characters"),
+  description: z.string().max(200, "Max 200 characters"),
+  isPublic: z.boolean(),
+  coverUrl: z.string().url().nullable().optional(),
+});
+
+type EditFormValues = z.infer<typeof editFormSchema>;
+
 type Props = {
   playlistId: string;
+  playlistName: string;
+  playlistDescription: string | null;
+  playlistCoverUrl: string | null;
+  isPublic: boolean;
+  isOwner: boolean;
   songs: SongInPlaylist[];
   userPlaylists?: UserPlaylist[];
 };
@@ -64,10 +104,14 @@ type SongRowProps = {
   idx: number;
   isActive: boolean;
   isLiked: boolean;
-  queue: PlayerSong[];
+  isOwner: boolean;
   userPlaylists: UserPlaylist[];
   onPlay: () => void;
-  onLike: (e: React.MouseEvent) => void;
+  onLike: (e?: React.MouseEvent) => void;
+  onRemove: () => void;
+  onAddToQueue: () => void;
+  onGoToArtist: () => void;
+  onShare: () => void;
 };
 
 function SongRow({
@@ -75,10 +119,14 @@ function SongRow({
   idx,
   isActive,
   isLiked,
-  queue: _queue,
+  isOwner,
   userPlaylists,
   onPlay,
   onLike,
+  onRemove,
+  onAddToQueue,
+  onGoToArtist,
+  onShare,
 }: SongRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -251,6 +299,20 @@ function SongRow({
               className="w-52 bg-[#18181F] border-white/10 text-zinc-100"
               onClick={(e) => e.stopPropagation()}
             >
+              {isOwner && (
+                <>
+                  <DropdownMenuItem
+                    variant="destructive"
+                    className="cursor-pointer gap-2"
+                    onClick={onRemove}
+                  >
+                    <Trash2 size={14} />
+                    Remove from this playlist
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/10" />
+                </>
+              )}
+
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white data-popup-open:bg-white/10">
                   <ListPlus size={14} />
@@ -282,7 +344,37 @@ function SongRow({
               </DropdownMenuSub>
 
               <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white">
+              <DropdownMenuItem
+                className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+                onClick={onAddToQueue}
+              >
+                <ListMusic size={14} />
+                Add to queue
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+                onClick={() => onLike()}
+              >
+                <Heart
+                  size={14}
+                  className={cn(
+                    isLiked ? "fill-[#EC4899] text-[#EC4899]" : "text-zinc-400"
+                  )}
+                />
+                {isLiked ? "Unlike" : "Like"}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+                onClick={onGoToArtist}
+              >
+                <User size={14} />
+                Go to artist
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+                onClick={onShare}
+              >
+                <Link2 size={14} />
                 Share
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -293,16 +385,338 @@ function SongRow({
   );
 }
 
+// ─── Edit Playlist Dialog ───────────────────────────────────────────────────
+
+type EditPlaylistDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  playlist: {
+    id: string;
+    name: string;
+    description: string | null;
+    coverUrl: string | null;
+    isPublic: boolean;
+  };
+};
+
+function EditPlaylistDialog({ open, onOpenChange, playlist }: EditPlaylistDialogProps) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    setValue,
+    watch,
+  } = useForm<EditFormValues>({
+    resolver: zodResolver(editFormSchema),
+    defaultValues: {
+      name: playlist.name,
+      description: playlist.description ?? "",
+      isPublic: playlist.isPublic,
+      coverUrl: playlist.coverUrl ?? null,
+    },
+  });
+
+  const descriptionValue = watch("description") ?? "";
+  const coverUrl = watch("coverUrl") ?? playlist.coverUrl ?? null;
+
+  const { startUpload, isUploading } = useUploadThing("playlistCover", {
+    onClientUploadComplete: (res: Array<{ url: string }> | undefined) => {
+      const url = res?.[0]?.url;
+      if (url) {
+        setValue("coverUrl", url, { shouldDirty: true });
+        setLocalPreview(null);
+        toast.success("Cover uploaded");
+      }
+    },
+    onUploadError: (err: Error) => {
+      toast.error(err.message);
+    },
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    reset({
+      name: playlist.name,
+      description: playlist.description ?? "",
+      isPublic: playlist.isPublic,
+      coverUrl: playlist.coverUrl ?? null,
+    });
+    setLocalPreview(null);
+  }, [open, playlist, reset]);
+
+  useEffect(() => {
+    return () => {
+      if (localPreview) URL.revokeObjectURL(localPreview);
+    };
+  }, [localPreview]);
+
+  function handleFile(file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file");
+      return;
+    }
+    const preview = URL.createObjectURL(file);
+    setLocalPreview(preview);
+    startUpload([file]);
+  }
+
+  function handleFileInput(files: FileList | null) {
+    const file = files?.[0];
+    if (file) handleFile(file);
+  }
+
+  async function onSubmit(values: EditFormValues) {
+    const result = await updatePlaylist({
+      id: playlist.id,
+      name: values.name,
+      description: values.description,
+      isPublic: values.isPublic,
+      coverUrl: values.coverUrl ?? null,
+    });
+
+    if (result.ok) {
+      toast.success("Playlist updated");
+      onOpenChange(false);
+    } else {
+      toast.error(result.error);
+    }
+  }
+
+  const previewUrl = localPreview ?? coverUrl;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[#18181F] border-white/10 text-zinc-100 max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-bold text-zinc-100">
+            Edit playlist details
+          </DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="shrink-0">
+              <div
+                className={cn(
+                  "relative w-[180px] h-[180px] rounded-md overflow-hidden shadow-xl",
+                  "border border-white/10 bg-white/5 group cursor-pointer",
+                  isDragging && "border-[#8B5CF6]"
+                )}
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                  handleFileInput(e.dataTransfer.files);
+                }}
+                role="button"
+                aria-label="Choose cover photo"
+              >
+                {previewUrl ? (
+                  <Image
+                    src={previewUrl}
+                    alt={playlist.name}
+                    fill
+                    sizes="180px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40" />
+                )}
+
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-sm font-medium text-white gap-2">
+                  <ImageUp size={16} />
+                  Choose photo
+                </div>
+
+                {isUploading && (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-sm text-zinc-200 gap-2">
+                    <Loader2 size={16} className="animate-spin" />
+                    Uploading…
+                  </div>
+                )}
+              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleFileInput(e.target.files)}
+              />
+            </div>
+
+            <div className="flex-1 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-zinc-300" htmlFor="edit-name">
+                  Name <span className="text-[#EC4899]">*</span>
+                </label>
+                <Input
+                  id="edit-name"
+                  placeholder="Playlist name"
+                  className="bg-white/5 border-white/10 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-[#8B5CF6]/50"
+                  {...register("name")}
+                />
+                {errors.name && (
+                  <p className="text-xs text-[#EC4899]">{errors.name.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-zinc-300" htmlFor="edit-desc">
+                    Description
+                  </label>
+                  <span className="text-xs text-zinc-500">
+                    {descriptionValue.length}/200
+                  </span>
+                </div>
+                <Textarea
+                  id="edit-desc"
+                  rows={4}
+                  maxLength={200}
+                  placeholder="Add a description"
+                  {...register("description")}
+                />
+                {errors.description && (
+                  <p className="text-xs text-[#EC4899]">{errors.description.message}</p>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-zinc-300">Make public</p>
+                  <p className="text-xs text-zinc-500">Anyone can see this playlist</p>
+                </div>
+                <Switch
+                  checked={watch("isPublic")}
+                  onCheckedChange={(checked) => setValue("isPublic", checked)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="px-4 py-2 text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting || isUploading}
+              className="flex items-center gap-2 px-5 py-2 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#EC4899] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
+            >
+              {(isSubmitting || isUploading) && (
+                <Loader2 size={14} className="animate-spin" />
+              )}
+              Save changes
+            </button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Delete Playlist Dialog ────────────────────────────────────────────────
+
+type DeletePlaylistDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  playlistName: string;
+  onConfirm: () => void;
+  isDeleting: boolean;
+};
+
+function DeletePlaylistDialog({
+  open,
+  onOpenChange,
+  playlistName,
+  onConfirm,
+  isDeleting,
+}: DeletePlaylistDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[#18181F] border-white/10 text-zinc-100 max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-bold text-zinc-100">
+            Delete "{playlistName}"?
+          </DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-zinc-400">
+          This can't be undone.
+        </p>
+        <div className="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className="px-4 py-2 text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={isDeleting}
+            onClick={onConfirm}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/15 text-red-300 text-sm font-semibold hover:bg-red-500/25 transition-colors disabled:opacity-60"
+          >
+            {isDeleting && <Loader2 size={14} className="animate-spin" />}
+            Delete
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ─── PlaylistView ─────────────────────────────────────────────────────────────
 
 export function PlaylistView({
-  playlistId: _playlistId,
+  playlistId,
+  playlistName,
+  playlistDescription,
+  playlistCoverUrl,
+  isPublic,
+  isOwner,
   songs,
   userPlaylists = [],
 }: Props) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [isPlaylistLiked, setIsPlaylistLiked] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [displaySongs, setDisplaySongs] = useState(songs);
+  const pendingRemovals = useRef(
+    new Map<string, { song: SongInPlaylist; index: number; timeoutId: number }>()
+  );
+
+  const otherPlaylists = useMemo(
+    () => userPlaylists.filter((pl) => pl.id !== playlistId),
+    [userPlaylists, playlistId]
+  );
+
+  useEffect(() => {
+    setDisplaySongs(songs);
+    pendingRemovals.current.forEach((entry) =>
+      window.clearTimeout(entry.timeoutId)
+    );
+    pendingRemovals.current.clear();
+  }, [songs]);
 
   const [confirmedLiked, setConfirmedLiked] = useState<Set<string>>(
     () => new Set(songs.filter((s) => s.isLiked).map((s) => s.songId))
@@ -317,8 +731,8 @@ export function PlaylistView({
     }
   );
 
-  function handleLike(songId: string, e: React.MouseEvent) {
-    e.stopPropagation();
+  function handleLike(songId: string, e?: React.MouseEvent) {
+    e?.stopPropagation();
     startTransition(async () => {
       applyOptimistic(songId);
       const result = await toggleLike(songId);
@@ -339,7 +753,7 @@ export function PlaylistView({
   const isPlaying = usePlayerStore((s) => s.isPlaying);
   const togglePlay = usePlayerStore((s) => s.togglePlay);
 
-  const queue: PlayerSong[] = songs.map((s) => ({
+  const queue: PlayerSong[] = displaySongs.map((s) => ({
     id: s.songId,
     title: s.title,
     artist: s.artist,
@@ -349,12 +763,99 @@ export function PlaylistView({
     audioUrl: s.audioUrl,
   }));
 
-  const filtered = songs.filter(
+  const filtered = displaySongs.filter(
     (s) =>
       s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (s.album ?? "").toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  function insertAtIndex(list: SongInPlaylist[], index: number, item: SongInPlaylist) {
+    const next = [...list];
+    const clamped = Math.max(0, Math.min(index, next.length));
+    next.splice(clamped, 0, item);
+    return next;
+  }
+
+  function undoRemove(songId: string) {
+    const pending = pendingRemovals.current.get(songId);
+    if (!pending) return;
+    window.clearTimeout(pending.timeoutId);
+    pendingRemovals.current.delete(songId);
+    setDisplaySongs((prev) => insertAtIndex(prev, pending.index, pending.song));
+    toast.success("Removal undone");
+  }
+
+  function handleRemoveSong(song: SongInPlaylist) {
+    if (!isOwner) return;
+    if (pendingRemovals.current.has(song.songId)) return;
+
+    const index = displaySongs.findIndex((s) => s.songId === song.songId);
+    if (index < 0) return;
+
+    setDisplaySongs((prev) => prev.filter((s) => s.songId !== song.songId));
+
+    const timeoutId = window.setTimeout(async () => {
+      pendingRemovals.current.delete(song.songId);
+      const result = await removeSongFromPlaylist(playlistId, song.songId);
+      if (!result.ok) {
+        setDisplaySongs((prev) => insertAtIndex(prev, index, song));
+        toast.error(result.error);
+      }
+    }, 5000);
+
+    pendingRemovals.current.set(song.songId, { song, index, timeoutId });
+
+    toast("Removed from playlist", {
+      action: {
+        label: "Undo",
+        onClick: () => undoRemove(song.songId),
+      },
+    });
+  }
+
+  function handleAddToQueue(song: SongInPlaylist) {
+    const playerSong: PlayerSong = {
+      id: song.songId,
+      title: song.title,
+      artist: song.artist,
+      album: song.album,
+      duration: song.duration,
+      coverUrl: song.coverUrl,
+      audioUrl: song.audioUrl,
+    };
+    const { queue: currentQueue, setQueue } = usePlayerStore.getState();
+    setQueue([...currentQueue, playerSong]);
+    toast.success("Added to queue");
+  }
+
+  function handleGoToArtist(song: SongInPlaylist) {
+    toast(`${song.artist} page coming soon`);
+  }
+
+  async function handleShare() {
+    const link = window.location.href;
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Link copied");
+    } catch {
+      toast.error("Could not copy link");
+    }
+  }
+
+  async function handleDeletePlaylist() {
+    if (isDeleting) return;
+    setIsDeleting(true);
+    const result = await deletePlaylist(playlistId);
+    setIsDeleting(false);
+    if (result.ok) {
+      toast.success("Playlist deleted");
+      setDeleteOpen(false);
+      router.push("/library");
+    } else {
+      toast.error(result.error);
+    }
+  }
 
   function handlePlaySong(song: SongInPlaylist) {
     const playerSong: PlayerSong = {
@@ -417,6 +918,46 @@ export function PlaylistView({
           />
         </button>
 
+        {isOwner && (
+          <>
+            <button
+              onClick={() => setEditOpen(true)}
+              className="h-9 px-3 rounded-full border border-white/10 text-zinc-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+              aria-label="Edit playlist"
+            >
+              <Pencil size={16} />
+              <span className="text-sm">Edit</span>
+            </button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <button
+                    className="w-8 h-8 flex items-center justify-center rounded-full text-zinc-500 hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Playlist options"
+                  >
+                    <MoreHorizontal size={16} />
+                  </button>
+                }
+              />
+              <DropdownMenuContent
+                side="bottom"
+                align="end"
+                className="w-44 bg-[#18181F] border-white/10 text-zinc-100"
+              >
+                <DropdownMenuItem
+                  variant="destructive"
+                  className="cursor-pointer gap-2"
+                  onClick={() => setDeleteOpen(true)}
+                >
+                  <Trash2 size={14} />
+                  Delete playlist
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        )}
+
         <div className="flex-1" />
 
         {/* Search in playlist — hidden on mobile to save space */}
@@ -466,13 +1007,37 @@ export function PlaylistView({
             idx={idx}
             isActive={isCurrentlyPlaying(song.songId)}
             isLiked={optimisticLiked.has(song.songId)}
-            queue={queue}
-            userPlaylists={userPlaylists}
+            isOwner={isOwner}
+            userPlaylists={otherPlaylists}
             onPlay={() => handlePlaySong(song)}
             onLike={(e) => handleLike(song.songId, e)}
+            onRemove={() => handleRemoveSong(song)}
+            onAddToQueue={() => handleAddToQueue(song)}
+            onGoToArtist={() => handleGoToArtist(song)}
+            onShare={handleShare}
           />
         ))}
       </div>
+
+        <EditPlaylistDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          playlist={{
+            id: playlistId,
+            name: playlistName,
+            description: playlistDescription,
+            coverUrl: playlistCoverUrl,
+            isPublic,
+          }}
+        />
+
+        <DeletePlaylistDialog
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+          playlistName={playlistName}
+          onConfirm={handleDeletePlaylist}
+          isDeleting={isDeleting}
+        />
 
       {isPending && null}
     </>

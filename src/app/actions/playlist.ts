@@ -11,7 +11,25 @@ const CreatePlaylistSchema = z.object({
   isPublic: z.boolean(),
 });
 
+const UpdatePlaylistSchema = z.object({
+  id: z.string().min(1, "Playlist id is required"),
+  name: z.string().min(1, "Name is required").max(60, "Max 60 characters"),
+  description: z.string().max(200, "Max 200 characters").optional(),
+  isPublic: z.boolean(),
+  coverUrl: z.string().url().optional().nullable(),
+});
+
+const PlaylistSongSchema = z.object({
+  playlistId: z.string().min(1, "Playlist id is required"),
+  songId: z.string().min(1, "Song id is required"),
+});
+
+const PlaylistIdSchema = z.object({
+  playlistId: z.string().min(1, "Playlist id is required"),
+});
+
 type CreatePlaylistInput = z.infer<typeof CreatePlaylistSchema>;
+type UpdatePlaylistInput = z.infer<typeof UpdatePlaylistSchema>;
 
 export async function createPlaylist(
   input: CreatePlaylistInput
@@ -50,6 +68,60 @@ export async function createPlaylist(
     return { ok: true, id: playlist.id };
   } catch {
     return { ok: false, error: "Failed to create playlist" };
+  }
+}
+
+// ─── Update playlist metadata ───────────────────────────────────────────────
+
+export async function updatePlaylist(
+  input: UpdatePlaylistInput
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const session = await auth();
+  if (!session?.user?.email) {
+    return { ok: false, error: "Not authenticated" };
+  }
+
+  const parsed = UpdatePlaylistSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: "Invalid input" };
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user) {
+    return { ok: false, error: "User not found" };
+  }
+
+  const playlist = await prisma.playlist.findUnique({
+    where: { id: parsed.data.id },
+    select: { userId: true },
+  });
+  if (!playlist || playlist.userId !== user.id) {
+    return { ok: false, error: "Playlist not found" };
+  }
+
+  const description = parsed.data.description?.trim() || null;
+  const coverUrl = parsed.data.coverUrl?.trim() || null;
+
+  try {
+    await prisma.playlist.update({
+      where: { id: parsed.data.id },
+      data: {
+        name: parsed.data.name,
+        description,
+        isPublic: parsed.data.isPublic,
+        coverUrl,
+      },
+    });
+
+    revalidatePath(`/library/playlist/${parsed.data.id}`);
+    revalidatePath("/library");
+
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Failed to update playlist" };
   }
 }
 
@@ -117,4 +189,75 @@ export async function addSongToNewPlaylist(
 
   revalidatePath("/library");
   return { ok: true, id: playlist.id, name };
+}
+
+// ─── Remove song from playlist ──────────────────────────────────────────────
+
+export async function removeSongFromPlaylist(
+  playlistId: string,
+  songId: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const session = await auth();
+  if (!session?.user?.email) return { ok: false, error: "Not authenticated" };
+
+  const parsed = PlaylistSongSchema.safeParse({ playlistId, songId });
+  if (!parsed.success) return { ok: false, error: "Invalid input" };
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user) return { ok: false, error: "User not found" };
+
+  const playlist = await prisma.playlist.findUnique({
+    where: { id: playlistId },
+    select: { userId: true },
+  });
+  if (!playlist || playlist.userId !== user.id) {
+    return { ok: false, error: "Playlist not found" };
+  }
+
+  try {
+    await prisma.playlistSong.delete({
+      where: { playlistId_songId: { playlistId, songId } },
+    });
+    revalidatePath(`/library/playlist/${playlistId}`);
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Failed to remove song" };
+  }
+}
+
+// ─── Delete playlist ────────────────────────────────────────────────────────
+
+export async function deletePlaylist(
+  playlistId: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const session = await auth();
+  if (!session?.user?.email) return { ok: false, error: "Not authenticated" };
+
+  const parsed = PlaylistIdSchema.safeParse({ playlistId });
+  if (!parsed.success) return { ok: false, error: "Invalid input" };
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user) return { ok: false, error: "User not found" };
+
+  const playlist = await prisma.playlist.findUnique({
+    where: { id: playlistId },
+    select: { userId: true },
+  });
+  if (!playlist || playlist.userId !== user.id) {
+    return { ok: false, error: "Playlist not found" };
+  }
+
+  try {
+    await prisma.playlist.delete({ where: { id: playlistId } });
+    revalidatePath("/library");
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Failed to delete playlist" };
+  }
 }

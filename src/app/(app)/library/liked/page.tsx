@@ -110,6 +110,11 @@ export default async function LikedSongsPage() {
 
       <PlaylistView
         playlistId="liked"
+        playlistName="Liked Songs"
+        playlistDescription={null}
+        playlistCoverUrl={null}
+        isPublic={false}
+        isOwner={false}
         songs={songs}
         userPlaylists={userPlaylists}
       />

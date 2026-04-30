@@ -166,6 +166,11 @@ export default async function PlaylistPage({ params }: Props) {
 
       <PlaylistView
         playlistId={id}
+        playlistName={playlist.name}
+        playlistDescription={playlist.description}
+        playlistCoverUrl={playlist.coverUrl}
+        isPublic={playlist.isPublic}
+        isOwner={isOwner}
         songs={songs}
         userPlaylists={userPlaylists}
       />
