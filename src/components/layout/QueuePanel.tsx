@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { X, GripVertical } from "lucide-react";
+import { X, GripVertical, RotateCcw } from "lucide-react";
 import { usePlayerStore } from "@/store/playerStore";
 import { cn } from "@/lib/utils";
 
@@ -10,20 +10,25 @@ export function QueuePanel() {
   const showQueue = usePlayerStore((s) => s.showQueue);
   const currentSong = usePlayerStore((s) => s.currentSong);
   const queue = usePlayerStore((s) => s.queue);
+  const sourceQueue = usePlayerStore((s) => s.sourceQueue);
   const currentIndex = usePlayerStore((s) => s.currentIndex);
+  const shuffleEnabled = usePlayerStore((s) => s.shuffleEnabled);
+  const shuffleHistory = usePlayerStore((s) => s.shuffleHistory);
   const jumpToIndex = usePlayerStore((s) => s.jumpToIndex);
   const removeFromQueue = usePlayerStore((s) => s.removeFromQueue);
   const setQueue = usePlayerStore((s) => s.setQueue);
   const toggleQueue = usePlayerStore((s) => s.toggleQueue);
+  const resetShuffleHistory = usePlayerStore((s) => s.resetShuffleHistory);
 
   const upNext = queue.slice(currentIndex + 1);
 
+  const totalSongs = sourceQueue.length > 0 ? sourceQueue.length : queue.length;
+  const playedCount = shuffleHistory.size;
+
   function handleClear() {
-    // Keep only the current song
     const current = queue[currentIndex];
     if (current) {
       setQueue([current]);
-      // currentIndex stays 0 after clearing
       usePlayerStore.setState({ currentIndex: 0 });
     } else {
       setQueue([]);
@@ -62,6 +67,27 @@ export function QueuePanel() {
               </button>
             </div>
           </div>
+
+          {/* Shuffle progress banner */}
+          {shuffleEnabled && totalSongs > 1 && (
+            <div className="px-5 py-2.5 flex items-center justify-between bg-white/[0.03] border-b border-white/5 shrink-0">
+              <p className="text-xs text-zinc-500">
+                Shuffle:{" "}
+                <span className="text-[#8B5CF6] font-medium">{playedCount}</span>
+                {" of "}
+                <span className="font-medium text-zinc-400">{totalSongs}</span>
+                {" songs played"}
+              </p>
+              <button
+                onClick={resetShuffleHistory}
+                className="w-5 h-5 flex items-center justify-center text-zinc-600 hover:text-[#8B5CF6] transition-colors"
+                aria-label="Reshuffle from beginning"
+                title="Reshuffle"
+              >
+                <RotateCcw size={12} />
+              </button>
+            </div>
+          )}
 
           <div className="flex-1 overflow-y-auto">
             {/* Now playing */}
