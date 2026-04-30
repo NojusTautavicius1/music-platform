@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   Shuffle,
@@ -9,6 +10,7 @@ import {
   Pause,
   SkipForward,
   Repeat,
+  Repeat1,
   Heart,
   ListMusic,
   Laptop2,
@@ -20,20 +22,30 @@ import { cn } from "@/lib/utils";
 import { formatDuration } from "@/lib/format";
 import { usePlayerStore } from "@/store/playerStore";
 
-const PLACEHOLDER_DURATION = 217;
-
 export function PlayerBar() {
   const currentSong = usePlayerStore((s) => s.currentSong);
   const isPlaying = usePlayerStore((s) => s.isPlaying);
-  const toggle = usePlayerStore((s) => s.toggle);
+  const progress = usePlayerStore((s) => s.progress);
+  const duration = usePlayerStore((s) => s.duration);
+  const volume = usePlayerStore((s) => s.volume);
+  const shuffleEnabled = usePlayerStore((s) => s.shuffleEnabled);
+  const repeatMode = usePlayerStore((s) => s.repeatMode);
 
-  const [isShuffle, setIsShuffle] = useState(false);
-  const [isRepeat, setIsRepeat] = useState(false);
+  const togglePlay = usePlayerStore((s) => s.togglePlay);
+  const next = usePlayerStore((s) => s.next);
+  const previous = usePlayerStore((s) => s.previous);
+  const seek = usePlayerStore((s) => s.seek);
+  const setVolume = usePlayerStore((s) => s.setVolume);
+  const toggleShuffle = usePlayerStore((s) => s.toggleShuffle);
+  const cycleRepeat = usePlayerStore((s) => s.cycleRepeat);
+
+  const router = useRouter();
   const [isLiked, setIsLiked] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [volume, setVolume] = useState(70);
 
-  const duration = currentSong?.duration ?? PLACEHOLDER_DURATION;
+  const currentTimeSecs = progress * (duration || 0);
+  const displayDuration = duration || (currentSong?.duration ?? 0);
+
+  const ACTIVE = "text-[#8B5CF6]";
 
   return (
     <footer className="h-[90px] shrink-0 bg-[#18181F] border-t border-white/5 flex items-center px-6 gap-4">
@@ -81,10 +93,10 @@ export function PlayerBar() {
       <div className="flex-1 flex flex-col items-center gap-1.5">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => setIsShuffle((v) => !v)}
+            onClick={toggleShuffle}
             className={cn(
               "transition-colors",
-              isShuffle ? "text-[#8B5CF6]" : "text-zinc-500 hover:text-zinc-200"
+              shuffleEnabled ? ACTIVE : "text-zinc-500 hover:text-zinc-200"
             )}
             aria-label="Shuffle"
           >
@@ -92,6 +104,7 @@ export function PlayerBar() {
           </button>
 
           <button
+            onClick={previous}
             className="text-zinc-400 hover:text-white transition-colors"
             aria-label="Previous"
           >
@@ -99,7 +112,7 @@ export function PlayerBar() {
           </button>
 
           <button
-            onClick={toggle}
+            onClick={togglePlay}
             className="w-10 h-10 rounded-full bg-linear-to-br from-[#8B5CF6] to-[#EC4899] flex items-center justify-center hover:scale-105 transition-transform shadow-lg"
             aria-label={isPlaying ? "Pause" : "Play"}
           >
@@ -111,6 +124,7 @@ export function PlayerBar() {
           </button>
 
           <button
+            onClick={next}
             className="text-zinc-400 hover:text-white transition-colors"
             aria-label="Next"
           >
@@ -118,29 +132,36 @@ export function PlayerBar() {
           </button>
 
           <button
-            onClick={() => setIsRepeat((v) => !v)}
+            onClick={cycleRepeat}
             className={cn(
               "transition-colors",
-              isRepeat ? "text-[#8B5CF6]" : "text-zinc-500 hover:text-zinc-200"
+              repeatMode !== "off" ? ACTIVE : "text-zinc-500 hover:text-zinc-200"
             )}
             aria-label="Repeat"
           >
-            <Repeat size={16} />
+            {repeatMode === "one" ? (
+              <Repeat1 size={16} />
+            ) : (
+              <Repeat size={16} />
+            )}
           </button>
         </div>
 
         <div className="flex items-center gap-2 w-full max-w-120">
           <span className="text-xs text-zinc-500 w-8 text-right shrink-0">
-            {formatDuration(currentTime)}
+            {formatDuration(currentTimeSecs)}
           </span>
           <Slider
-            value={[currentTime]}
-            max={duration}
-            onValueChange={(v) => setCurrentTime(Array.isArray(v) ? v[0] : v)}
+            value={[currentTimeSecs]}
+            max={displayDuration || 1}
+            onValueChange={(v) => {
+              const secs = Array.isArray(v) ? v[0] : v;
+              seek(secs / (displayDuration || 1));
+            }}
             className="flex-1"
           />
           <span className="text-xs text-zinc-500 w-8 shrink-0">
-            {formatDuration(duration)}
+            {formatDuration(displayDuration)}
           </span>
         </div>
       </div>
@@ -162,13 +183,17 @@ export function PlayerBar() {
         <div className="flex items-center gap-2">
           <Volume2 size={16} className="text-zinc-500 shrink-0" />
           <Slider
-            value={[volume]}
+            value={[Math.round(volume * 100)]}
             max={100}
-            onValueChange={(v) => setVolume(Array.isArray(v) ? v[0] : v)}
+            onValueChange={(v) => {
+              const pct = Array.isArray(v) ? v[0] : v;
+              setVolume(pct / 100);
+            }}
             className="w-24"
           />
         </div>
         <button
+          onClick={() => router.push("/now-playing")}
           className="text-zinc-500 hover:text-zinc-200 transition-colors"
           aria-label="Fullscreen"
         >

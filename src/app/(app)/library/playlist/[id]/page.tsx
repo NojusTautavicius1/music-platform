@@ -16,33 +16,65 @@ export default async function PlaylistPage({ params }: Props) {
   const { id } = await params;
   const session = await auth();
 
-  const playlist = await prisma.playlist.findUnique({
-    where: { id },
-    include: {
-      user: { select: { name: true, image: true, email: true } },
-      songs: {
-        orderBy: { position: "asc" },
-        include: {
-          song: {
-            select: {
-              id: true,
-              title: true,
-              artist: true,
-              album: true,
-              duration: true,
-              coverUrl: true,
-              audioUrl: true,
+  const [playlist, user] = await Promise.all([
+    prisma.playlist.findUnique({
+      where: { id },
+      include: {
+        user: { select: { name: true, image: true, email: true } },
+        songs: {
+          orderBy: { position: "asc" },
+          include: {
+            song: {
+              select: {
+                id: true,
+                title: true,
+                artist: true,
+                album: true,
+                duration: true,
+                coverUrl: true,
+                audioUrl: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    }),
+    session?.user?.email
+      ? prisma.user.findUnique({
+          where: { email: session.user.email },
+          select: { id: true },
+        })
+      : null,
+  ]);
 
   if (!playlist) notFound();
 
   const isOwner = session?.user?.email === playlist.user.email;
   if (!playlist.isPublic && !isOwner) notFound();
+
+  // Fetch liked songs for the current user
+  const likedSongIds = user
+    ? new Set(
+        (
+          await prisma.likedSong.findMany({
+            where: {
+              userId: user.id,
+              songId: { in: playlist.songs.map((ps) => ps.song.id) },
+            },
+            select: { songId: true },
+          })
+        ).map((ls) => ls.songId)
+      )
+    : new Set<string>();
+
+  // Fetch user's playlists for "Add to playlist" submenu
+  const userPlaylists = user
+    ? await prisma.playlist.findMany({
+        where: { userId: user.id },
+        orderBy: { name: "asc" },
+        select: { id: true, name: true },
+      })
+    : [];
 
   const totalSeconds = playlist.songs.reduce(
     (acc, ps) => acc + ps.song.duration,
@@ -59,13 +91,13 @@ export default async function PlaylistPage({ params }: Props) {
     duration: ps.song.duration,
     coverUrl: ps.song.coverUrl,
     audioUrl: ps.song.audioUrl,
+    isLiked: likedSongIds.has(ps.song.id),
   }));
 
   return (
     <div>
       {/* ── Header ──────────────────────────────────────────────────── */}
       <section className="relative px-8 pt-16 pb-8 min-h-[320px] flex items-end">
-        {/* Gradient background */}
         <div
           className="absolute inset-x-0 top-0 pointer-events-none"
           style={{
@@ -75,7 +107,6 @@ export default async function PlaylistPage({ params }: Props) {
           }}
         />
 
-        {/* Content row */}
         <div className="relative flex gap-6 items-end w-full">
           {/* Cover */}
           <div className="shrink-0 w-[232px] h-[232px] rounded-md shadow-2xl overflow-hidden">
@@ -89,7 +120,7 @@ export default async function PlaylistPage({ params }: Props) {
                 priority
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-[#8B5CF6]/50 to-[#EC4899]/50" />
+              <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/50 to-[#EC4899]/50" />
             )}
           </div>
 
@@ -98,18 +129,14 @@ export default async function PlaylistPage({ params }: Props) {
             <p className="text-xs font-semibold uppercase tracking-widest text-zinc-300 mb-2">
               {playlist.isPublic ? "Public Playlist" : "Private Playlist"}
             </p>
-
             <h1 className="text-6xl font-bold text-white leading-tight mb-4 line-clamp-2">
               {playlist.name}
             </h1>
-
             {playlist.description && (
               <p className="text-zinc-400 text-sm mb-4 line-clamp-2 max-w-xl">
                 {playlist.description}
               </p>
             )}
-
-            {/* Metadata row */}
             <div className="flex items-center gap-2 text-sm text-zinc-300">
               {playlist.user.image && (
                 <div className="w-6 h-6 rounded-full overflow-hidden shrink-0">
@@ -139,8 +166,11 @@ export default async function PlaylistPage({ params }: Props) {
         </div>
       </section>
 
-      {/* ── Interactive section (client) ─────────────────────────────── */}
-      <PlaylistView playlistId={id} songs={songs} />
+      <PlaylistView
+        playlistId={id}
+        songs={songs}
+        userPlaylists={userPlaylists}
+      />
     </div>
   );
 }

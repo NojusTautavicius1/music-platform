@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/hooks/useDebounce";
 
 type SessionUser = {
   name?: string | null;
@@ -39,6 +40,8 @@ export function TopBar({ user, signOutAction }: Props) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [, startTransition] = useTransition();
+  const debouncedQuery = useDebounce(query, 400);
+  const mounted = useRef(false);
 
   const initials = (user.name ?? user.email ?? "?")
     .split(" ")
@@ -46,6 +49,21 @@ export function TopBar({ user, signOutAction }: Props) {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  // Auto-navigate after 400 ms pause, but skip the first render
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    const q = debouncedQuery.trim();
+    if (q) {
+      startTransition(() =>
+        router.push(`/search/${encodeURIComponent(q)}`)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQuery]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();

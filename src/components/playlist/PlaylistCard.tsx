@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
 
 type Props = {
   id: string;
@@ -10,6 +13,7 @@ type Props = {
   coverUrl?: string | null;
   size?: "sm" | "md" | "lg";
   href?: string;
+  songs?: PlayerSong[];
 };
 
 const SIZE_PX = { sm: 160, md: 180, lg: 240 } as const;
@@ -21,9 +25,20 @@ export function PlaylistCard({
   coverUrl,
   size = "md",
   href,
+  songs,
 }: Props) {
+  const play = usePlayerStore((s) => s.play);
   const px = SIZE_PX[size];
   const dest = href ?? `/library/playlist/${id}`;
+
+  function handlePlayClick(e: React.MouseEvent) {
+    if (songs?.length) {
+      e.preventDefault();
+      e.stopPropagation();
+      play(songs[0], songs);
+    }
+    // else fall through → Link navigates
+  }
 
   return (
     <Link
@@ -45,14 +60,16 @@ export function PlaylistCard({
             className="object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#8B5CF6]/40 to-[#EC4899]/40" />
+          <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40" />
         )}
 
         {/* Play button */}
-        <div
+        <button
+          onClick={handlePlayClick}
+          aria-label={`Play ${title}`}
           className={cn(
             "absolute bottom-2 right-2 w-10 h-10 rounded-full",
-            "bg-gradient-to-br from-[#8B5CF6] to-[#EC4899]",
+            "bg-linear-to-br from-[#8B5CF6] to-[#EC4899]",
             "flex items-center justify-center shadow-xl",
             "opacity-0 translate-y-2",
             "group-hover:opacity-100 group-hover:translate-y-0",
@@ -60,7 +77,7 @@ export function PlaylistCard({
           )}
         >
           <Play size={16} fill="white" className="text-white ml-0.5" />
-        </div>
+        </button>
       </div>
 
       {/* Text */}

@@ -77,7 +77,7 @@ async function main() {
         ) ?? null,
         genre,
         duration: faker.number.int({ min: 110, max: 360 }),
-        audioUrl: null,
+        audioUrl: "/audio/sample.mp3",
         coverUrl: `https://picsum.photos/seed/song${i}/400`,
       },
     });

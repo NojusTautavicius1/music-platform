@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { PlayerBar } from "@/components/layout/PlayerBar";
+import { AudioEngineProvider } from "@/components/layout/AudioEngineProvider";
 
 export default async function AppLayout({
   children,
@@ -26,6 +27,7 @@ export default async function AppLayout({
           <main className="flex-1 overflow-y-auto">{children}</main>
         </div>
       </div>
+      <AudioEngineProvider />
       <PlayerBar />
     </div>
   );

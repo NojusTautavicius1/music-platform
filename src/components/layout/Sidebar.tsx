@@ -9,16 +9,21 @@ export async function Sidebar() {
   const session = await auth();
   const email = session?.user?.email;
 
-  const playlists = email
-    ? await prisma.playlist.findMany({
-        where: { user: { email } },
-        orderBy: { updatedAt: "desc" },
-        select: { id: true, name: true, coverUrl: true },
-      })
-    : [];
+  const [playlists, likedCount] = await Promise.all([
+    email
+      ? prisma.playlist.findMany({
+          where: { user: { email } },
+          orderBy: { updatedAt: "desc" },
+          select: { id: true, name: true, coverUrl: true },
+        })
+      : [],
+    email
+      ? prisma.likedSong.count({ where: { user: { email } } })
+      : 0,
+  ]);
 
   return (
-    <aside className="w-[240px] shrink-0 bg-[#18181F] border-r border-white/5 flex flex-col">
+    <aside className="w-[240px] shrink-0 bg-[#18181F] border-r border-white/5 flex flex-col overflow-hidden">
       {/* Logo */}
       <div className="px-6 py-5 shrink-0">
         <Link href="/">
@@ -56,10 +61,13 @@ export async function Sidebar() {
           href="/library/liked"
           className="flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors text-sm font-medium"
         >
-          <div className="w-8 h-8 rounded bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded bg-linear-to-br from-[#8B5CF6] to-[#3B82F6] flex items-center justify-center shrink-0">
             <Heart size={14} fill="white" className="text-white" />
           </div>
-          Liked Songs
+          <span className="flex-1 min-w-0 truncate">Liked Songs</span>
+          {likedCount > 0 && (
+            <span className="text-xs text-zinc-600 shrink-0">{likedCount}</span>
+          )}
         </Link>
       </div>
 
