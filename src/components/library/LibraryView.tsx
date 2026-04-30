@@ -246,7 +246,7 @@ export function LibraryView({ playlists }: Props) {
   return (
     <div className="pb-8">
       {/* ── Header ──────────────────────────────────────────────────── */}
-      <div className="px-8 pt-8 flex items-center justify-between">
+      <div className="px-4 md:px-8 pt-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold text-zinc-100">Your Library</h1>
           <button
@@ -326,7 +326,7 @@ export function LibraryView({ playlists }: Props) {
       </div>
 
       {/* ── Filter chips ────────────────────────────────────────────── */}
-      <div className="px-8 pt-4 flex items-center gap-2">
+      <div className="px-4 md:px-8 pt-4 flex items-center gap-2">
         <FilterChip
           label="All"
           active={filter === "all"}
@@ -365,7 +365,7 @@ export function LibraryView({ playlists }: Props) {
           }
         />
       ) : view === "grid" ? (
-        <div className="px-8 pt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <div className="px-4 md:px-8 pt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-4">
           {displayed.map((p) => (
             <PlaylistCard
               key={p.id}
@@ -378,6 +378,7 @@ export function LibraryView({ playlists }: Props) {
               }
               coverUrl={p.coverUrl}
               size="md"
+              fluid
             />
           ))}
         </div>

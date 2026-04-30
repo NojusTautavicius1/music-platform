@@ -12,6 +12,8 @@ type Props = {
   subtitle: string;
   coverUrl?: string | null;
   size?: "sm" | "md" | "lg";
+  /** When true, the card fills its container width (for grids). When false (default), uses fixed pixel width for horizontal scroll. */
+  fluid?: boolean;
   href?: string;
   songs?: PlayerSong[];
 };
@@ -24,6 +26,7 @@ export function PlaylistCard({
   subtitle,
   coverUrl,
   size = "md",
+  fluid = false,
   href,
   songs,
 }: Props) {
@@ -37,26 +40,28 @@ export function PlaylistCard({
       e.stopPropagation();
       play(songs[0], songs);
     }
-    // else fall through → Link navigates
   }
 
   return (
     <Link
       href={dest}
       className="group block rounded-xl p-3 hover:bg-white/5 transition-all duration-200 hover:-translate-y-0.5"
-      style={{ width: px }}
+      style={fluid ? undefined : { width: px }}
     >
       {/* Cover */}
       <div
-        className="relative rounded-md overflow-hidden shrink-0"
-        style={{ width: px - 24, height: px - 24 }}
+        className={cn(
+          "relative rounded-md overflow-hidden shrink-0",
+          fluid && "aspect-square w-full"
+        )}
+        style={fluid ? undefined : { width: px - 24, height: px - 24 }}
       >
         {coverUrl ? (
           <Image
             src={coverUrl}
             alt={title}
             fill
-            sizes={`${px}px`}
+            sizes={fluid ? "50vw" : `${px}px`}
             className="object-cover"
           />
         ) : (

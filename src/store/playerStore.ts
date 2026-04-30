@@ -19,12 +19,15 @@ type PlayerStore = {
   currentIndex: number;
   isPlaying: boolean;
   volume: number;
+  isMuted: boolean;
+  lastVolume: number;
   progress: number;
   duration: number;
   seekRequest: number | null;
   shuffleEnabled: boolean;
   repeatMode: RepeatMode;
   showLyrics: boolean;
+  showQueue: boolean;
 
   play: (song: PlayerSong, queue?: PlayerSong[]) => void;
   pause: () => void;
@@ -35,9 +38,14 @@ type PlayerStore = {
   previous: () => void;
   seek: (progress: number) => void;
   setVolume: (v: number) => void;
+  toggleMute: () => void;
   toggleShuffle: () => void;
   cycleRepeat: () => void;
   toggleLyrics: () => void;
+  toggleQueue: () => void;
+  setQueue: (queue: PlayerSong[]) => void;
+  removeFromQueue: (index: number) => void;
+  jumpToIndex: (index: number) => void;
   setProgress: (p: number) => void;
   setDuration: (d: number) => void;
   clearSeekRequest: () => void;
@@ -50,12 +58,15 @@ export const usePlayerStore = create<PlayerStore>()(
     currentIndex: 0,
     isPlaying: false,
     volume: 0.7,
+    isMuted: false,
+    lastVolume: 0.7,
     progress: 0,
     duration: 0,
     seekRequest: null,
     shuffleEnabled: false,
     repeatMode: "off",
     showLyrics: false,
+    showQueue: false,
 
     play: (song, queue) => {
       const q = queue ?? get().queue;
@@ -105,7 +116,6 @@ export const usePlayerStore = create<PlayerStore>()(
       const elapsedSeconds = progress * duration;
 
       if (elapsedSeconds > 3) {
-        // Restart the current song by seeking to 0
         set({ seekRequest: 0, progress: 0 });
         return;
       }
@@ -122,7 +132,20 @@ export const usePlayerStore = create<PlayerStore>()(
       set({ seekRequest: progress * duration, progress });
     },
 
-    setVolume: (v) => set({ volume: Math.max(0, Math.min(1, v)) }),
+    setVolume: (v) => {
+      const clamped = Math.max(0, Math.min(1, v));
+      set({ volume: clamped, isMuted: clamped === 0, lastVolume: clamped > 0 ? clamped : get().lastVolume });
+    },
+
+    toggleMute: () => {
+      const { isMuted, volume, lastVolume } = get();
+      if (isMuted || volume === 0) {
+        const restore = lastVolume > 0 ? lastVolume : 0.7;
+        set({ volume: restore, isMuted: false });
+      } else {
+        set({ lastVolume: volume, volume: 0, isMuted: true });
+      }
+    },
 
     toggleShuffle: () => set((s) => ({ shuffleEnabled: !s.shuffleEnabled })),
 
@@ -133,6 +156,25 @@ export const usePlayerStore = create<PlayerStore>()(
       })),
 
     toggleLyrics: () => set((s) => ({ showLyrics: !s.showLyrics })),
+
+    toggleQueue: () => set((s) => ({ showQueue: !s.showQueue })),
+
+    setQueue: (queue) => set({ queue }),
+
+    removeFromQueue: (index) => {
+      const { queue, currentIndex } = get();
+      const next = queue.filter((_, i) => i !== index);
+      const newCurrentIndex = index < currentIndex ? currentIndex - 1 : currentIndex;
+      set({ queue: next, currentIndex: newCurrentIndex });
+    },
+
+    jumpToIndex: (index) => {
+      const { queue } = get();
+      const song = queue[index];
+      if (song) {
+        set({ currentSong: song, currentIndex: index, isPlaying: true, progress: 0, duration: 0, seekRequest: null });
+      }
+    },
 
     setProgress: (p) => set({ progress: p }),
 

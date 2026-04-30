@@ -9,6 +9,7 @@ import {
   LogOut,
   User,
   Settings,
+  Menu,
 } from "lucide-react";
 import {
   Avatar,
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useUIStore } from "@/store/uiStore";
 
 type SessionUser = {
   name?: string | null;
@@ -42,6 +44,7 @@ export function TopBar({ user, signOutAction }: Props) {
   const [, startTransition] = useTransition();
   const debouncedQuery = useDebounce(query, 400);
   const mounted = useRef(false);
+  const setSidebarOpen = useUIStore((s) => s.setSidebarOpen);
 
   const initials = (user.name ?? user.email ?? "?")
     .split(" ")
@@ -50,7 +53,6 @@ export function TopBar({ user, signOutAction }: Props) {
     .toUpperCase()
     .slice(0, 2);
 
-  // Auto-navigate after 400 ms pause, but skip the first render
   useEffect(() => {
     if (!mounted.current) {
       mounted.current = true;
@@ -72,9 +74,18 @@ export function TopBar({ user, signOutAction }: Props) {
   }
 
   return (
-    <header className="h-16 shrink-0 flex items-center gap-4 px-6 bg-[#0A0A0F]/80 backdrop-blur-md border-b border-white/5 sticky top-0 z-10">
-      {/* Back / forward */}
-      <div className="flex items-center gap-1 shrink-0">
+    <header className="h-16 shrink-0 flex items-center gap-2 md:gap-4 px-3 md:px-6 bg-[#0A0A0F]/80 backdrop-blur-md border-b border-white/5 sticky top-0 z-10">
+      {/* Hamburger — mobile only */}
+      <button
+        onClick={() => setSidebarOpen(true)}
+        className="lg:hidden w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors shrink-0"
+        aria-label="Open navigation"
+      >
+        <Menu size={20} />
+      </button>
+
+      {/* Back / forward — desktop only */}
+      <div className="hidden md:flex items-center gap-1 shrink-0">
         <button
           onClick={() => router.back()}
           className="w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
@@ -93,7 +104,7 @@ export function TopBar({ user, signOutAction }: Props) {
 
       {/* Search */}
       <form onSubmit={handleSearch} className="flex-1 flex justify-center">
-        <div className="relative w-full max-w-[400px]">
+        <div className="relative w-full max-w-100">
           <Search
             size={16}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
@@ -107,15 +118,15 @@ export function TopBar({ user, signOutAction }: Props) {
         </div>
       </form>
 
-      {/* User avatar + dropdown */}
-      <div className="shrink-0">
+      {/* User avatar + dropdown — desktop only (mobile uses BottomNav profile tab) */}
+      <div className="hidden md:block shrink-0">
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
               <button className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B5CF6]/60">
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} />
-                  <AvatarFallback className="bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] text-white text-xs font-semibold">
+                  <AvatarFallback className="bg-linear-to-br from-[#8B5CF6] to-[#EC4899] text-white text-xs font-semibold">
                     {initials}
                   </AvatarFallback>
                 </Avatar>

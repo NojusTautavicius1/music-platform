@@ -57,7 +57,7 @@ type Props = {
   userPlaylists?: UserPlaylist[];
 };
 
-// ─── Song Row ─────────────────────────────────────────────────────────────────
+// ─── Song Row (desktop table row) ────────────────────────────────────────────
 
 type SongRowProps = {
   song: SongInPlaylist;
@@ -101,34 +101,13 @@ function SongRow({
   }
 
   return (
-    <div
-      onClick={onPlay}
-      className={cn(
-        "grid grid-cols-[2.5rem_1fr_180px_140px_8rem] items-center h-14 px-4 rounded-lg cursor-pointer group",
-        "hover:bg-white/5 transition-colors",
-        isActive && "bg-white/5"
-      )}
-    >
-      {/* # / play icon */}
-      <div className="flex items-center justify-center">
-        {isActive ? (
-          <Pause size={14} fill="#8B5CF6" className="text-[#8B5CF6]" />
-        ) : (
-          <>
-            <span className="text-sm text-zinc-400 group-hover:hidden">
-              {idx + 1}
-            </span>
-            <Play
-              size={14}
-              fill="white"
-              className="text-white hidden group-hover:block"
-            />
-          </>
-        )}
-      </div>
-
-      {/* Cover + Title + Artist */}
-      <div className="flex items-center gap-3 min-w-0">
+    <>
+      {/* ── Mobile card (< md) ───────────────────────────────────── */}
+      <div
+        onClick={onPlay}
+        className="md:hidden flex items-center gap-3 h-16 px-1 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+      >
+        {/* Cover */}
         <div className="relative w-10 h-10 shrink-0 rounded overflow-hidden">
           {song.coverUrl ? (
             <Image
@@ -142,125 +121,175 @@ function SongRow({
             <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30" />
           )}
         </div>
-        <div className="min-w-0">
-          <p
-            className={cn(
-              "text-sm font-medium truncate",
-              isActive ? "text-[#8B5CF6]" : "text-zinc-100"
-            )}
-          >
+
+        {/* Title + artist */}
+        <div className="flex-1 min-w-0">
+          <p className={cn(
+            "text-sm font-medium truncate",
+            isActive ? "text-[#8B5CF6]" : "text-zinc-100"
+          )}>
             {song.title}
           </p>
           <p className="text-xs text-zinc-400 truncate">{song.artist}</p>
         </div>
-      </div>
 
-      {/* Album */}
-      <div className="hidden md:block min-w-0 pr-4">
-        <p className="text-sm text-zinc-400 line-clamp-1">
-          {song.album ?? "—"}
-        </p>
-      </div>
-
-      {/* Date added */}
-      <div className="hidden md:block">
-        <p className="text-sm text-zinc-400">
-          {formatDistanceToNow(new Date(song.addedAt), { addSuffix: true })}
-        </p>
-      </div>
-
-      {/* Heart + Duration + Three-dot */}
-      <div className="flex items-center justify-end gap-1.5">
-        <button
-          onClick={onLike}
-          className={cn(
-            "transition-opacity shrink-0",
-            isLiked
-              ? "opacity-100"
-              : "opacity-0 group-hover:opacity-100"
-          )}
-          aria-label={isLiked ? "Unlike song" : "Like song"}
-        >
-          <Heart
-            size={14}
-            className={cn(
-              isLiked
-                ? "fill-[#EC4899] text-[#EC4899]"
-                : "text-zinc-500 hover:text-zinc-300"
-            )}
-          />
-        </button>
-
-        <span className="text-sm text-zinc-400 tabular-nums w-9 text-right shrink-0">
+        {/* Duration */}
+        <span className="text-sm text-zinc-400 tabular-nums shrink-0">
           {formatDuration(song.duration)}
         </span>
-
-        {/* Three-dot menu */}
-        <DropdownMenu onOpenChange={setMenuOpen}>
-          <DropdownMenuTrigger
-            render={
-              <button
-                onClick={(e) => e.stopPropagation()}
-                className={cn(
-                  "w-6 h-6 flex items-center justify-center rounded-full text-zinc-500 hover:text-white hover:bg-white/10 transition-all shrink-0",
-                  menuOpen
-                    ? "opacity-100"
-                    : "opacity-0 group-hover:opacity-100"
-                )}
-                aria-label="More options"
-              >
-                <MoreHorizontal size={14} />
-              </button>
-            }
-          />
-          <DropdownMenuContent
-            side="bottom"
-            align="end"
-            className="w-52 bg-[#18181F] border-white/10 text-zinc-100"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Add to playlist submenu */}
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white data-popup-open:bg-white/10">
-                <ListPlus size={14} />
-                Add to playlist
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent
-                className="w-52 bg-[#18181F] border-white/10 text-zinc-100 max-h-[240px] overflow-y-auto"
-              >
-                {/* Create new */}
-                <DropdownMenuItem
-                  className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
-                  onClick={handleAddToNew}
-                >
-                  <PlusCircle size={14} />
-                  Create new playlist
-                </DropdownMenuItem>
-
-                {userPlaylists.length > 0 && (
-                  <DropdownMenuSeparator className="bg-white/10" />
-                )}
-
-                {userPlaylists.map((pl) => (
-                  <DropdownMenuItem
-                    key={pl.id}
-                    className="cursor-pointer focus:bg-white/10 focus:text-white truncate"
-                    onClick={() => handleAddToPlaylist(pl)}
-                  >
-                    {pl.name}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-
-            <DropdownMenuSeparator className="bg-white/10" />
-            <DropdownMenuItem className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white">
-              Share
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
-    </div>
+
+      {/* ── Desktop table row (md+) ──────────────────────────────── */}
+      <div
+        onClick={onPlay}
+        className={cn(
+          "hidden md:grid grid-cols-[2.5rem_1fr_180px_140px_8rem] items-center h-14 px-4 rounded-lg cursor-pointer group",
+          "hover:bg-white/5 transition-colors",
+          isActive && "bg-white/5"
+        )}
+      >
+        {/* # / play icon */}
+        <div className="flex items-center justify-center">
+          {isActive ? (
+            <Pause size={14} fill="#8B5CF6" className="text-[#8B5CF6]" />
+          ) : (
+            <>
+              <span className="text-sm text-zinc-400 group-hover:hidden">
+                {idx + 1}
+              </span>
+              <Play
+                size={14}
+                fill="white"
+                className="text-white hidden group-hover:block"
+              />
+            </>
+          )}
+        </div>
+
+        {/* Cover + Title + Artist */}
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="relative w-10 h-10 shrink-0 rounded overflow-hidden">
+            {song.coverUrl ? (
+              <Image
+                src={song.coverUrl}
+                alt={song.title}
+                fill
+                sizes="40px"
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className={cn(
+              "text-sm font-medium truncate",
+              isActive ? "text-[#8B5CF6]" : "text-zinc-100"
+            )}>
+              {song.title}
+            </p>
+            <p className="text-xs text-zinc-400 truncate">{song.artist}</p>
+          </div>
+        </div>
+
+        {/* Album */}
+        <div className="min-w-0 pr-4">
+          <p className="text-sm text-zinc-400 line-clamp-1">
+            {song.album ?? "—"}
+          </p>
+        </div>
+
+        {/* Date added */}
+        <div>
+          <p className="text-sm text-zinc-400">
+            {formatDistanceToNow(new Date(song.addedAt), { addSuffix: true })}
+          </p>
+        </div>
+
+        {/* Heart + Duration + Three-dot */}
+        <div className="flex items-center justify-end gap-1.5">
+          <button
+            onClick={onLike}
+            className={cn(
+              "transition-opacity shrink-0",
+              isLiked ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+            )}
+            aria-label={isLiked ? "Unlike song" : "Like song"}
+          >
+            <Heart
+              size={14}
+              className={cn(
+                isLiked
+                  ? "fill-[#EC4899] text-[#EC4899]"
+                  : "text-zinc-500 hover:text-zinc-300"
+              )}
+            />
+          </button>
+
+          <span className="text-sm text-zinc-400 tabular-nums w-9 text-right shrink-0">
+            {formatDuration(song.duration)}
+          </span>
+
+          <DropdownMenu onOpenChange={setMenuOpen}>
+            <DropdownMenuTrigger
+              render={
+                <button
+                  onClick={(e) => e.stopPropagation()}
+                  className={cn(
+                    "w-6 h-6 flex items-center justify-center rounded-full text-zinc-500 hover:text-white hover:bg-white/10 transition-all shrink-0",
+                    menuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                  )}
+                  aria-label="More options"
+                >
+                  <MoreHorizontal size={14} />
+                </button>
+              }
+            />
+            <DropdownMenuContent
+              side="bottom"
+              align="end"
+              className="w-52 bg-[#18181F] border-white/10 text-zinc-100"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white data-popup-open:bg-white/10">
+                  <ListPlus size={14} />
+                  Add to playlist
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-52 bg-[#18181F] border-white/10 text-zinc-100 max-h-60 overflow-y-auto">
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+                    onClick={handleAddToNew}
+                  >
+                    <PlusCircle size={14} />
+                    Create new playlist
+                  </DropdownMenuItem>
+
+                  {userPlaylists.length > 0 && (
+                    <DropdownMenuSeparator className="bg-white/10" />
+                  )}
+
+                  {userPlaylists.map((pl) => (
+                    <DropdownMenuItem
+                      key={pl.id}
+                      className="cursor-pointer focus:bg-white/10 focus:text-white truncate"
+                      onClick={() => handleAddToPlaylist(pl)}
+                    >
+                      {pl.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuItem className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white">
+                Share
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -275,9 +304,6 @@ export function PlaylistView({
   const [isPlaylistLiked, setIsPlaylistLiked] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // ── Like state ──────────────────────────────────────────────────────────────
-  // Use regular state + optimistic pattern: confirmed reflects server truth,
-  // displayed is the optimistic overlay during pending transitions.
   const [confirmedLiked, setConfirmedLiked] = useState<Set<string>>(
     () => new Set(songs.filter((s) => s.isLiked).map((s) => s.songId))
   );
@@ -308,7 +334,6 @@ export function PlaylistView({
     });
   }
 
-  // ── Player ──────────────────────────────────────────────────────────────────
   const play = usePlayerStore((s) => s.play);
   const currentSong = usePlayerStore((s) => s.currentSong);
   const isPlaying = usePlayerStore((s) => s.isPlaying);
@@ -354,8 +379,7 @@ export function PlaylistView({
   return (
     <>
       {/* ── Action bar ─────────────────────────────────────────────── */}
-      <div className="px-8 py-6 flex items-center gap-4">
-        {/* Play */}
+      <div className="px-4 md:px-8 py-6 flex items-center gap-4">
         <button
           onClick={() => {
             if (songs.length === 0) return;
@@ -377,7 +401,6 @@ export function PlaylistView({
           )}
         </button>
 
-        {/* Heart (playlist-level) */}
         <button
           onClick={() => setIsPlaylistLiked((v) => !v)}
           aria-label="Like playlist"
@@ -394,11 +417,10 @@ export function PlaylistView({
           />
         </button>
 
-        {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Search in playlist */}
-        <div className="relative">
+        {/* Search in playlist — hidden on mobile to save space */}
+        <div className="relative hidden sm:block">
           <Search
             size={14}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
@@ -407,23 +429,23 @@ export function PlaylistView({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search in playlist"
-            className="pl-8 h-8 max-w-[200px] bg-white/5 border-white/10 text-zinc-100 placeholder:text-zinc-500 text-sm rounded-full focus-visible:ring-[#8B5CF6]/50"
+            className="pl-8 h-8 max-w-50 bg-white/5 border-white/10 text-zinc-100 placeholder:text-zinc-500 text-sm rounded-full focus-visible:ring-[#8B5CF6]/50"
           />
         </div>
       </div>
 
-      {/* ── Song table ─────────────────────────────────────────────── */}
-      <div className="px-8 pb-8">
-        {/* Sticky header */}
-        <div className="sticky top-0 z-10 bg-[#0A0A0F] grid grid-cols-[2.5rem_1fr_180px_140px_8rem] items-center px-4 py-2 border-b border-white/10 mb-1">
+      {/* ── Song list ──────────────────────────────────────────────── */}
+      <div className="px-4 md:px-8 pb-8">
+        {/* Desktop table header — hidden on mobile */}
+        <div className="hidden md:grid grid-cols-[2.5rem_1fr_180px_140px_8rem] items-center px-4 py-2 border-b border-white/10 mb-1 sticky top-0 z-10 bg-[#0A0A0F]">
           <span className="text-xs text-zinc-500 text-center">#</span>
           <span className="text-xs text-zinc-500 uppercase tracking-wider">
             Title
           </span>
-          <span className="text-xs text-zinc-500 uppercase tracking-wider hidden md:block">
+          <span className="text-xs text-zinc-500 uppercase tracking-wider">
             Album
           </span>
-          <span className="text-xs text-zinc-500 uppercase tracking-wider hidden md:block">
+          <span className="text-xs text-zinc-500 uppercase tracking-wider">
             Date Added
           </span>
           <span className="flex justify-end text-zinc-500">
@@ -431,7 +453,6 @@ export function PlaylistView({
           </span>
         </div>
 
-        {/* Rows */}
         {filtered.length === 0 && (
           <p className="text-zinc-500 text-sm px-4 py-8 text-center">
             No songs match your search.
@@ -453,7 +474,6 @@ export function PlaylistView({
         ))}
       </div>
 
-      {/* Suppress unused warning for isPending */}
       {isPending && null}
     </>
   );

@@ -52,7 +52,6 @@ export default async function PlaylistPage({ params }: Props) {
   const isOwner = session?.user?.email === playlist.user.email;
   if (!playlist.isPublic && !isOwner) notFound();
 
-  // Fetch liked songs for the current user
   const likedSongIds = user
     ? new Set(
         (
@@ -67,7 +66,6 @@ export default async function PlaylistPage({ params }: Props) {
       )
     : new Set<string>();
 
-  // Fetch user's playlists for "Add to playlist" submenu
   const userPlaylists = user
     ? await prisma.playlist.findMany({
         where: { userId: user.id },
@@ -97,7 +95,7 @@ export default async function PlaylistPage({ params }: Props) {
   return (
     <div>
       {/* ── Header ──────────────────────────────────────────────────── */}
-      <section className="relative px-8 pt-16 pb-8 min-h-[320px] flex items-end">
+      <section className="relative px-4 md:px-8 pt-8 md:pt-16 pb-8 md:min-h-80 flex items-end">
         <div
           className="absolute inset-x-0 top-0 pointer-events-none"
           style={{
@@ -107,9 +105,9 @@ export default async function PlaylistPage({ params }: Props) {
           }}
         />
 
-        <div className="relative flex gap-6 items-end w-full">
+        <div className="relative flex flex-col md:flex-row md:items-end gap-4 md:gap-6 w-full">
           {/* Cover */}
-          <div className="shrink-0 w-[232px] h-[232px] rounded-md shadow-2xl overflow-hidden">
+          <div className="w-[180px] h-[180px] md:w-58 md:h-58 rounded-md shadow-2xl overflow-hidden shrink-0">
             {playlist.coverUrl ? (
               <Image
                 src={playlist.coverUrl}
@@ -125,11 +123,11 @@ export default async function PlaylistPage({ params }: Props) {
           </div>
 
           {/* Meta */}
-          <div className="min-w-0 pb-2">
+          <div className="min-w-0 md:pb-2">
             <p className="text-xs font-semibold uppercase tracking-widest text-zinc-300 mb-2">
               {playlist.isPublic ? "Public Playlist" : "Private Playlist"}
             </p>
-            <h1 className="text-6xl font-bold text-white leading-tight mb-4 line-clamp-2">
+            <h1 className="text-3xl md:text-6xl font-bold text-white leading-tight mb-4 line-clamp-2">
               {playlist.name}
             </h1>
             {playlist.description && (
@@ -137,7 +135,7 @@ export default async function PlaylistPage({ params }: Props) {
                 {playlist.description}
               </p>
             )}
-            <div className="flex items-center gap-2 text-sm text-zinc-300">
+            <div className="flex items-center gap-2 text-sm text-zinc-300 flex-wrap">
               {playlist.user.image && (
                 <div className="w-6 h-6 rounded-full overflow-hidden shrink-0">
                   <Image
