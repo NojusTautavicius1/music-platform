@@ -28,6 +28,7 @@ import {
   ChevronUp,
   Sparkles,
   Music,
+  GripVertical,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -49,9 +50,19 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/utils";
 import { formatDuration } from "@/lib/format";
 import { useUploadThing } from "@/lib/uploadthing";
+import { useDndSensors } from "@/hooks/useDndSensors";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
 import { toggleLike } from "@/app/actions/like";
 import {
@@ -61,6 +72,7 @@ import {
   removeSongFromPlaylist,
   updatePlaylist,
   searchSongsNotInPlaylist,
+  reorderPlaylistSongs,
 } from "@/app/actions/playlist";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -130,6 +142,8 @@ type SongRowProps = {
   onAddToQueue: () => void;
   onGoToArtist: () => void;
   onShare: () => void;
+  /** overlay=true renders the DragOverlay ghost — no sortable hooks, no interactions */
+  overlay?: boolean;
 };
 
 function SongRow({
@@ -145,8 +159,27 @@ function SongRow({
   onAddToQueue,
   onGoToArtist,
   onShare,
+  overlay = false,
 }: SongRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // useSortable must be called unconditionally; when overlay=true we pass a
+  // stable but unused id so the hook doesn't break rules-of-hooks
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: overlay ? "__overlay__" : song.songId, disabled: overlay || !isOwner });
+
+  const style: React.CSSProperties = overlay
+    ? {}
+    : {
+        transform: CSS.Transform.toString(transform),
+        transition,
+      };
 
   async function handleAddToPlaylist(playlist: UserPlaylist) {
     const result = await addSongToPlaylist(playlist.id, song.songId);
@@ -167,12 +200,33 @@ function SongRow({
   }
 
   return (
-    <>
+    <div ref={overlay ? undefined : setNodeRef} style={style} {...(overlay ? {} : attributes)}>
+      {/* drop indicator line above this row while dragging over it */}
+      {isDragging && (
+        <div className="h-0.5 mx-2 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#EC4899] opacity-80" />
+      )}
+
       {/* ── Mobile card (< md) ───────────────────────────────────── */}
       <div
-        onClick={onPlay}
-        className="md:hidden flex items-center gap-3 h-16 px-1 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+        onClick={overlay ? undefined : onPlay}
+        className={cn(
+          "md:hidden flex items-center gap-3 h-16 px-1 rounded-lg cursor-pointer hover:bg-white/5 transition-colors",
+          isDragging && "opacity-40 scale-[0.99]",
+          overlay && "opacity-90 bg-[#18181F] shadow-xl rounded-lg ring-1 ring-white/10"
+        )}
       >
+        {/* Drag handle — mobile */}
+        {isOwner && (
+          <button
+            {...(overlay ? {} : listeners)}
+            className="text-zinc-600 hover:text-zinc-400 shrink-0 touch-none cursor-grab active:cursor-grabbing"
+            aria-label="Drag to reorder"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <GripVertical size={16} />
+          </button>
+        )}
+
         {/* Cover */}
         <div className="relative w-10 h-10 shrink-0 rounded overflow-hidden">
           {song.coverUrl ? (
@@ -207,13 +261,29 @@ function SongRow({
 
       {/* ── Desktop table row (md+) ──────────────────────────────── */}
       <div
-        onClick={onPlay}
+        onClick={overlay ? undefined : onPlay}
         className={cn(
-          "hidden md:grid grid-cols-[2.5rem_1fr_180px_140px_8rem] items-center h-14 px-4 rounded-lg cursor-pointer group",
+          "hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_140px_8rem] items-center h-14 px-2 rounded-lg cursor-pointer group",
           "hover:bg-white/5 transition-colors",
-          isActive && "bg-white/5"
+          isActive && "bg-white/5",
+          isDragging && "opacity-40 scale-[0.99]",
+          overlay && "opacity-90 bg-[#18181F] shadow-xl ring-1 ring-white/10 rounded-lg"
         )}
       >
+        {/* Drag handle — desktop */}
+        {isOwner ? (
+          <button
+            {...(overlay ? {} : listeners)}
+            className="flex items-center justify-center text-zinc-700 hover:text-zinc-400 transition-colors shrink-0 touch-none cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100"
+            aria-label="Drag to reorder"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <GripVertical size={14} />
+          </button>
+        ) : (
+          <span />
+        )}
+
         {/* # / play icon */}
         <div className="flex items-center justify-center">
           {isActive ? (
@@ -399,7 +469,7 @@ function SongRow({
           </DropdownMenu>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -1006,6 +1076,34 @@ export function PlaylistView({
     });
   }
 
+  const dndSensors = useDndSensors();
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveDragId(String(event.active.id));
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    setActiveDragId(null);
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const from = displaySongs.findIndex((s) => s.songId === active.id);
+    const to = displaySongs.findIndex((s) => s.songId === over.id);
+    if (from < 0 || to < 0) return;
+    // Optimistic reorder
+    const next = [...displaySongs];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    setDisplaySongs(next);
+    // Persist in background
+    reorderPlaylistSongs(playlistId, from, to).then((res) => {
+      if (!res.ok) {
+        setDisplaySongs(displaySongs); // rollback
+        toast.error("Could not save order");
+      }
+    });
+  }
+
   const play = usePlayerStore((s) => s.play);
   const currentSong = usePlayerStore((s) => s.currentSong);
   const isPlaying = usePlayerStore((s) => s.isPlaying);
@@ -1236,20 +1334,13 @@ export function PlaylistView({
       {/* ── Song list ──────────────────────────────────────────────── */}
       <div className="px-4 md:px-8 pb-8">
         {/* Desktop table header — hidden on mobile */}
-        <div className="hidden md:grid grid-cols-[2.5rem_1fr_180px_140px_8rem] items-center px-4 py-2 border-b border-white/10 mb-1 sticky top-0 z-10 bg-[#0A0A0F]">
+        <div className="hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_140px_8rem] items-center px-2 py-2 border-b border-white/10 mb-1 sticky top-0 z-10 bg-[#0A0A0F]">
+          <span />
           <span className="text-xs text-zinc-500 text-center">#</span>
-          <span className="text-xs text-zinc-500 uppercase tracking-wider">
-            Title
-          </span>
-          <span className="text-xs text-zinc-500 uppercase tracking-wider">
-            Album
-          </span>
-          <span className="text-xs text-zinc-500 uppercase tracking-wider">
-            Date Added
-          </span>
-          <span className="flex justify-end text-zinc-500">
-            <Clock size={14} />
-          </span>
+          <span className="text-xs text-zinc-500 uppercase tracking-wider">Title</span>
+          <span className="text-xs text-zinc-500 uppercase tracking-wider">Album</span>
+          <span className="text-xs text-zinc-500 uppercase tracking-wider">Date Added</span>
+          <span className="flex justify-end text-zinc-500"><Clock size={14} /></span>
         </div>
 
         {filtered.length === 0 && (
@@ -1258,23 +1349,60 @@ export function PlaylistView({
           </p>
         )}
 
-        {filtered.map((song, idx) => (
-          <SongRow
-            key={song.songId}
-            song={song}
-            idx={idx}
-            isActive={isCurrentlyPlaying(song.songId)}
-            isLiked={optimisticLiked.has(song.songId)}
-            isOwner={isOwner}
-            userPlaylists={otherPlaylists}
-            onPlay={() => handlePlaySong(song)}
-            onLike={(e) => handleLike(song.songId, e)}
-            onRemove={() => handleRemoveSong(song)}
-            onAddToQueue={() => handleAddToQueue(song)}
-            onGoToArtist={() => handleGoToArtist(song)}
-            onShare={handleShare}
-          />
-        ))}
+        <DndContext
+          sensors={dndSensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={filtered.map((s) => s.songId)}
+            strategy={verticalListSortingStrategy}
+          >
+            {filtered.map((song, idx) => (
+              <SongRow
+                key={song.songId}
+                song={song}
+                idx={idx}
+                isActive={isCurrentlyPlaying(song.songId)}
+                isLiked={optimisticLiked.has(song.songId)}
+                isOwner={isOwner}
+                userPlaylists={otherPlaylists}
+                onPlay={() => handlePlaySong(song)}
+                onLike={(e) => handleLike(song.songId, e)}
+                onRemove={() => handleRemoveSong(song)}
+                onAddToQueue={() => handleAddToQueue(song)}
+                onGoToArtist={() => handleGoToArtist(song)}
+                onShare={handleShare}
+              />
+            ))}
+          </SortableContext>
+
+          <DragOverlay dropAnimation={null}>
+            {activeDragId ? (() => {
+              const song = displaySongs.find((s) => s.songId === activeDragId);
+              const idx = displaySongs.findIndex((s) => s.songId === activeDragId);
+              if (!song) return null;
+              return (
+                <SongRow
+                  song={song}
+                  idx={idx}
+                  isActive={false}
+                  isLiked={false}
+                  isOwner={isOwner}
+                  userPlaylists={[]}
+                  onPlay={() => {}}
+                  onLike={() => {}}
+                  onRemove={() => {}}
+                  onAddToQueue={() => {}}
+                  onGoToArtist={() => {}}
+                  onShare={() => {}}
+                  overlay
+                />
+              );
+            })() : null}
+          </DragOverlay>
+        </DndContext>
       </div>
 
       {/* ── Recommendations + Find More (owners only) ──────────────── */}

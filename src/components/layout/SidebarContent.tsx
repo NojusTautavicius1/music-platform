@@ -4,6 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NavItem } from "./NavItem";
+import { SidebarPlaylistList } from "./SidebarPlaylistList";
 
 export async function SidebarContent() {
   const session = await auth();
@@ -13,7 +14,7 @@ export async function SidebarContent() {
     email
       ? prisma.playlist.findMany({
           where: { user: { email } },
-          orderBy: { updatedAt: "desc" },
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
           select: { id: true, name: true, coverUrl: true },
         })
       : [],
@@ -78,35 +79,7 @@ export async function SidebarContent() {
 
       {/* Playlists */}
       <ScrollArea className="flex-1 px-3 pb-4">
-        <div className="space-y-1">
-          {playlists.length === 0 && (
-            <p className="px-3 py-2 text-xs text-zinc-600">No playlists yet</p>
-          )}
-          {playlists.map((playlist) => (
-            <Link
-              key={playlist.id}
-              href={`/library/playlist/${playlist.id}`}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors group"
-            >
-              {playlist.coverUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={playlist.coverUrl}
-                  alt={playlist.name}
-                  className="w-8 h-8 rounded object-cover shrink-0"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded bg-white/10 shrink-0" />
-              )}
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-zinc-200 truncate group-hover:text-white transition-colors">
-                  {playlist.name}
-                </p>
-                <p className="text-xs text-zinc-500 truncate">Playlist · by you</p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <SidebarPlaylistList playlists={playlists} />
       </ScrollArea>
     </>
   );

@@ -335,3 +335,88 @@ export async function searchSongsNotInPlaylist(
 
   return { ok: true, songs, hasMore: skip + songs.length < total };
 }
+
+// ─── Reorder songs within a playlist ─────────────────────────────────────────
+// Moves the song at fromIndex to toIndex, shifting the affected range by ±1.
+// Updates only the rows in [min, max] in a single transaction.
+
+export async function reorderPlaylistSongs(
+  playlistId: string,
+  fromIndex: number,
+  toIndex: number
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (fromIndex === toIndex) return { ok: true };
+
+  const session = await auth();
+  if (!session?.user?.email) return { ok: false, error: "Not authenticated" };
+
+  const playlist = await prisma.playlist.findUnique({
+    where: { id: playlistId },
+    include: {
+      user: { select: { email: true } },
+      songs: { orderBy: { position: "asc" }, select: { songId: true, position: true } },
+    },
+  });
+  if (!playlist || playlist.user.email !== session.user.email) {
+    return { ok: false, error: "Playlist not found" };
+  }
+
+  const songs = playlist.songs;
+  if (fromIndex < 0 || fromIndex >= songs.length || toIndex < 0 || toIndex >= songs.length) {
+    return { ok: false, error: "Index out of range" };
+  }
+
+  // Build the reordered list and only update rows whose position changed
+  const reordered = [...songs];
+  const [moved] = reordered.splice(fromIndex, 1);
+  reordered.splice(toIndex, 0, moved);
+
+  const updates = reordered
+    .map((s, i) => ({ songId: s.songId, newPosition: i }))
+    .filter((u, i) => songs[i]?.songId !== u.songId || songs[i]?.position !== u.newPosition);
+
+  await prisma.$transaction(
+    updates.map(({ songId, newPosition }) =>
+      prisma.playlistSong.update({
+        where: { playlistId_songId: { playlistId, songId } },
+        data: { position: newPosition },
+      })
+    )
+  );
+
+  revalidatePath(`/library/playlist/${playlistId}`);
+  return { ok: true };
+}
+
+// ─── Reorder sidebar playlists ────────────────────────────────────────────────
+// Receives the full ordered list of playlist IDs (as the user sees them) and
+// assigns each playlist a sortOrder equal to its index in that list.
+
+export async function reorderPlaylists(
+  orderedIds: string[]
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const session = await auth();
+  if (!session?.user?.email) return { ok: false, error: "Not authenticated" };
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user) return { ok: false, error: "User not found" };
+
+  // Verify all playlists belong to this user
+  const count = await prisma.playlist.count({
+    where: { id: { in: orderedIds }, userId: user.id },
+  });
+  if (count !== orderedIds.length) return { ok: false, error: "Invalid playlists" };
+
+  await prisma.$transaction(
+    orderedIds.map((id, i) =>
+      prisma.playlist.update({ where: { id }, data: { sortOrder: i } })
+    )
+  );
+
+  revalidatePath("/library");
+  revalidatePath("/");
+  return { ok: true };
+}

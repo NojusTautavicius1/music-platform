@@ -83,6 +83,7 @@ model Playlist {
   description String?
   coverUrl    String?
   isPublic    Boolean  @default(false)
+  sortOrder   Int      @default(0)
   userId      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -91,6 +92,7 @@ model Playlist {
   songs PlaylistSong[]
 
   @@index([userId])
+  @@index([userId, sortOrder])
 }
 
 model PlaylistSong {

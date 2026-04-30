@@ -1,9 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { X, GripVertical, RotateCcw } from "lucide-react";
-import { usePlayerStore } from "@/store/playerStore";
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
+import { useDndSensors } from "@/hooks/useDndSensors";
 import { cn } from "@/lib/utils";
 
 export function QueuePanel() {
@@ -16,12 +27,15 @@ export function QueuePanel() {
   const shuffleHistory = usePlayerStore((s) => s.shuffleHistory);
   const jumpToIndex = usePlayerStore((s) => s.jumpToIndex);
   const removeFromQueue = usePlayerStore((s) => s.removeFromQueue);
+  const reorderQueue = usePlayerStore((s) => s.reorderQueue);
   const setQueue = usePlayerStore((s) => s.setQueue);
   const toggleQueue = usePlayerStore((s) => s.toggleQueue);
   const resetShuffleHistory = usePlayerStore((s) => s.resetShuffleHistory);
 
-  const upNext = queue.slice(currentIndex + 1);
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  const sensors = useDndSensors();
 
+  const upNext = queue.slice(currentIndex + 1);
   const totalSongs = sourceQueue.length > 0 ? sourceQueue.length : queue.length;
   const playedCount = shuffleHistory.size;
 
@@ -34,6 +48,31 @@ export function QueuePanel() {
       setQueue([]);
     }
   }
+
+  function handleDragStart(e: DragStartEvent) {
+    setActiveDragId(String(e.active.id));
+  }
+
+  function handleDragEnd(e: DragEndEvent) {
+    setActiveDragId(null);
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const fromRelative = upNext.findIndex((s, i) => uniqueKey(s, currentIndex + 1 + i) === String(active.id));
+    const toRelative   = upNext.findIndex((s, i) => uniqueKey(s, currentIndex + 1 + i) === String(over.id));
+    if (fromRelative < 0 || toRelative < 0) return;
+    reorderQueue(currentIndex + 1 + fromRelative, currentIndex + 1 + toRelative);
+  }
+
+  // Each queue row needs a stable unique key that survives reorder
+  // We key by both songId and its position so the same song appearing twice
+  // in the queue still gets distinct DnD items.
+  function uniqueKey(song: PlayerSong, absoluteIndex: number) {
+    return `${song.id}::${absoluteIndex}`;
+  }
+
+  const activeSong = activeDragId
+    ? upNext.find((s, i) => uniqueKey(s, currentIndex + 1 + i) === activeDragId) ?? null
+    : null;
 
   return (
     <AnimatePresence>
@@ -107,23 +146,47 @@ export function QueuePanel() {
               </p>
 
               {upNext.length === 0 ? (
-                <p className="text-sm text-zinc-600 py-4">
-                  Nothing else queued
-                </p>
+                <p className="text-sm text-zinc-600 py-4">Nothing else queued</p>
               ) : (
-                <div className="space-y-0.5">
-                  {upNext.map((song, i) => {
-                    const absoluteIndex = currentIndex + 1 + i;
-                    return (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={upNext.map((s, i) => uniqueKey(s, currentIndex + 1 + i))}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-0.5">
+                      {upNext.map((song, i) => {
+                        const absoluteIndex = currentIndex + 1 + i;
+                        const key = uniqueKey(song, absoluteIndex);
+                        return (
+                          <QueueRow
+                            key={key}
+                            id={key}
+                            song={song}
+                            onPlay={() => jumpToIndex(absoluteIndex)}
+                            onRemove={() => removeFromQueue(absoluteIndex)}
+                          />
+                        );
+                      })}
+                    </div>
+                  </SortableContext>
+
+                  <DragOverlay dropAnimation={null}>
+                    {activeSong ? (
                       <QueueRow
-                        key={`${song.id}-${absoluteIndex}`}
-                        song={song}
-                        onPlay={() => jumpToIndex(absoluteIndex)}
-                        onRemove={() => removeFromQueue(absoluteIndex)}
+                        id="__overlay__"
+                        song={activeSong}
+                        onPlay={() => {}}
+                        onRemove={() => {}}
+                        overlay
                       />
-                    );
-                  })}
-                </div>
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
               )}
             </section>
           </div>
@@ -156,25 +219,49 @@ function NowPlayingRow({ song }: { song: { title: string; artist: string; coverU
 // ─── Queue Row ────────────────────────────────────────────────────────────────
 
 type QueueRowProps = {
-  song: { title: string; artist: string; coverUrl: string | null };
+  id: string;
+  song: PlayerSong;
   onPlay: () => void;
   onRemove: () => void;
+  overlay?: boolean;
 };
 
-function QueueRow({ song, onPlay, onRemove }: QueueRowProps) {
+function QueueRow({ id, song, onPlay, onRemove, overlay = false }: QueueRowProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id, disabled: overlay });
+
+  const style: React.CSSProperties = overlay
+    ? {}
+    : { transform: CSS.Transform.toString(transform), transition };
+
   return (
     <div
-      onClick={onPlay}
+      ref={overlay ? undefined : setNodeRef}
+      style={style}
+      {...(overlay ? {} : attributes)}
+      onClick={overlay ? undefined : onPlay}
       className={cn(
         "flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer group",
-        "hover:bg-white/5 transition-colors"
+        "hover:bg-white/5 transition-colors",
+        isDragging && "opacity-30",
+        overlay && "opacity-90 bg-[#18181F] shadow-xl ring-1 ring-white/10 rounded-lg cursor-grabbing"
       )}
     >
-      {/* Drag handle — visual only for now */}
-      <GripVertical
-        size={14}
-        className="text-zinc-600 shrink-0 cursor-grab group-hover:text-zinc-400 transition-colors"
-      />
+      {/* Drag handle */}
+      <button
+        {...(overlay ? {} : listeners)}
+        className="text-zinc-600 shrink-0 touch-none cursor-grab active:cursor-grabbing group-hover:text-zinc-400 transition-colors"
+        aria-label="Drag to reorder"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GripVertical size={14} />
+      </button>
 
       {/* Cover */}
       <div className="relative w-9 h-9 rounded shrink-0 overflow-hidden">
@@ -192,16 +279,15 @@ function QueueRow({ song, onPlay, onRemove }: QueueRowProps) {
       </div>
 
       {/* Remove */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onRemove();
-        }}
-        className="w-6 h-6 flex items-center justify-center text-zinc-600 hover:text-white opacity-0 group-hover:opacity-100 transition-all shrink-0"
-        aria-label="Remove from queue"
-      >
-        <X size={14} />
-      </button>
+      {!overlay && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          className="w-6 h-6 flex items-center justify-center text-zinc-600 hover:text-white opacity-0 group-hover:opacity-100 transition-all shrink-0"
+          aria-label="Remove from queue"
+        >
+          <X size={14} />
+        </button>
+      )}
     </div>
   );
 }

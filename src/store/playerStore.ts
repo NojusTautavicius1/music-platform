@@ -81,6 +81,7 @@ type PlayerStore = {
   setDuration: (d: number) => void;
   clearSeekRequest: () => void;
   resetShuffleHistory: () => void;
+  reorderQueue: (fromIndex: number, toIndex: number) => void;
 };
 
 export const usePlayerStore = create<PlayerStore>()(
@@ -337,6 +338,24 @@ export const usePlayerStore = create<PlayerStore>()(
     setDuration: (d) => set({ duration: d }),
 
     clearSeekRequest: () => set({ seekRequest: null }),
+
+    reorderQueue: (fromIndex, toIndex) => {
+      if (fromIndex === toIndex) return;
+      const { queue, currentIndex } = get();
+      const next = [...queue];
+      const [moved] = next.splice(fromIndex, 1);
+      next.splice(toIndex, 0, moved);
+      // Keep currentIndex tracking the same song after the move
+      let newCurrentIndex = currentIndex;
+      if (fromIndex === currentIndex) {
+        newCurrentIndex = toIndex;
+      } else if (fromIndex < currentIndex && toIndex >= currentIndex) {
+        newCurrentIndex = currentIndex - 1;
+      } else if (fromIndex > currentIndex && toIndex <= currentIndex) {
+        newCurrentIndex = currentIndex + 1;
+      }
+      set({ queue: next, currentIndex: newCurrentIndex });
+    },
 
     resetShuffleHistory: () => {
       const { currentSong, sourceQueue, queue } = get();
