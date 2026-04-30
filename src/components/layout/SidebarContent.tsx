@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, Search, Library, Plus, Heart } from "lucide-react";
+import { Home, Search, Library, LayoutGrid, Plus, Heart } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -40,6 +40,9 @@ export async function SidebarContent() {
         </NavItem>
         <NavItem href="/search" icon={<Search size={20} />}>
           Search
+        </NavItem>
+        <NavItem href="/browse" icon={<LayoutGrid size={20} />}>
+          Browse
         </NavItem>
         <NavItem href="/library" icon={<Library size={20} />}>
           Your Library

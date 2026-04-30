@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useOptimistic, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useOptimistic, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -23,6 +23,11 @@ import {
   User,
   Loader2,
   ImageUp,
+  Plus,
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
+  Music,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -55,6 +60,7 @@ import {
   deletePlaylist,
   removeSongFromPlaylist,
   updatePlaylist,
+  searchSongsNotInPlaylist,
 } from "@/app/actions/playlist";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -77,6 +83,17 @@ export type UserPlaylist = {
   name: string;
 };
 
+export type SuggestedSong = {
+  id: string;
+  title: string;
+  artist: string;
+  album: string | null;
+  genre: string | null;
+  duration: number;
+  coverUrl: string | null;
+  audioUrl: string | null;
+};
+
 const editFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(60, "Max 60 characters"),
   description: z.string().max(200, "Max 200 characters"),
@@ -95,6 +112,7 @@ type Props = {
   isOwner: boolean;
   songs: SongInPlaylist[];
   userPlaylists?: UserPlaylist[];
+  suggestedSongs?: SuggestedSong[];
 };
 
 // ─── Song Row (desktop table row) ────────────────────────────────────────────
@@ -681,6 +699,213 @@ function DeletePlaylistDialog({
   );
 }
 
+// ─── Suggestion Row ──────────────────────────────────────────────────────────
+
+function SuggestionRow({
+  song,
+  onAdd,
+  isPending,
+}: {
+  song: SuggestedSong;
+  onAdd: () => void;
+  isPending: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors group">
+      <div className="relative w-10 h-10 rounded shrink-0 overflow-hidden">
+        {song.coverUrl ? (
+          <Image src={song.coverUrl} alt={song.title} fill sizes="40px" className="object-cover" />
+        ) : (
+          <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30 flex items-center justify-center">
+            <Music size={14} className="text-zinc-600" />
+          </div>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-zinc-100 truncate">{song.title}</p>
+        <p className="text-xs text-zinc-500 truncate">{song.artist}</p>
+      </div>
+      <span className="text-xs text-zinc-600 tabular-nums shrink-0">
+        {formatDuration(song.duration)}
+      </span>
+      <button
+        onClick={onAdd}
+        disabled={isPending}
+        className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-white/10 text-xs text-zinc-300 hover:text-white hover:bg-white/10 transition-colors shrink-0 disabled:opacity-40"
+        aria-label={`Add ${song.title}`}
+      >
+        {isPending ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
+        Add
+      </button>
+    </div>
+  );
+}
+
+// ─── Recommended Section ──────────────────────────────────────────────────────
+
+function RecommendedSection({
+  songs,
+  alreadyInSet,
+  onAdd,
+}: {
+  songs: SuggestedSong[];
+  alreadyInSet: Set<string>;
+  onAdd: (song: SuggestedSong) => Promise<void>;
+}) {
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
+  const visible = songs.filter((s) => !alreadyInSet.has(s.id));
+  if (visible.length === 0) return null;
+
+  async function handleAdd(song: SuggestedSong) {
+    setPendingIds((p) => new Set([...p, song.id]));
+    await onAdd(song);
+    setPendingIds((p) => { const n = new Set(p); n.delete(song.id); return n; });
+  }
+
+  return (
+    <div className="px-4 md:px-8 pb-6">
+      <div className="flex items-center gap-2 mb-3">
+        <Sparkles size={14} className="text-[#8B5CF6] shrink-0" />
+        <h3 className="text-sm font-semibold text-zinc-300">Suggested for this playlist</h3>
+      </div>
+      <div className="space-y-0.5">
+        {visible.map((song) => (
+          <SuggestionRow
+            key={song.id}
+            song={song}
+            isPending={pendingIds.has(song.id)}
+            onAdd={() => handleAdd(song)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Find More Section ────────────────────────────────────────────────────────
+
+function FindMoreSection({
+  playlistId,
+  alreadyInSet,
+  onAdd,
+}: {
+  playlistId: string;
+  alreadyInSet: Set<string>;
+  onAdd: (song: SuggestedSong) => Promise<void>;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SuggestedSong[]>([]);
+  const [hasMore, setHasMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const fetchResults = useCallback(
+    async (q: string, p: number, append: boolean) => {
+      setLoading(true);
+      const res = await searchSongsNotInPlaylist(playlistId, q, p);
+      setLoading(false);
+      if (!res.ok) return;
+      setResults((prev) => (append ? [...prev, ...res.songs] : res.songs));
+      setHasMore(res.hasMore);
+    },
+    [playlistId]
+  );
+
+  useEffect(() => {
+    if (!expanded) return;
+    fetchResults(query, 1, false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expanded]);
+
+  function handleQueryChange(val: string) {
+    setQuery(val);
+    setPage(1);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchResults(val, 1, false), 350);
+  }
+
+  async function handleAdd(song: SuggestedSong) {
+    setPendingIds((p) => new Set([...p, song.id]));
+    await onAdd(song);
+    setPendingIds((p) => { const n = new Set(p); n.delete(song.id); return n; });
+  }
+
+  function handleLoadMore() {
+    const next = page + 1;
+    setPage(next);
+    fetchResults(query, next, true);
+  }
+
+  const visible = results.filter((s) => !alreadyInSet.has(s.id));
+
+  return (
+    <div className="px-4 md:px-8 pb-10">
+      <div className="border-t border-white/5 pt-6">
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="flex items-center gap-2 text-sm font-semibold text-zinc-400 hover:text-white transition-colors"
+        >
+          {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          {expanded ? "Hide search" : "+ Find more songs"}
+        </button>
+
+        {expanded && (
+          <div className="mt-4 space-y-3">
+            {/* Mini search */}
+            <div className="relative max-w-sm">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => handleQueryChange(e.target.value)}
+                placeholder="Search all songs…"
+                className="w-full h-9 pl-8 pr-3 rounded-full border border-white/10 bg-white/5 text-zinc-200 text-sm placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#8B5CF6]/50"
+                autoFocus
+              />
+            </div>
+
+            {/* Results */}
+            {loading && results.length === 0 ? (
+              <div className="flex items-center gap-2 py-4 text-zinc-600 text-sm">
+                <Loader2 size={14} className="animate-spin" />
+                Searching…
+              </div>
+            ) : visible.length === 0 ? (
+              <p className="text-sm text-zinc-600 py-4">
+                {query ? "No songs found." : "All songs are already in this playlist."}
+              </p>
+            ) : (
+              <div className="space-y-0.5">
+                {visible.map((song) => (
+                  <SuggestionRow
+                    key={song.id}
+                    song={song}
+                    isPending={pendingIds.has(song.id)}
+                    onAdd={() => handleAdd(song)}
+                  />
+                ))}
+                {hasMore && (
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={loading}
+                    className="mt-2 flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors disabled:opacity-40"
+                  >
+                    {loading && <Loader2 size={12} className="animate-spin" />}
+                    Load more
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── PlaylistView ─────────────────────────────────────────────────────────────
 
 export function PlaylistView({
@@ -692,6 +917,7 @@ export function PlaylistView({
   isOwner,
   songs,
   userPlaylists = [],
+  suggestedSongs = [],
 }: Props) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -717,6 +943,38 @@ export function PlaylistView({
     );
     pendingRemovals.current.clear();
   }, [songs]);
+
+  const [optimisticallyAdded, setOptimisticallyAdded] = useState<Set<string>>(new Set());
+
+  const alreadyInPlaylist = useMemo(
+    () => new Set([...displaySongs.map((s) => s.songId), ...optimisticallyAdded]),
+    [displaySongs, optimisticallyAdded]
+  );
+
+  async function handleAddFromSuggestion(song: SuggestedSong) {
+    setOptimisticallyAdded((prev) => new Set([...prev, song.id]));
+    const newSong: SongInPlaylist = {
+      songId: song.id,
+      position: displaySongs.length,
+      addedAt: new Date().toISOString(),
+      title: song.title,
+      artist: song.artist,
+      album: song.album,
+      duration: song.duration,
+      coverUrl: song.coverUrl,
+      audioUrl: song.audioUrl,
+      isLiked: false,
+    };
+    setDisplaySongs((prev) => [...prev, newSong]);
+    const result = await addSongToPlaylist(playlistId, song.id);
+    if (result.ok) {
+      toast.success(`Added "${song.title}"`);
+    } else {
+      setOptimisticallyAdded((prev) => { const n = new Set(prev); n.delete(song.id); return n; });
+      setDisplaySongs((prev) => prev.filter((s) => s.songId !== song.id));
+      toast.error(result.error);
+    }
+  }
 
   const [confirmedLiked, setConfirmedLiked] = useState<Set<string>>(
     () => new Set(songs.filter((s) => s.isLiked).map((s) => s.songId))
@@ -1018,6 +1276,24 @@ export function PlaylistView({
           />
         ))}
       </div>
+
+      {/* ── Recommendations + Find More (owners only) ──────────────── */}
+      {isOwner && (
+        <>
+          {suggestedSongs.length > 0 && (
+            <RecommendedSection
+              songs={suggestedSongs}
+              alreadyInSet={alreadyInPlaylist}
+              onAdd={handleAddFromSuggestion}
+            />
+          )}
+          <FindMoreSection
+            playlistId={playlistId}
+            alreadyInSet={alreadyInPlaylist}
+            onAdd={handleAddFromSuggestion}
+          />
+        </>
+      )}
 
         <EditPlaylistDialog
           open={editOpen}

@@ -6,11 +6,21 @@ import { formatTotalDuration } from "@/lib/format";
 import {
   PlaylistView,
   type SongInPlaylist,
+  type SuggestedSong,
 } from "@/components/playlist/PlaylistView";
 
 type Props = {
   params: Promise<{ id: string }>;
 };
+
+function shuffleTake<T>(arr: T[], n: number): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a.slice(0, n);
+}
 
 export default async function PlaylistPage({ params }: Props) {
   const { id } = await params;
@@ -73,6 +83,33 @@ export default async function PlaylistPage({ params }: Props) {
         select: { id: true, name: true },
       })
     : [];
+
+  // Aggregate genres already in this playlist, then find up to 20 songs with
+  // those genres not already in the playlist; shuffle in JS and take 5.
+  const playlistSongIds = playlist.songs.map((ps) => ps.song.id);
+  const suggestedSongs: SuggestedSong[] = [];
+  if (isOwner && playlist.songs.length > 0) {
+    const genreRows = await prisma.song.findMany({
+      where: { id: { in: playlistSongIds }, genre: { not: null } },
+      distinct: ["genre"],
+      select: { genre: true },
+    });
+    const genres = genreRows.map((r) => r.genre as string);
+    if (genres.length > 0) {
+      const candidates = await prisma.song.findMany({
+        where: {
+          genre: { in: genres },
+          id: { notIn: playlistSongIds },
+        },
+        take: 30,
+        select: {
+          id: true, title: true, artist: true, album: true,
+          genre: true, duration: true, coverUrl: true, audioUrl: true,
+        },
+      });
+      suggestedSongs.push(...shuffleTake(candidates, 5));
+    }
+  }
 
   const totalSeconds = playlist.songs.reduce(
     (acc, ps) => acc + ps.song.duration,
@@ -173,6 +210,7 @@ export default async function PlaylistPage({ params }: Props) {
         isOwner={isOwner}
         songs={songs}
         userPlaylists={userPlaylists}
+        suggestedSongs={suggestedSongs}
       />
     </div>
   );

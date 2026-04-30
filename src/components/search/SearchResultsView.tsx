@@ -1,14 +1,18 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Play, Search, Music, User as UserIcon, Disc3 } from "lucide-react";
+import { Play, Search, Music, User as UserIcon, Disc3, Plus } from "lucide-react";
+import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { formatDuration } from "@/lib/format";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { addSongToPlaylist } from "@/app/actions/playlist";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -30,12 +34,20 @@ type PlaylistResult = {
   _count: { songs: number };
 };
 
+type UserPlaylist = {
+  id: string;
+  name: string;
+};
+
 type Props = {
   query: string;
   tab: string;
   songs: SongResult[];
   playlists: PlaylistResult[];
   artists: string[];
+  userPlaylists: UserPlaylist[];
+  songCount: number;
+  songPage: number;
 };
 
 // ─── Tab config ───────────────────────────────────────────────────────────────
@@ -82,16 +94,21 @@ function SongRow({
   index,
   queue,
   compact = false,
+  userPlaylists,
+  showAdd,
 }: {
   song: SongResult;
   index: number;
   queue: PlayerSong[];
   compact?: boolean;
+  userPlaylists: UserPlaylist[];
+  showAdd?: boolean;
 }) {
   const play = usePlayerStore((s) => s.play);
   const currentSong = usePlayerStore((s) => s.currentSong);
   const isPlaying = usePlayerStore((s) => s.isPlaying);
   const togglePlay = usePlayerStore((s) => s.togglePlay);
+  const [addOpen, setAddOpen] = useState(false);
 
   const isActive = currentSong?.id === song.id;
   const isCurrentlyPlaying = isActive && isPlaying;
@@ -153,6 +170,50 @@ function SongRow({
         </p>
         <p className="text-xs text-zinc-400 truncate">{song.artist}</p>
       </div>
+
+      {showAdd && userPlaylists.length > 0 && (
+        <Popover open={addOpen} onOpenChange={setAddOpen}>
+          <PopoverTrigger
+            render={
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="w-7 h-7 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+                aria-label="Add to playlist"
+              >
+                <Plus size={14} />
+              </button>
+            }
+          />
+          <PopoverContent
+            sideOffset={8}
+            className="w-52 p-2 bg-[#18181F] border-white/10 text-zinc-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 px-2 pb-1">
+              Add to playlist
+            </p>
+            <div className="max-h-52 overflow-y-auto">
+              {userPlaylists.map((pl) => (
+                <button
+                  key={pl.id}
+                  onClick={async () => {
+                    const result = await addSongToPlaylist(pl.id, song.id);
+                    if (result.ok) {
+                      toast.success(`Added to ${result.playlistName}`);
+                      setAddOpen(false);
+                    } else {
+                      toast.error(result.error);
+                    }
+                  }}
+                  className="w-full text-left px-2 py-1.5 rounded text-sm text-zinc-200 hover:bg-white/5 transition-colors"
+                >
+                  {pl.name}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      )}
 
       <span className="text-xs text-zinc-500 tabular-nums shrink-0">
         {formatDuration(song.duration)}
@@ -282,6 +343,9 @@ export function SearchResultsView({
   songs,
   playlists,
   artists,
+  userPlaylists,
+  songCount,
+  songPage,
 }: Props) {
   const pathname = usePathname();
   const activeTab: TabKey = TABS.some((t) => t.key === tab)
@@ -299,6 +363,8 @@ export function SearchResultsView({
     coverUrl: s.coverUrl,
     audioUrl: s.audioUrl,
   }));
+
+  const showLoadMore = activeTab === "songs" && songs.length < songCount;
 
   return (
     <div className="pb-12">
@@ -351,6 +417,8 @@ export function SearchResultsView({
                           song={song}
                           index={i}
                           queue={songQueue}
+                          userPlaylists={userPlaylists}
+                          showAdd={false}
                         />
                       ))}
                     </div>
@@ -404,10 +472,27 @@ export function SearchResultsView({
               description={`No songs match "${query}".`}
             />
           ) : (
-            <div className="space-y-0.5 max-w-3xl">
-              {songs.map((song, i) => (
-                <SongRow key={song.id} song={song} index={i} queue={songQueue} />
-              ))}
+            <div className="space-y-3 max-w-3xl">
+              <div className="space-y-0.5">
+                {songs.map((song, i) => (
+                  <SongRow
+                    key={song.id}
+                    song={song}
+                    index={i}
+                    queue={songQueue}
+                    userPlaylists={userPlaylists}
+                    showAdd
+                  />
+                ))}
+              </div>
+              {showLoadMore && (
+                <Link
+                  href={`${pathname}?tab=songs&page=${songPage + 1}`}
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-full border border-white/10 text-sm text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
+                >
+                  Load more
+                </Link>
+              )}
             </div>
           )
         ) : activeTab === "artists" ? (

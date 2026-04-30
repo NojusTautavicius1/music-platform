@@ -261,3 +261,77 @@ export async function deletePlaylist(
     return { ok: false, error: "Failed to delete playlist" };
   }
 }
+
+// ─── Search songs not already in a playlist ───────────────────────────────────
+
+export type SuggestedSong = {
+  id: string;
+  title: string;
+  artist: string;
+  album: string | null;
+  genre: string | null;
+  duration: number;
+  coverUrl: string | null;
+  audioUrl: string | null;
+};
+
+export async function searchSongsNotInPlaylist(
+  playlistId: string,
+  query: string,
+  page: number = 1
+): Promise<{ ok: true; songs: SuggestedSong[]; hasMore: boolean } | { ok: false; error: string }> {
+  const session = await auth();
+  if (!session?.user?.email) return { ok: false, error: "Not authenticated" };
+
+  const playlist = await prisma.playlist.findUnique({
+    where: { id: playlistId },
+    include: {
+      songs: { select: { songId: true } },
+      user: { select: { email: true } },
+    },
+  });
+  if (!playlist) return { ok: false, error: "Playlist not found" };
+  if (!playlist.isPublic && playlist.user.email !== session.user.email) {
+    return { ok: false, error: "Playlist not found" };
+  }
+
+  const existingIds = playlist.songs.map((ps) => ps.songId);
+
+  const take = 20;
+  const skip = (page - 1) * take;
+
+  const where = {
+    id: { notIn: existingIds.length > 0 ? existingIds : ["__none__"] },
+    ...(query.trim()
+      ? {
+          OR: [
+            { title: { contains: query, mode: "insensitive" as const } },
+            { artist: { contains: query, mode: "insensitive" as const } },
+            { album: { contains: query, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
+  };
+
+  const [songs, total] = await Promise.all([
+    prisma.song.findMany({
+      where,
+      orderBy: { title: "asc" },
+      take,
+      skip,
+      select: {
+        id: true,
+        title: true,
+        artist: true,
+        album: true,
+        genre: true,
+        duration: true,
+        coverUrl: true,
+        audioUrl: true,
+      },
+    }),
+    prisma.song.count({ where }),
+  ]);
+
+  return { ok: true, songs, hasMore: skip + songs.length < total };
+}
