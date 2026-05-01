@@ -296,7 +296,7 @@ export default async function HomePage() {
     <div className="p-4 md:p-8 space-y-12 max-w-[1600px]">
       {/* Greeting */}
       <div>
-        <h1 className="text-3xl md:text-5xl font-bold leading-tight pb-1 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-5xl font-bold leading-tight pb-1 bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
           {greeting}, {firstName}
         </h1>
         <p className="text-zinc-500 mt-2 text-base">

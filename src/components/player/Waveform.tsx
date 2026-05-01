@@ -12,19 +12,28 @@ type Props = {
   variant?: "compact" | "full";
 };
 
-// Seeded deterministic peaks from a string (song ID)
-function seededPeaks(seed: string, count = 100): number[] {
+function seededPeaks(seed: string, count: number): number[] {
   let h = 0;
   for (let i = 0; i < seed.length; i++) {
     h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
   }
-  const peaks: number[] = [];
+  const out: number[] = [];
   for (let i = 0; i < count; i++) {
     h = (Math.imul(1664525, h) + 1013904223) | 0;
-    const val = ((h >>> 0) / 0xffffffff) * 0.8 + 0.1;
-    peaks.push(val);
+    out.push(((h >>> 0) / 0xffffffff) * 0.8 + 0.1);
   }
-  return peaks;
+  return out;
+}
+
+function resample(src: number[], n: number): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const fi = (i / n) * src.length;
+    const lo = Math.floor(fi);
+    const hi = Math.min(lo + 1, src.length - 1);
+    out.push(src[lo] + (src[hi] - src[lo]) * (fi - lo));
+  }
+  return out;
 }
 
 export function Waveform({
@@ -36,82 +45,90 @@ export function Waveform({
   height = 32,
   variant = "compact",
 }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const wsRef = useRef<import("wavesurfer.js").default | null>(null);
-  const seekingRef = useRef(false);
-  const lastTimeRef = useRef(-1);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
-  const effectivePeaks = peaks ?? seededPeaks(audioUrl, variant === "full" ? 200 : 100);
+  const effectivePeaks = peaks ?? seededPeaks(audioUrl, 150);
+  const progress = duration > 0 ? currentTime / duration : 0;
 
-  const initWavesurfer = useCallback(async () => {
-    if (!containerRef.current || wsRef.current) return;
+  const barW = variant === "full" ? 3 : 2;
+  const gap = variant === "full" ? 2 : 1;
+  const step = barW + gap;
+  const filledColor = variant === "full" ? "#8B5CF6" : "rgba(255,255,255,0.78)";
+  const unfilledColor =
+    variant === "full" ? "rgba(139,92,246,0.28)" : "rgba(255,255,255,0.18)";
 
-    const WaveSurfer = (await import("wavesurfer.js")).default;
+  const paint = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const w = canvas.offsetWidth;
+    if (!w) return;
 
-    const ws = WaveSurfer.create({
-      container: containerRef.current,
-      height,
-      waveColor: variant === "full" ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.2)",
-      progressColor: variant === "full" ? "#8B5CF6" : "rgba(255,255,255,0.7)",
-      cursorColor: "transparent",
-      barWidth: variant === "full" ? 3 : 2,
-      barGap: variant === "full" ? 2 : 1,
-      barRadius: 2,
-      normalize: true,
-      interact: true,
-      backend: "WebAudio",
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = w * dpr;
+    canvas.height = height * dpr;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, height);
+
+    const totalBars = Math.max(1, Math.floor(w / step));
+    const bars = resample(effectivePeaks, totalBars);
+    const splitAt = Math.round(progress * totalBars);
+
+    bars.forEach((p, i) => {
+      const x = i * step;
+      const bh = Math.max(2, p * height * 0.88);
+      const y = (height - bh) / 2;
+
+      ctx.fillStyle = i < splitAt ? filledColor : unfilledColor;
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(x, y, barW, bh, 1);
+      } else {
+        ctx.rect(x, y, barW, bh);
+      }
+      ctx.fill();
     });
+  }, [
+    effectivePeaks,
+    progress,
+    height,
+    step,
+    barW,
+    filledColor,
+    unfilledColor,
+  ]);
 
-    // Load with peaks only — no audio fetch
-    ws.load(audioUrl, [effectivePeaks], duration || 1);
-
-    ws.on("interaction", (newTime: number) => {
-      seekingRef.current = true;
-      onSeek(newTime);
-      // Release after a short debounce
-      setTimeout(() => { seekingRef.current = false; }, 300);
-    });
-
-    wsRef.current = ws;
-  }, [audioUrl, duration, effectivePeaks, height, onSeek, variant]);
-
-  // Init on mount
   useEffect(() => {
-    initWavesurfer();
-    return () => {
-      wsRef.current?.destroy();
-      wsRef.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    paint();
+  }, [paint]);
 
-  // Sync playhead when currentTime changes (driven by Howler via playerStore)
+  // Repaint when container resizes
   useEffect(() => {
-    const ws = wsRef.current;
-    if (!ws || seekingRef.current) return;
-    if (Math.abs(currentTime - lastTimeRef.current) < 0.25) return;
-    lastTimeRef.current = currentTime;
-    try {
-      ws.setTime(currentTime);
-    } catch {
-      // ws not ready yet
-    }
-  }, [currentTime]);
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => paint());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [paint]);
 
-  // Re-init when song changes
-  useEffect(() => {
-    wsRef.current?.destroy();
-    wsRef.current = null;
-    lastTimeRef.current = -1;
-    initWavesurfer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audioUrl]);
+  function handleClick(e: React.MouseEvent<HTMLCanvasElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    onSeek(ratio * (duration || 1));
+  }
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full cursor-pointer"
-      style={{ height }}
-    />
+    <div ref={wrapRef} className="w-full" style={{ height }}>
+      <canvas
+        ref={canvasRef}
+        onClick={handleClick}
+        className="w-full cursor-pointer block"
+        style={{ height }}
+      />
+    </div>
   );
 }
