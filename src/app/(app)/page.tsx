@@ -95,37 +95,140 @@ async function MadeForYouSection() {
 
 // ─── Section: Recently played ─────────────────────────────────────────────────
 
-async function RecentlyPlayedSection({ email }: { email?: string | null }) {
-  let playlists = email
-    ? await prisma.playlist.findMany({
-        where: { user: { email } },
-        orderBy: { updatedAt: "desc" },
-        take: 6,
-        select: { id: true, name: true, description: true, coverUrl: true },
-      })
-    : [];
-
-  if (playlists.length === 0) {
-    playlists = await prisma.playlist.findMany({
-      where: { isPublic: true },
-      orderBy: { updatedAt: "desc" },
+async function RecentlyPlayedSection({ userId }: { userId?: string | null }) {
+  if (userId) {
+    const recentDistinct = await prisma.playHistory.groupBy({
+      by: ["songId"],
+      where: { userId },
+      _max: { playedAt: true },
+      orderBy: { _max: { playedAt: "desc" } },
       take: 6,
-      select: { id: true, name: true, description: true, coverUrl: true },
     });
+
+    const songIds = recentDistinct.map((r) => r.songId);
+    if (songIds.length > 0) {
+      const songs = await prisma.song.findMany({
+        where: { id: { in: songIds } },
+        select: { id: true, title: true, artist: true, coverUrl: true },
+      });
+      const songById = new Map(songs.map((s) => [s.id, s]));
+      const orderedSongs = recentDistinct
+        .map((r) => songById.get(r.songId))
+        .filter((s): s is NonNullable<typeof s> => !!s);
+
+      if (orderedSongs.length > 0) {
+        return (
+          <section>
+            <h2 className="text-2xl font-bold text-zinc-100 mb-6">Recently played</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
+              {orderedSongs.map((s) => (
+                <PlaylistCard
+                  key={s.id}
+                  id={s.id}
+                  title={s.title}
+                  subtitle={s.artist}
+                  coverUrl={s.coverUrl}
+                  size="md"
+                  fluid
+                  href={`/song/${s.id}`}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      }
+    }
   }
 
-  if (playlists.length === 0) return null;
+  // Fallback: newest songs for unauthenticated or no history
+  const songs = await prisma.song.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 6,
+    select: { id: true, title: true, artist: true, coverUrl: true },
+  });
+
+  if (songs.length === 0) return null;
 
   return (
     <section>
       <h2 className="text-2xl font-bold text-zinc-100 mb-6">Recently played</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
+        {songs.map((s) => (
+          <PlaylistCard
+            key={s.id}
+            id={s.id}
+            title={s.title}
+            subtitle={s.artist}
+            coverUrl={s.coverUrl}
+            size="md"
+            fluid
+            href={`/song/${s.id}`}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── Section: Jump back in ─────────────────────────────────────────────────────
+
+async function JumpBackInSection({ userId }: { userId?: string | null }) {
+  if (!userId) return null;
+
+  // Find playlists the user owns that contain songs they recently played
+  const rows = await prisma.playHistory.findMany({
+    where: { userId },
+    orderBy: { playedAt: "desc" },
+    select: { songId: true, playedAt: true },
+    take: 200,
+  });
+
+  if (rows.length === 0) return null;
+
+  const latestBySong = new Map<string, Date>();
+  for (const row of rows) {
+    if (!latestBySong.has(row.songId)) {
+      latestBySong.set(row.songId, row.playedAt);
+    }
+  }
+
+  const playlistSongs = await prisma.playlistSong.findMany({
+    where: {
+      songId: { in: [...latestBySong.keys()] },
+      playlist: { userId },
+    },
+    select: {
+      songId: true,
+      playlist: { select: { id: true, name: true, coverUrl: true } },
+    },
+  });
+
+  const playlistMap = new Map<string, { id: string; name: string; coverUrl: string | null; latestPlay: Date }>();
+  for (const ps of playlistSongs) {
+    const latest = latestBySong.get(ps.songId);
+    if (!latest) continue;
+    const existing = playlistMap.get(ps.playlist.id);
+    if (!existing || latest > existing.latestPlay) {
+      playlistMap.set(ps.playlist.id, { ...ps.playlist, latestPlay: latest });
+    }
+  }
+
+  const playlists = [...playlistMap.values()]
+    .sort((a, b) => b.latestPlay.getTime() - a.latestPlay.getTime())
+    .slice(0, 4);
+
+  if (playlists.length === 0) return null;
+
+  return (
+    <section>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-6">Jump back in</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1">
         {playlists.map((p) => (
           <PlaylistCard
             key={p.id}
             id={p.id}
             title={p.name}
-            subtitle={p.description ?? "Playlist"}
+            subtitle="Playlist"
             coverUrl={p.coverUrl}
             size="md"
             fluid
@@ -174,6 +277,9 @@ export default async function HomePage() {
   const session = await auth();
   const firstName = session?.user?.name?.split(" ")[0] ?? "there";
   const email = session?.user?.email;
+  const userId = email
+    ? (await prisma.user.findUnique({ where: { email }, select: { id: true } }))?.id
+    : null;
 
   const hour = new Date().getHours();
   const greeting =
@@ -206,7 +312,20 @@ export default async function HomePage() {
           />
         }
       >
-        <RecentlyPlayedSection email={email} />
+        <RecentlyPlayedSection userId={userId} />
+      </Suspense>
+
+      {/* Jump back in */}
+      <Suspense
+        fallback={
+          <GridSkeleton
+            count={4}
+            size={180}
+            gridClass="grid-cols-2 sm:grid-cols-4"
+          />
+        }
+      >
+        <JumpBackInSection userId={userId} />
       </Suspense>
 
       {/* Genre chips — static, no Suspense needed */}

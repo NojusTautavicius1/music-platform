@@ -3,10 +3,13 @@
 import { useEffect, useRef } from "react";
 import { Howl } from "howler";
 import { usePlayerStore } from "@/store/playerStore";
+import { recordPlay } from "@/app/actions/playHistory";
 
 export function useAudioEngine() {
   const howlRef = useRef<Howl | null>(null);
   const rafRef = useRef<number>(0);
+  // { songId, time } — used to throttle duplicate play records
+  const lastPlayRef = useRef<{ songId: string; time: number } | null>(null);
 
   useEffect(() => {
     function startRaf(howl: Howl) {
@@ -53,6 +56,16 @@ export function useAudioEngine() {
           },
           onplay() {
             startRaf(howl);
+            // Record fresh start only (position near 0 = not a resume after pause)
+            const pos = howl.seek() as number;
+            if (pos < 1 && song?.id) {
+              const now = Date.now();
+              const last = lastPlayRef.current;
+              if (!last || last.songId !== song.id || now - last.time > 30_000) {
+                lastPlayRef.current = { songId: song.id, time: now };
+                recordPlay(song.id).catch(() => {});
+              }
+            }
           },
           onpause() {
             cancelAnimationFrame(rafRef.current);

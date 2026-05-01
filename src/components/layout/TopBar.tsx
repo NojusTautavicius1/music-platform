@@ -10,6 +10,7 @@ import {
   User,
   Settings,
   Menu,
+  BarChart2,
 } from "lucide-react";
 import {
   Avatar,
@@ -144,6 +145,13 @@ export function TopBar({ user, signOutAction }: Props) {
             <DropdownMenuItem className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white">
               <User size={14} />
               Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+              onClick={() => router.push("/stats")}
+            >
+              <BarChart2 size={14} />
+              Stats
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white">
               <Settings size={14} />
