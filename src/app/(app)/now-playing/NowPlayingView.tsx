@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +9,7 @@ import {
   MoreHorizontal,
   Heart,
   Share2,
+  Check,
   Music2,
   Shuffle,
   SkipBack,
@@ -24,13 +25,22 @@ import { Waveform } from "@/components/player/Waveform";
 import { cn } from "@/lib/utils";
 import { formatDuration } from "@/lib/format";
 import { usePlayerStore } from "@/store/playerStore";
+import { toggleLike } from "@/app/actions/like";
 
 export function NowPlayingView() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+  const shareTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Read store after mount to avoid hydration mismatch
   useEffect(() => setMounted(true), []);
+
+  // Reset like state when song changes
+  const currentSongId = usePlayerStore((s) => s.currentSong?.id);
+  useEffect(() => { setIsLiked(false); }, [currentSongId]);
 
   const currentSong  = usePlayerStore((s) => s.currentSong);
   const isPlaying    = usePlayerStore((s) => s.isPlaying);
@@ -54,6 +64,34 @@ export function NowPlayingView() {
   const displayDuration = duration || currentSong?.duration || 0;
 
   const ACTIVE = "text-[#8B5CF6]";
+
+  async function handleLike() {
+    if (!currentSong || isLiking) return;
+    setIsLiking(true);
+    setIsLiked((v) => !v);
+    const result = await toggleLike(currentSong.id);
+    if (result.ok) {
+      setIsLiked(result.isLiked);
+    } else {
+      setIsLiked((v) => !v); // revert
+    }
+    setIsLiking(false);
+  }
+
+  function handleShare() {
+    const url = window.location.origin + "/now-playing";
+    navigator.clipboard.writeText(url).catch(() => {
+      const el = document.createElement("textarea");
+      el.value = url;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    });
+    setShareCopied(true);
+    if (shareTimerRef.current) clearTimeout(shareTimerRef.current);
+    shareTimerRef.current = setTimeout(() => setShareCopied(false), 2000);
+  }
 
   // Don't render song-specific UI until client hydrates
   if (!mounted) {
@@ -160,16 +198,25 @@ export function NowPlayingView() {
               </div>
               <div className="flex items-center gap-3 shrink-0 pt-1">
                 <button
-                  className="text-zinc-400 hover:text-[#EC4899] transition-colors"
-                  aria-label="Like"
+                  onClick={handleLike}
+                  disabled={isLiking}
+                  className={cn(
+                    "transition-colors",
+                    isLiked ? "text-[#EC4899]" : "text-zinc-400 hover:text-[#EC4899]"
+                  )}
+                  aria-label={isLiked ? "Unlike" : "Like"}
                 >
-                  <Heart size={20} />
+                  <Heart size={20} fill={isLiked ? "currentColor" : "none"} />
                 </button>
                 <button
-                  className="text-zinc-400 hover:text-white transition-colors"
+                  onClick={handleShare}
+                  className={cn(
+                    "transition-colors",
+                    shareCopied ? "text-green-400" : "text-zinc-400 hover:text-white"
+                  )}
                   aria-label="Share"
                 >
-                  <Share2 size={20} />
+                  {shareCopied ? <Check size={20} /> : <Share2 size={20} />}
                 </button>
                 <button
                   onClick={toggleLyrics}

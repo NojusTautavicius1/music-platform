@@ -122,9 +122,10 @@ export function useAudioEngine() {
         const howl = howlRef.current;
         if (howl) {
           howl.seek(seekRequest);
-          // Restart RAF if playing so progress updates immediately after seek
-          if (howl.playing()) {
-            cancelAnimationFrame(rafRef.current);
+          // Use store's isPlaying — howl.playing() can briefly return false
+          // during an async HTML5 seek, which would stop the RAF
+          cancelAnimationFrame(rafRef.current);
+          if (usePlayerStore.getState().isPlaying) {
             startRaf(howl);
           }
         }
