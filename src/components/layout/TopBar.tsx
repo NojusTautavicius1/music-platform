@@ -11,6 +11,7 @@ import {
   Settings,
   Menu,
   BarChart2,
+  Command,
 } from "lucide-react";
 import {
   Avatar,
@@ -46,6 +47,7 @@ export function TopBar({ user, signOutAction }: Props) {
   const debouncedQuery = useDebounce(query, 400);
   const mounted = useRef(false);
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen);
+  const setCommandPaletteOpen = useUIStore((s) => s.setCommandPaletteOpen);
 
   const initials = (user.name ?? user.email ?? "?")
     .split(" ")
@@ -105,7 +107,7 @@ export function TopBar({ user, signOutAction }: Props) {
 
       {/* Search */}
       <form onSubmit={handleSearch} className="flex-1 flex justify-center">
-        <div className="relative w-full max-w-100">
+        <div className="relative w-full max-w-100 flex items-center gap-2">
           <Search
             size={16}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
@@ -114,8 +116,17 @@ export function TopBar({ user, signOutAction }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="What do you want to listen to?"
-            className="pl-9 bg-white/5 border-white/10 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-[#8B5CF6]/50 h-9 rounded-full"
+            className="flex-1 pl-9 bg-white/5 border-white/10 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-[#8B5CF6]/50 h-9 rounded-full"
           />
+          <button
+            type="button"
+            onClick={() => setCommandPaletteOpen(true)}
+            className="hidden md:flex items-center gap-2 px-3 h-9 rounded-full border border-white/10 text-xs text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+            aria-label="Open command palette"
+          >
+            <Command size={12} />
+            <span>⌘K</span>
+          </button>
         </div>
       </form>
 

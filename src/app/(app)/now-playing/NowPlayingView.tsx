@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { formatDuration } from "@/lib/format";
 import { usePlayerStore } from "@/store/playerStore";
 import { toggleLike } from "@/app/actions/like";
+import { CoverGradient } from "@/components/playlist/CoverGradient";
 
 export function NowPlayingView() {
   const router = useRouter();
@@ -118,20 +119,15 @@ export function NowPlayingView() {
   }
 
   return (
-    <div className="relative h-full overflow-hidden bg-[#0A0A0F] flex flex-col">
-      {/* ── Blurred background ────────────────────────────────────── */}
-      {currentSong.coverUrl && (
-        <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={currentSong.coverUrl}
-            alt=""
-            aria-hidden
-            className="absolute inset-0 w-full h-full object-cover blur-3xl scale-110 opacity-50 pointer-events-none select-none"
-          />
-          <div className="absolute inset-0 bg-black/60 pointer-events-none" />
-        </>
-      )}
+    <CoverGradient coverUrl={currentSong.coverUrl ?? ""} className="relative h-full overflow-hidden bg-[#0A0A0F] flex flex-col">
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(180deg, var(--cover-gradient) 0%, rgba(10,10,15,0.9) 70%)",
+          filter: "saturate(1.4) blur(60px)",
+          opacity: 0.55,
+        }}
+      />
 
       {/* ── Relative content ──────────────────────────────────────── */}
       <div className="relative z-10 flex flex-col h-full">
@@ -345,6 +341,6 @@ export function NowPlayingView() {
           </AnimatePresence>
         </div>
       </div>
-    </div>
+    </CoverGradient>
   );
 }

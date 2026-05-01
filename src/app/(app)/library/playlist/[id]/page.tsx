@@ -10,6 +10,7 @@ import {
   type SuggestedSong,
 } from "@/components/playlist/PlaylistView";
 import { ShareButton } from "@/components/shared/ShareButton";
+import { CoverGradient } from "@/components/playlist/CoverGradient";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://sonara.vercel.app";
 
@@ -199,17 +200,9 @@ export default async function PlaylistPage({ params }: Props) {
       />
 
       {/* ── Header ──────────────────────────────────────────────────── */}
-      <section className="relative px-4 md:px-8 pt-8 md:pt-16 pb-8 md:min-h-80 flex items-end">
-        <div
-          className="absolute inset-x-0 top-0 pointer-events-none"
-          style={{
-            height: "320px",
-            background:
-              "linear-gradient(to bottom, rgba(124, 58, 237, 0.55) 0%, transparent 100%)",
-          }}
-        />
-
-        <div className="relative flex flex-col md:flex-row md:items-end gap-4 md:gap-6 w-full">
+      <CoverGradient coverUrl={playlist.coverUrl ?? ""}>
+        <section className="relative px-4 md:px-8 pt-8 md:pt-16 pb-8 md:min-h-80 flex items-end">
+          <div className="relative flex flex-col md:flex-row md:items-end gap-4 md:gap-6 w-full">
           {/* Cover */}
           <div className="w-[180px] h-[180px] md:w-58 md:h-58 rounded-md shadow-2xl overflow-hidden shrink-0">
             {playlist.coverUrl ? (
@@ -269,8 +262,9 @@ export default async function PlaylistPage({ params }: Props) {
               </span>
             </div>
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
+      </CoverGradient>
 
       <PlaylistView
         playlistId={id}

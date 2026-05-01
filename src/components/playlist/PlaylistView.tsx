@@ -64,7 +64,9 @@ import { formatDuration } from "@/lib/format";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useDndSensors } from "@/hooks/useDndSensors";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
+import { PlaylistSuggestionsSection } from "@/components/playlist/PlaylistSuggestionsSection";
 import { toggleLike } from "@/app/actions/like";
+import type { RecommendationSong } from "@/app/actions/recommendations";
 import {
   addSongToPlaylist,
   createPlaylistWithSong,
@@ -96,17 +98,7 @@ export type UserPlaylist = {
   name: string;
 };
 
-export type SuggestedSong = {
-  id: string;
-  title: string;
-  artist: string;
-  album: string | null;
-  genre: string | null;
-  duration: number;
-  coverUrl: string | null;
-  audioUrl: string | null;
-  waveformPeaks?: number[] | null;
-};
+export type SuggestedSong = RecommendationSong;
 
 const editFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(60, "Max 60 characters"),
@@ -822,7 +814,7 @@ function RecommendedSection({
 }: {
   songs: SuggestedSong[];
   alreadyInSet: Set<string>;
-  onAdd: (song: SuggestedSong) => Promise<void>;
+  onAdd: (song: SuggestedSong) => Promise<boolean>;
 }) {
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const visible = songs.filter((s) => !alreadyInSet.has(s.id));
@@ -863,7 +855,7 @@ function FindMoreSection({
 }: {
   playlistId: string;
   alreadyInSet: Set<string>;
-  onAdd: (song: SuggestedSong) => Promise<void>;
+  onAdd: (song: SuggestedSong) => Promise<boolean>;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState("");
@@ -1023,7 +1015,7 @@ export function PlaylistView({
     [displaySongs, optimisticallyAdded]
   );
 
-  async function handleAddFromSuggestion(song: SuggestedSong) {
+  async function handleAddFromSuggestion(song: SuggestedSong): Promise<boolean> {
     setOptimisticallyAdded((prev) => new Set([...prev, song.id]));
     const newSong: SongInPlaylist = {
       songId: song.id,
@@ -1042,10 +1034,12 @@ export function PlaylistView({
     const result = await addSongToPlaylist(playlistId, song.id);
     if (result.ok) {
       toast.success(`Added "${song.title}"`);
+      return true;
     } else {
       setOptimisticallyAdded((prev) => { const n = new Set(prev); n.delete(song.id); return n; });
       setDisplaySongs((prev) => prev.filter((s) => s.songId !== song.id));
       toast.error(result.error);
+      return false;
     }
   }
 
@@ -1339,94 +1333,113 @@ export function PlaylistView({
 
       {/* ── Song list ──────────────────────────────────────────────── */}
       <div className="px-4 md:px-8 pb-8">
-        {/* Desktop table header — hidden on mobile */}
-        <div className="hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_140px_8rem] items-center px-2 py-2 border-b border-white/10 mb-1 sticky top-0 z-10 bg-[#0A0A0F]">
-          <span />
-          <span className="text-xs text-zinc-500 text-center">#</span>
-          <span className="text-xs text-zinc-500 uppercase tracking-wider">Title</span>
-          <span className="text-xs text-zinc-500 uppercase tracking-wider">Album</span>
-          <span className="text-xs text-zinc-500 uppercase tracking-wider">Date Added</span>
-          <span className="flex justify-end text-zinc-500"><Clock size={14} /></span>
-        </div>
+        {displaySongs.length === 0 ? (
+          isOwner ? (
+            <PlaylistSuggestionsSection
+              playlistId={playlistId}
+              mode="empty"
+              initialSongs={suggestedSongs}
+              alreadyInPlaylist={alreadyInPlaylist}
+              onAddSong={handleAddFromSuggestion}
+            />
+          ) : (
+            <p className="text-zinc-500 text-sm px-4 py-8 text-center">
+              This playlist is empty.
+            </p>
+          )
+        ) : (
+          <>
+            {/* Desktop table header — hidden on mobile */}
+            <div className="hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_140px_8rem] items-center px-2 py-2 border-b border-white/10 mb-1 sticky top-0 z-10 bg-[#0A0A0F]">
+              <span />
+              <span className="text-xs text-zinc-500 text-center">#</span>
+              <span className="text-xs text-zinc-500 uppercase tracking-wider">Title</span>
+              <span className="text-xs text-zinc-500 uppercase tracking-wider">Album</span>
+              <span className="text-xs text-zinc-500 uppercase tracking-wider">Date Added</span>
+              <span className="flex justify-end text-zinc-500"><Clock size={14} /></span>
+            </div>
 
-        {filtered.length === 0 && (
-          <p className="text-zinc-500 text-sm px-4 py-8 text-center">
-            No songs match your search.
-          </p>
-        )}
+            {filtered.length === 0 && (
+              <p className="text-zinc-500 text-sm px-4 py-8 text-center">
+                No songs match your search.
+              </p>
+            )}
 
-        <DndContext
-          sensors={dndSensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={filtered.map((s) => s.songId)}
-            strategy={verticalListSortingStrategy}
-          >
-            {filtered.map((song, idx) => (
-              <SongRow
-                key={song.songId}
-                song={song}
-                idx={idx}
-                isActive={isCurrentlyPlaying(song.songId)}
-                isLiked={optimisticLiked.has(song.songId)}
-                isOwner={isOwner}
-                userPlaylists={otherPlaylists}
-                onPlay={() => handlePlaySong(song)}
-                onLike={(e) => handleLike(song.songId, e)}
-                onRemove={() => handleRemoveSong(song)}
-                onAddToQueue={() => handleAddToQueue(song)}
-                onGoToArtist={() => handleGoToArtist(song)}
-                onShare={handleShare}
+            <DndContext
+              sensors={dndSensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={filtered.map((s) => s.songId)}
+                strategy={verticalListSortingStrategy}
+              >
+                {filtered.map((song, idx) => (
+                  <SongRow
+                    key={song.songId}
+                    song={song}
+                    idx={idx}
+                    isActive={isCurrentlyPlaying(song.songId)}
+                    isLiked={optimisticLiked.has(song.songId)}
+                    isOwner={isOwner}
+                    userPlaylists={otherPlaylists}
+                    onPlay={() => handlePlaySong(song)}
+                    onLike={(e) => handleLike(song.songId, e)}
+                    onRemove={() => handleRemoveSong(song)}
+                    onAddToQueue={() => handleAddToQueue(song)}
+                    onGoToArtist={() => handleGoToArtist(song)}
+                    onShare={handleShare}
+                  />
+                ))}
+              </SortableContext>
+
+              <DragOverlay dropAnimation={null}>
+                {activeDragId ? (() => {
+                  const song = displaySongs.find((s) => s.songId === activeDragId);
+                  const idx = displaySongs.findIndex((s) => s.songId === activeDragId);
+                  if (!song) return null;
+                  return (
+                    <SongRow
+                      song={song}
+                      idx={idx}
+                      isActive={false}
+                      isLiked={false}
+                      isOwner={isOwner}
+                      userPlaylists={[]}
+                      onPlay={() => {}}
+                      onLike={() => {}}
+                      onRemove={() => {}}
+                      onAddToQueue={() => {}}
+                      onGoToArtist={() => {}}
+                      onShare={() => {}}
+                      overlay
+                    />
+                  );
+                })() : null}
+              </DragOverlay>
+            </DndContext>
+
+            {isOwner && (
+              <PlaylistSuggestionsSection
+                playlistId={playlistId}
+                mode="more"
+                initialSongs={suggestedSongs}
+                alreadyInPlaylist={alreadyInPlaylist}
+                onAddSong={handleAddFromSuggestion}
               />
-            ))}
-          </SortableContext>
-
-          <DragOverlay dropAnimation={null}>
-            {activeDragId ? (() => {
-              const song = displaySongs.find((s) => s.songId === activeDragId);
-              const idx = displaySongs.findIndex((s) => s.songId === activeDragId);
-              if (!song) return null;
-              return (
-                <SongRow
-                  song={song}
-                  idx={idx}
-                  isActive={false}
-                  isLiked={false}
-                  isOwner={isOwner}
-                  userPlaylists={[]}
-                  onPlay={() => {}}
-                  onLike={() => {}}
-                  onRemove={() => {}}
-                  onAddToQueue={() => {}}
-                  onGoToArtist={() => {}}
-                  onShare={() => {}}
-                  overlay
-                />
-              );
-            })() : null}
-          </DragOverlay>
-        </DndContext>
+            )}
+          </>
+        )}
       </div>
 
       {/* ── Recommendations + Find More (owners only) ──────────────── */}
-      {isOwner && (
-        <>
-          {suggestedSongs.length > 0 && (
-            <RecommendedSection
-              songs={suggestedSongs}
-              alreadyInSet={alreadyInPlaylist}
-              onAdd={handleAddFromSuggestion}
-            />
-          )}
-          <FindMoreSection
-            playlistId={playlistId}
-            alreadyInSet={alreadyInPlaylist}
-            onAdd={handleAddFromSuggestion}
-          />
-        </>
+      {isOwner && displaySongs.length > 0 && (
+        <FindMoreSection
+          playlistId={playlistId}
+          alreadyInSet={alreadyInPlaylist}
+          onAdd={handleAddFromSuggestion}
+        />
       )}
 
         <EditPlaylistDialog
