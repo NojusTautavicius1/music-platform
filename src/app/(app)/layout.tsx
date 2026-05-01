@@ -9,6 +9,7 @@ import { AudioEngineProvider } from "@/components/layout/AudioEngineProvider";
 import { MobileSidebarSheet } from "@/components/layout/MobileSidebarSheet";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { QueuePanel } from "@/components/layout/QueuePanel";
+import { CommandPalette } from "@/components/CommandPalette";
 
 export default async function AppLayout({
   children,
@@ -51,6 +52,7 @@ export default async function AppLayout({
       </div>
 
       <AudioEngineProvider />
+      <CommandPalette />
       {/* QueuePanel floats over content — does not push layout */}
       <QueuePanel />
       {/* Bottom nav sits above PlayerBar on mobile */}
