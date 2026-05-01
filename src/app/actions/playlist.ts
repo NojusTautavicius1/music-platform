@@ -1,14 +1,14 @@
 "use server";
 
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 const CreatePlaylistSchema = z.object({
   name: z.string().min(1, "Name is required").max(60, "Max 60 characters"),
-  description: z.string().max(200, "Max 200 characters"),
-  isPublic: z.boolean(),
+  description: z.string().max(200, "Max 200 characters").optional(),
+  isPublic: z.boolean().default(false),
 });
 
 const UpdatePlaylistSchema = z.object({
@@ -36,7 +36,7 @@ export async function createPlaylist(
 ): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   const session = await auth();
   if (!session?.user?.email) {
-    return { ok: false, error: "Not authenticated" };
+    throw new Error("Not authenticated");
   }
 
   const parsed = CreatePlaylistSchema.safeParse(input);
@@ -56,7 +56,7 @@ export async function createPlaylist(
     const playlist = await prisma.playlist.create({
       data: {
         name: parsed.data.name,
-        description: parsed.data.description || null,
+        description: parsed.data.description?.trim() || null,
         isPublic: parsed.data.isPublic,
         userId: user.id,
       },
@@ -64,6 +64,7 @@ export async function createPlaylist(
     });
 
     revalidatePath("/library");
+    revalidateTag("user-playlists", "default");
 
     return { ok: true, id: playlist.id };
   } catch {
@@ -162,33 +163,41 @@ export async function addSongToPlaylist(
 
 // ─── Create new playlist with one song ───────────────────────────────────────
 
-export async function addSongToNewPlaylist(
-  songId: string
+export async function createPlaylistWithSong(
+  songId: string,
+  name?: string
 ): Promise<{ ok: true; id: string; name: string } | { ok: false; error: string }> {
   const session = await auth();
   if (!session?.user?.email) return { ok: false, error: "Not authenticated" };
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
+  const [user, song] = await Promise.all([
+    prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    }),
+    prisma.song.findUnique({
+      where: { id: songId },
+      select: { title: true },
+    }),
+  ]);
   if (!user) return { ok: false, error: "User not found" };
+  if (!song) return { ok: false, error: "Song not found" };
 
-  const count = await prisma.playlist.count({ where: { userId: user.id } });
-  const name = `My Playlist #${count + 1}`;
+  const playlistName = name?.trim() || `${song.title} mix`;
 
   const playlist = await prisma.playlist.create({
     data: {
-      name,
+      name: playlistName,
       userId: user.id,
       isPublic: false,
-      songs: { create: [{ songId, position: 0 }] },
+      songs: { create: [{ songId, position: 1 }] },
     },
     select: { id: true },
   });
 
   revalidatePath("/library");
-  return { ok: true, id: playlist.id, name };
+  revalidateTag("user-playlists", "default");
+  return { ok: true, id: playlist.id, name: playlistName };
 }
 
 // ─── Remove song from playlist ──────────────────────────────────────────────
