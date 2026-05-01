@@ -54,6 +54,15 @@ export function useAudioEngine() {
           onload() {
             usePlayerStore.getState().setDuration(howl.duration());
           },
+          onseek() {
+            // HTML5 seek is async: howl.playing() briefly returns false while
+            // the browser buffers, which kills the RAF tick. Restart it here,
+            // after the seeked event confirms the position is set.
+            cancelAnimationFrame(rafRef.current);
+            if (usePlayerStore.getState().isPlaying) {
+              startRaf(howl);
+            }
+          },
           onplay() {
             startRaf(howl);
             // Record fresh start only (position near 0 = not a resume after pause)
@@ -121,13 +130,8 @@ export function useAudioEngine() {
         if (seekRequest === null) return;
         const howl = howlRef.current;
         if (howl) {
+          // RAF restart is handled by the onseek callback once seek completes
           howl.seek(seekRequest);
-          // Use store's isPlaying — howl.playing() can briefly return false
-          // during an async HTML5 seek, which would stop the RAF
-          cancelAnimationFrame(rafRef.current);
-          if (usePlayerStore.getState().isPlaying) {
-            startRaf(howl);
-          }
         }
         usePlayerStore.getState().clearSeekRequest();
       }
