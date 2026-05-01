@@ -83,7 +83,7 @@ export function CreatePlaylistDialog({ children, open, onOpenChange }: Props) {
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setOpen}>
-      {children ? <DialogTrigger>{children}</DialogTrigger> : null}
+      {children && <DialogTrigger render={children} />}
       <DialogContent className="bg-[#18181F] border-white/10 text-zinc-100 max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold text-zinc-100">
