@@ -10,6 +10,8 @@ export const metadata: Metadata = {
 };
 import { prisma } from "@/lib/prisma";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
+import { MixCard } from "@/components/shared/MixCard";
+import { MixRefreshTrigger } from "@/components/shared/MixRefreshTrigger";
 import { GENRE_COLORS, FEATURED_GENRES } from "@/lib/genreColors";
 
 // ─── Skeleton helpers ─────────────────────────────────────────────────────────
@@ -70,33 +72,81 @@ function GridSkeleton({
 
 // ─── Section: Made for you ────────────────────────────────────────────────────
 
-async function MadeForYouSection() {
-  const playlists = await prisma.playlist.findMany({
-    where: { isPublic: true },
-    take: 6,
-    orderBy: { name: "asc" },
-    select: { id: true, name: true, description: true, coverUrl: true },
+const STALE_MS = 24 * 60 * 60 * 1000; // 24 h
+
+async function MadeForYouSection({ userId }: { userId?: string | null }) {
+  if (!userId) {
+    // Unauthenticated: show public playlists as a teaser
+    const playlists = await prisma.playlist.findMany({
+      where: { isPublic: true },
+      take: 6,
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, description: true, coverUrl: true },
+    });
+    if (playlists.length === 0) return null;
+    return (
+      <section>
+        <h2 className="text-2xl font-bold text-zinc-100 mb-6">Made for you</h2>
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-3 px-3">
+          {playlists.map((p) => (
+            <div key={p.id} className="shrink-0 snap-start">
+              <PlaylistCard
+                id={p.id}
+                title={p.name}
+                subtitle={p.description ?? "Playlist"}
+                coverUrl={p.coverUrl}
+                size="lg"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  const mixes = await prisma.generatedPlaylist.findMany({
+    where: { userId },
+    orderBy: { kind: "asc" },
   });
 
-  if (playlists.length === 0) return null;
+  const needsRefresh =
+    mixes.length < 4 ||
+    mixes.some((m) => Date.now() - m.generatedAt.getTime() > STALE_MS);
+
+  if (mixes.length === 0) {
+    return (
+      <>
+        <MixRefreshTrigger needsRefresh />
+        <section>
+          <h2 className="text-2xl font-bold text-zinc-100 mb-6">Made for you</h2>
+          <p className="text-zinc-500 text-sm">
+            Your personalized mixes are being prepared…
+          </p>
+        </section>
+      </>
+    );
+  }
 
   return (
-    <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-6">Made for you</h2>
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-3 px-3">
-        {playlists.map((p) => (
-          <div key={p.id} className="shrink-0 snap-start">
-            <PlaylistCard
-              id={p.id}
-              title={p.name}
-              subtitle={p.description ?? "Playlist"}
-              coverUrl={p.coverUrl}
-              size="lg"
-            />
-          </div>
-        ))}
-      </div>
-    </section>
+    <>
+      <MixRefreshTrigger needsRefresh={needsRefresh} />
+      <section>
+        <h2 className="text-2xl font-bold text-zinc-100 mb-6">Made for you</h2>
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-3 px-3">
+          {mixes.map((mix) => (
+            <div key={mix.kind} className="snap-start">
+              <MixCard
+                kind={mix.kind}
+                name={mix.name}
+                description={mix.description}
+                gradientFrom={mix.gradientFrom}
+                gradientTo={mix.gradientTo}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
 
@@ -305,8 +355,8 @@ export default async function HomePage() {
       </div>
 
       {/* Made for you */}
-      <Suspense fallback={<HorizontalSkeleton count={6} size={240} />}>
-        <MadeForYouSection />
+      <Suspense fallback={<HorizontalSkeleton count={4} size={216} />}>
+        <MadeForYouSection userId={userId} />
       </Suspense>
 
       {/* Recently played */}

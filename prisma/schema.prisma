@@ -14,12 +14,13 @@ model User {
   image         String?
   createdAt     DateTime      @default(now())
 
-  accounts      Account[]
-  sessions      Session[]
-  playlists     Playlist[]
-  likedSongs    LikedSong[]
-  playHistory   PlayHistory[]
-  preferences   UserPreferences?
+  accounts           Account[]
+  sessions           Session[]
+  playlists          Playlist[]
+  likedSongs         LikedSong[]
+  playHistory        PlayHistory[]
+  preferences        UserPreferences?
+  generatedPlaylists GeneratedPlaylist[]
 }
 
 model UserPreferences {
@@ -146,4 +147,22 @@ model PlayHistory {
   song Song @relation(fields: [songId], references: [id], onDelete: Cascade)
 
   @@index([userId, playedAt])
+}
+
+model GeneratedPlaylist {
+  id           String   @id @default(cuid())
+  userId       String
+  kind         String   // 'daily-mix-1' | 'daily-mix-2' | 'discover-weekly' | 'on-repeat'
+  name         String
+  description  String
+  coverUrl     String?
+  gradientFrom String
+  gradientTo   String
+  songIds      String[]
+  generatedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, kind])
+  @@index([userId, generatedAt])
 }

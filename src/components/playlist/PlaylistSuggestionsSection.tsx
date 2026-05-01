@@ -76,6 +76,7 @@ export function PlaylistSuggestionsSection({
   const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
       mountedRef.current = false;
     };
@@ -107,9 +108,8 @@ export function PlaylistSuggestionsSection({
       if (!mountedRef.current) return;
       setSongs(nextSongs);
     } catch {
-      toast.error("Could not refresh suggestions");
+      if (mountedRef.current) toast.error("Could not refresh suggestions");
     } finally {
-      if (!mountedRef.current) return;
       setLoading(false);
     }
   }, [mode, mountedRef, playlistId]);
