@@ -1,3 +1,4 @@
+import { type Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { auth } from "@/lib/auth";
@@ -8,6 +9,41 @@ import {
   type SongInPlaylist,
   type SuggestedSong,
 } from "@/components/playlist/PlaylistView";
+import { ShareButton } from "@/components/shared/ShareButton";
+
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://sonara.vercel.app";
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const playlist = await prisma.playlist.findUnique({
+    where: { id },
+    select: {
+      name: true,
+      description: true,
+      coverUrl: true,
+      user: { select: { name: true } },
+    },
+  });
+  if (!playlist) return {};
+
+  const creatorName = playlist.user.name ?? "Sonara";
+  const ogImageUrl = `${BASE}/api/og?title=${encodeURIComponent(playlist.name)}&subtitle=${encodeURIComponent(`A playlist by ${creatorName}`)}`;
+
+  return {
+    title: `${playlist.name} · A playlist by ${creatorName}`,
+    description: playlist.description ?? `Listen to ${playlist.name} on Sonara.`,
+    openGraph: {
+      title: playlist.name,
+      description: playlist.description ?? `A playlist by ${creatorName}`,
+      images: [{ url: ogImageUrl, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: playlist.name,
+      images: [ogImageUrl],
+    },
+  };
+}
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -129,8 +165,34 @@ export default async function PlaylistPage({ params }: Props) {
     isLiked: likedSongIds.has(ps.song.id),
   }));
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "MusicPlaylist",
+    name: playlist.name,
+    description: playlist.description ?? undefined,
+    image: playlist.coverUrl ?? undefined,
+    numTracks: playlist.songs.length,
+    url: `${BASE}/library/playlist/${id}`,
+    author: {
+      "@type": "Person",
+      name: playlist.user.name ?? "Unknown",
+    },
+    track: playlist.songs.slice(0, 20).map((ps) => ({
+      "@type": "MusicRecording",
+      name: ps.song.title,
+      byArtist: { "@type": "MusicGroup", name: ps.song.artist },
+    })),
+  };
+
+  const shareUrl = `${BASE}/library/playlist/${id}`;
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* ── Header ──────────────────────────────────────────────────── */}
       <section className="relative px-4 md:px-8 pt-8 md:pt-16 pb-8 md:min-h-80 flex items-end">
         <div
@@ -172,7 +234,11 @@ export default async function PlaylistPage({ params }: Props) {
                 {playlist.description}
               </p>
             )}
-            <div className="flex items-center gap-2 text-sm text-zinc-300 flex-wrap">
+            <div className="flex items-center gap-4 mt-4 flex-wrap">
+              <ShareButton url={shareUrl} />
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-zinc-300 flex-wrap mt-3">
               {playlist.user.image && (
                 <div className="w-6 h-6 rounded-full overflow-hidden shrink-0">
                   <Image

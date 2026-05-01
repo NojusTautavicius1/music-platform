@@ -14,18 +14,22 @@ import {
 import { usePlayerStore } from "@/store/playerStore";
 import { updateDisplayName, updatePreferences, deleteAccount } from "@/app/actions/settings";
 
-const VOLUME_KEY = "player.volume";
-const CROSSFADE_KEY = "settings.crossfadeSeconds";
-const QUALITY_KEY = "settings.audioQuality";
-const AUTO_PLAY_KEY = "settings.autoPlayEnabled";
-const EMAIL_NEW_KEY = "settings.emailNewPlaylists";
-const EMAIL_WEEKLY_KEY = "settings.emailWeekly";
-const PROFILE_PUBLIC_KEY = "settings.profilePublic";
-const SHOW_ACTIVITY_KEY = "settings.showActivity";
+
+type Preferences = {
+  defaultVolume: number;
+  crossfadeSeconds: number;
+  audioQuality: "auto" | "low" | "medium" | "high";
+  autoPlayEnabled: boolean;
+  emailNewPlaylists: boolean;
+  emailWeekly: boolean;
+  profilePublic: boolean;
+  showActivity: boolean;
+};
 
 type Props = {
   name: string;
   email: string;
+  preferences: Preferences;
 };
 
 type TabKey = "account" | "playback" | "notifications" | "privacy" | "about";
@@ -38,7 +42,7 @@ const TAB_LABELS: Array<{ key: TabKey; label: string }> = [
   { key: "about", label: "About" },
 ];
 
-export function SettingsForm({ name, email }: Props) {
+export function SettingsForm({ name, email, preferences }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>("account");
   const [displayName, setDisplayName] = useState(name);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -46,47 +50,19 @@ export function SettingsForm({ name, email }: Props) {
 
   const setVolume = usePlayerStore((s) => s.setVolume);
 
-  const [defaultVolume, setDefaultVolume] = useState(0.7);
-  const [crossfadeSeconds, setCrossfadeSeconds] = useState(0);
-  const [audioQuality, setAudioQuality] = useState<"auto" | "low" | "medium" | "high">("auto");
-  const [autoPlayEnabled, setAutoPlayEnabled] = useState(true);
-  const [emailNewPlaylists, setEmailNewPlaylists] = useState(true);
-  const [emailWeekly, setEmailWeekly] = useState(true);
-  const [profilePublic, setProfilePublic] = useState(true);
-  const [showActivity, setShowActivity] = useState(true);
+  const [defaultVolume, setDefaultVolume] = useState(preferences.defaultVolume);
+  const [crossfadeSeconds, setCrossfadeSeconds] = useState(preferences.crossfadeSeconds);
+  const [audioQuality, setAudioQuality] = useState<"auto" | "low" | "medium" | "high">(preferences.audioQuality);
+  const [autoPlayEnabled, setAutoPlayEnabled] = useState(preferences.autoPlayEnabled);
+  const [emailNewPlaylists, setEmailNewPlaylists] = useState(preferences.emailNewPlaylists);
+  const [emailWeekly, setEmailWeekly] = useState(preferences.emailWeekly);
+  const [profilePublic, setProfilePublic] = useState(preferences.profilePublic);
+  const [showActivity, setShowActivity] = useState(preferences.showActivity);
 
+  // Sync player volume to saved preference on mount
   useEffect(() => {
-    const savedVolume = localStorage.getItem(VOLUME_KEY);
-    if (savedVolume) {
-      const parsed = parseFloat(savedVolume);
-      if (!Number.isNaN(parsed)) setDefaultVolume(parsed);
-    }
-
-    const savedCrossfade = localStorage.getItem(CROSSFADE_KEY);
-    if (savedCrossfade) {
-      const parsed = Number(savedCrossfade);
-      if (!Number.isNaN(parsed)) setCrossfadeSeconds(parsed);
-    }
-
-    const savedQuality = localStorage.getItem(QUALITY_KEY);
-    if (savedQuality === "auto" || savedQuality === "low" || savedQuality === "medium" || savedQuality === "high") {
-      setAudioQuality(savedQuality);
-    }
-
-    const savedAutoPlay = localStorage.getItem(AUTO_PLAY_KEY);
-    if (savedAutoPlay) setAutoPlayEnabled(savedAutoPlay === "true");
-
-    const savedEmailNew = localStorage.getItem(EMAIL_NEW_KEY);
-    if (savedEmailNew) setEmailNewPlaylists(savedEmailNew === "true");
-
-    const savedEmailWeekly = localStorage.getItem(EMAIL_WEEKLY_KEY);
-    if (savedEmailWeekly) setEmailWeekly(savedEmailWeekly === "true");
-
-    const savedProfilePublic = localStorage.getItem(PROFILE_PUBLIC_KEY);
-    if (savedProfilePublic) setProfilePublic(savedProfilePublic === "true");
-
-    const savedShowActivity = localStorage.getItem(SHOW_ACTIVITY_KEY);
-    if (savedShowActivity) setShowActivity(savedShowActivity === "true");
+    setVolume(preferences.defaultVolume);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleSaveName() {
@@ -101,15 +77,6 @@ export function SettingsForm({ name, email }: Props) {
   }
 
   function handleSavePreferences() {
-    localStorage.setItem(VOLUME_KEY, String(defaultVolume));
-    localStorage.setItem(CROSSFADE_KEY, String(crossfadeSeconds));
-    localStorage.setItem(QUALITY_KEY, audioQuality);
-    localStorage.setItem(AUTO_PLAY_KEY, String(autoPlayEnabled));
-    localStorage.setItem(EMAIL_NEW_KEY, String(emailNewPlaylists));
-    localStorage.setItem(EMAIL_WEEKLY_KEY, String(emailWeekly));
-    localStorage.setItem(PROFILE_PUBLIC_KEY, String(profilePublic));
-    localStorage.setItem(SHOW_ACTIVITY_KEY, String(showActivity));
-
     setVolume(defaultVolume);
 
     startTransition(async () => {

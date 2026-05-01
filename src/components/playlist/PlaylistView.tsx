@@ -1186,7 +1186,7 @@ export function PlaylistView({
   }
 
   function handleGoToArtist(song: SongInPlaylist) {
-    toast(`${song.artist} page coming soon`);
+    toast(`Artist pages are coming soon`);
   }
 
   async function handleShare() {

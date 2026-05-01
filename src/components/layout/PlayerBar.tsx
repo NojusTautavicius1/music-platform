@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Shuffle,
   SkipBack,
@@ -221,19 +222,28 @@ export function PlayerBar() {
       <div className="hidden md:flex h-22.5 items-center px-6 gap-4">
         {/* Left — song info */}
         <div className="flex items-center gap-3 w-[30%] min-w-0">
-          <div className="relative w-14 h-14 rounded shrink-0 overflow-hidden">
-            {currentSong?.coverUrl ? (
-              <Image
-                src={currentSong.coverUrl}
-                alt={currentSong.title}
-                fill
-                sizes="56px"
-                className="object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40" />
-            )}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSong?.id ?? "empty"}
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="relative w-14 h-14 rounded shrink-0 overflow-hidden"
+            >
+              {currentSong?.coverUrl ? (
+                <Image
+                  src={currentSong.coverUrl}
+                  alt={currentSong.title}
+                  fill
+                  sizes="56px"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40" />
+              )}
+            </motion.div>
+          </AnimatePresence>
           <div className="min-w-0">
             <p className="text-sm font-medium text-zinc-100 truncate">
               {currentSong?.title ?? "No song playing"}
@@ -242,10 +252,12 @@ export function PlayerBar() {
               {currentSong?.artist ?? "—"}
             </p>
           </div>
-          <button
+          <motion.button
             onClick={() => setIsLiked((v) => !v)}
+            whileTap={{ scale: 1.4 }}
+            transition={{ type: "spring", stiffness: 500, damping: 15 }}
             className="ml-2 shrink-0"
-            aria-label="Like"
+            aria-label={isLiked ? "Unlike" : "Like"}
           >
             <Heart
               size={16}
@@ -256,7 +268,7 @@ export function PlayerBar() {
                   : "text-zinc-500 hover:text-zinc-300"
               )}
             />
-          </button>
+          </motion.button>
         </div>
 
         {/* Center — controls + progress */}

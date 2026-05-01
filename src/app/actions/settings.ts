@@ -48,6 +48,18 @@ export async function updatePreferences(input: PreferencesInput): Promise<Action
   const parsed = PreferencesSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Invalid preferences" };
 
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user) return { ok: false, error: "User not found" };
+
+  await prisma.userPreferences.upsert({
+    where: { userId: user.id },
+    create: { userId: user.id, ...parsed.data },
+    update: parsed.data,
+  });
+
   revalidatePath("/settings");
   return { ok: true };
 }

@@ -1,8 +1,18 @@
+import { type Metadata } from "next";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const session = await auth();
+  const name = session?.user?.name;
+  return {
+    title: name ? `${name} on Sonara` : "Profile",
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function ProfilePage() {
   const session = await auth();

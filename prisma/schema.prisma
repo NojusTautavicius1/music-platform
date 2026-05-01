@@ -19,6 +19,21 @@ model User {
   playlists     Playlist[]
   likedSongs    LikedSong[]
   playHistory   PlayHistory[]
+  preferences   UserPreferences?
+}
+
+model UserPreferences {
+  userId            String  @id
+  defaultVolume     Float   @default(0.7)
+  crossfadeSeconds  Int     @default(0)
+  audioQuality      String  @default("auto")
+  autoPlayEnabled   Boolean @default(true)
+  emailNewPlaylists Boolean @default(true)
+  emailWeekly       Boolean @default(true)
+  profilePublic     Boolean @default(true)
+  showActivity      Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {

@@ -1,6 +1,13 @@
+import { type Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Sonara — Your music, beautifully organized",
+  description:
+    "Pick up where you left off. Browse playlists, top genres, and discover new releases.",
+};
 import { prisma } from "@/lib/prisma";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import { GENRE_COLORS, FEATURED_GENRES } from "@/lib/genreColors";
