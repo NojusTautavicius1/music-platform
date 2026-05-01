@@ -142,7 +142,10 @@ export function TopBar({ user, signOutAction }: Props) {
               {user.email}
             </div>
             <DropdownMenuSeparator className="bg-white/10" />
-            <DropdownMenuItem className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white">
+            <DropdownMenuItem
+              className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+              onClick={() => router.push("/profile")}
+            >
               <User size={14} />
               Profile
             </DropdownMenuItem>
@@ -153,7 +156,10 @@ export function TopBar({ user, signOutAction }: Props) {
               <BarChart2 size={14} />
               Stats
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white">
+            <DropdownMenuItem
+              className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+              onClick={() => router.push("/settings")}
+            >
               <Settings size={14} />
               Settings
             </DropdownMenuItem>

@@ -120,6 +120,7 @@ export function SidebarPlaylistList({ playlists: initial }: { playlists: Playlis
 
   return (
     <DndContext
+      id="sidebar-playlist-dnd"
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
