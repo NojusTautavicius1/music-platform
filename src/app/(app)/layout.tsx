@@ -1,5 +1,6 @@
 import { auth, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { PageTransition } from "@/components/shared/PageTransition";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SidebarContent } from "@/components/layout/SidebarContent";
 import { TopBar } from "@/components/layout/TopBar";
@@ -24,6 +25,14 @@ export default async function AppLayout({
 
   return (
     <div className="h-screen flex flex-col bg-[#0A0A0F] text-zinc-100 overflow-hidden">
+      {/* Skip to main content — screen readers / keyboard */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[#8B5CF6] focus:text-white focus:text-sm focus:font-semibold"
+      >
+        Skip to content
+      </a>
+
       {/* Mobile sidebar sheet — lg+ users never see this */}
       <MobileSidebarSheet>
         <SidebarContent />
@@ -35,7 +44,9 @@ export default async function AppLayout({
 
         <div className="flex-1 flex flex-col min-h-0">
           <TopBar user={session.user} signOutAction={handleSignOut} />
-          <main className="flex-1 overflow-y-auto">{children}</main>
+          <main id="main-content" className="flex-1 overflow-y-auto">
+            <PageTransition>{children}</PageTransition>
+          </main>
         </div>
       </div>
 

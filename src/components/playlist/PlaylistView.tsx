@@ -67,7 +67,7 @@ import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
 import { toggleLike } from "@/app/actions/like";
 import {
   addSongToPlaylist,
-  addSongToNewPlaylist,
+  createPlaylistWithSong,
   deletePlaylist,
   removeSongFromPlaylist,
   updatePlaylist,
@@ -191,7 +191,7 @@ function SongRow({
   }
 
   async function handleAddToNew() {
-    const result = await addSongToNewPlaylist(song.songId);
+    const result = await createPlaylistWithSong(song.songId);
     if (result.ok) {
       toast.success(`Added to ${result.name}`);
     } else {
@@ -1186,7 +1186,7 @@ export function PlaylistView({
   }
 
   function handleGoToArtist(song: SongInPlaylist) {
-    toast(`${song.artist} page coming soon`);
+    toast(`Artist pages are coming soon`);
   }
 
   async function handleShare() {

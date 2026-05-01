@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Home, Search, Library, User, LogOut } from "lucide-react";
+import { Home, Search, Library, User, LogOut, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -88,7 +88,23 @@ export function BottomNav({ user, signOutAction }: Props) {
             </div>
           </div>
 
-          <div className="border-t border-white/10 pt-2">
+          <div className="border-t border-white/10 pt-2 space-y-1">
+            <Link
+              href="/profile"
+              onClick={() => setProfileOpen(false)}
+              className="flex items-center gap-3 w-full px-2 py-3 rounded-lg text-zinc-200 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              <User size={18} />
+              Profile
+            </Link>
+            <Link
+              href="/settings"
+              onClick={() => setProfileOpen(false)}
+              className="flex items-center gap-3 w-full px-2 py-3 rounded-lg text-zinc-200 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              <Settings size={18} />
+              Settings
+            </Link>
             <button
               onClick={() => startTransition(() => signOutAction())}
               className="flex items-center gap-3 w-full px-2 py-3 rounded-lg text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors"

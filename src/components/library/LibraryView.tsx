@@ -1,38 +1,17 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { toast } from "sonner";
-import {
-  Plus,
-  LayoutGrid,
-  List,
-  ChevronDown,
-  Music2,
-  Loader2,
-} from "lucide-react";
+import { useState, useMemo } from "react";
+import { CreatePlaylistDialog } from "@/components/playlist/CreatePlaylistDialog";
+import { Plus, LayoutGrid, List, ChevronDown, Music2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { createPlaylist } from "@/app/actions/playlist";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,132 +30,6 @@ type SortMode = "recent" | "alpha";
 type FilterMode = "all" | "playlists";
 type ViewMode = "grid" | "list";
 
-// ─── Form schema ──────────────────────────────────────────────────────────────
-
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required").max(60, "Max 60 characters"),
-  description: z.string().max(200, "Max 200 characters"),
-  isPublic: z.boolean(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
-// ─── Create Playlist Dialog ───────────────────────────────────────────────────
-
-function CreatePlaylistDialog({
-  open,
-  onOpenChange,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}) {
-  const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-    setValue,
-    watch,
-  } = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { name: "", description: "", isPublic: false },
-  });
-
-  const isPublic = watch("isPublic");
-
-  useEffect(() => {
-    if (!open) reset();
-  }, [open, reset]);
-
-  async function onSubmit(values: FormValues) {
-    const result = await createPlaylist(values);
-    if (result.ok) {
-      onOpenChange(false);
-      toast.success("Playlist created");
-      router.push(`/library/playlist/${result.id}`);
-    } else {
-      toast.error(result.error);
-    }
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#18181F] border-white/10 text-zinc-100 max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-bold text-zinc-100">
-            Create playlist
-          </DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mt-1">
-          {/* Name */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-300" htmlFor="pl-name">
-              Name <span className="text-[#EC4899]">*</span>
-            </label>
-            <Input
-              id="pl-name"
-              placeholder="My awesome playlist"
-              className="bg-white/5 border-white/10 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-[#8B5CF6]/50"
-              {...register("name")}
-            />
-            {errors.name && (
-              <p className="text-xs text-[#EC4899]">{errors.name.message}</p>
-            )}
-          </div>
-
-          {/* Description */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-300" htmlFor="pl-desc">
-              Description
-            </label>
-            <Textarea
-              id="pl-desc"
-              placeholder="Optional description…"
-              rows={3}
-              {...register("description")}
-            />
-            {errors.description && (
-              <p className="text-xs text-[#EC4899]">{errors.description.message}</p>
-            )}
-          </div>
-
-          {/* Public toggle */}
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-zinc-300">Make public</p>
-              <p className="text-xs text-zinc-500">Anyone can see this playlist</p>
-            </div>
-            <Switch
-              checked={isPublic}
-              onCheckedChange={(checked) => setValue("isPublic", checked)}
-            />
-          </div>
-
-          {/* Footer */}
-          <div className="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="px-4 py-2 text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex items-center gap-2 px-5 py-2 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#EC4899] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
-            >
-              {isSubmitting && <Loader2 size={14} className="animate-spin" />}
-              Create
-            </button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
 
 // ─── Filter chip ──────────────────────────────────────────────────────────────
 
@@ -223,7 +76,6 @@ export function LibraryView({ playlists }: Props) {
   const [sort, setSort] = useState<SortMode>("recent");
   const [filter, setFilter] = useState<FilterMode>("all");
   const [view, setView] = useState<ViewMode>("grid");
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   const sortLabel = sort === "recent" ? "Recently added" : "Alphabetical";
 
@@ -249,13 +101,14 @@ export function LibraryView({ playlists }: Props) {
       <div className="px-4 md:px-8 pt-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold text-zinc-100">Your Library</h1>
-          <button
-            onClick={() => setDialogOpen(true)}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
-            aria-label="Create playlist"
-          >
-            <Plus size={18} />
-          </button>
+          <CreatePlaylistDialog>
+            <button
+              className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label="Create playlist"
+            >
+              <Plus size={18} />
+            </button>
+          </CreatePlaylistDialog>
         </div>
 
         <div className="flex items-center gap-2">
@@ -356,12 +209,11 @@ export function LibraryView({ playlists }: Props) {
           title="Your library is quiet"
           description="Create your first playlist to start curating"
           action={
-            <button
-              onClick={() => setDialogOpen(true)}
-              className="px-5 py-2.5 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#EC4899] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
-            >
-              Create Playlist
-            </button>
+            <CreatePlaylistDialog>
+              <button className="px-5 py-2.5 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#EC4899] text-white text-sm font-semibold hover:opacity-90 transition-opacity">
+                Create Playlist
+              </button>
+            </CreatePlaylistDialog>
           }
         />
       ) : view === "grid" ? (
@@ -424,8 +276,6 @@ export function LibraryView({ playlists }: Props) {
         </div>
       )}
 
-      {/* ── Dialog ──────────────────────────────────────────────────── */}
-      <CreatePlaylistDialog open={dialogOpen} onOpenChange={setDialogOpen} />
     </div>
   );
 }

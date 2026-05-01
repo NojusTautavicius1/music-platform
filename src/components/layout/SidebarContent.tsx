@@ -3,6 +3,7 @@ import { Home, Search, Library, LayoutGrid, Plus, Heart } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { CreatePlaylistDialog } from "@/components/playlist/CreatePlaylistDialog";
 import { NavItem } from "./NavItem";
 import { SidebarPlaylistList } from "./SidebarPlaylistList";
 
@@ -54,12 +55,14 @@ export async function SidebarContent() {
 
       {/* Create + Liked */}
       <div className="px-3 space-y-1 shrink-0">
-        <button className="flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors w-full text-left text-sm font-medium">
-          <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center shrink-0">
-            <Plus size={16} />
-          </div>
-          Create Playlist
-        </button>
+        <CreatePlaylistDialog>
+          <button className="flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors w-full text-left text-sm font-medium">
+            <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center shrink-0">
+              <Plus size={16} />
+            </div>
+            Create Playlist
+          </button>
+        </CreatePlaylistDialog>
 
         <Link
           href="/library/liked"

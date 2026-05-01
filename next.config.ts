@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
     root: appRoot,
   },
   reactCompiler: true,
+  experimental: {
+    optimizePackageImports: ["lucide-react", "date-fns", "framer-motion"],
+  },
   images: {
     remotePatterns: [
       { hostname: "picsum.photos" },
