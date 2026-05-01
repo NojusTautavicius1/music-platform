@@ -32,6 +32,7 @@ export default async function LikedSongsPage() {
             duration: true,
             coverUrl: true,
             audioUrl: true,
+            waveformPeaks: true,
           },
         },
       },
@@ -55,6 +56,7 @@ export default async function LikedSongsPage() {
     duration: r.song.duration,
     coverUrl: r.song.coverUrl,
     audioUrl: r.song.audioUrl,
+    waveformPeaks: r.song.waveformPeaks as number[] | null,
     isLiked: true,
   }));
 

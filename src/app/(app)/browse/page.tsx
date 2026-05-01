@@ -54,6 +54,7 @@ export default async function BrowsePage({ searchParams }: Props) {
         duration: true,
         coverUrl: true,
         audioUrl: true,
+        waveformPeaks: true,
       },
     }),
     prisma.song.count({ where }),
@@ -74,9 +75,14 @@ export default async function BrowsePage({ searchParams }: Props) {
 
   const genres = genreRows.map((g) => g.genre as string);
 
+  const typedSongs = songs.map((s) => ({
+    ...s,
+    waveformPeaks: s.waveformPeaks as number[] | null,
+  }));
+
   return (
     <BrowseSongsView
-      songs={songs}
+      songs={typedSongs}
       total={total}
       genres={genres}
       userPlaylists={userPlaylists}

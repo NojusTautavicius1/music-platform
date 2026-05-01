@@ -22,6 +22,7 @@ import {
   Laptop,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+import { Waveform } from "@/components/player/Waveform";
 import {
   Popover,
   PopoverTrigger,
@@ -333,15 +334,21 @@ export function PlayerBar() {
             <span className="text-xs text-zinc-500 w-8 text-right shrink-0">
               {formatDuration(currentTimeSecs)}
             </span>
-            <Slider
-              value={[currentTimeSecs]}
-              max={displayDuration || 1}
-              onValueChange={(v) => {
-                const secs = Array.isArray(v) ? v[0] : v;
-                seek(secs / (displayDuration || 1));
-              }}
-              className="flex-1"
-            />
+            {currentSong ? (
+              <div className="flex-1">
+                <Waveform
+                  audioUrl={currentSong.audioUrl ?? currentSong.id}
+                  peaks={currentSong.waveformPeaks as number[] | null}
+                  currentTime={currentTimeSecs}
+                  duration={displayDuration}
+                  onSeek={(secs) => seek(secs / (displayDuration || 1))}
+                  height={32}
+                  variant="compact"
+                />
+              </div>
+            ) : (
+              <div className="flex-1 h-8 rounded bg-white/5" />
+            )}
             <span className="text-xs text-zinc-500 w-8 shrink-0">
               {formatDuration(displayDuration)}
             </span>

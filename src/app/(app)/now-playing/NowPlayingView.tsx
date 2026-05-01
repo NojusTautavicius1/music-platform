@@ -20,6 +20,7 @@ import {
   Volume2,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+import { Waveform } from "@/components/player/Waveform";
 import { cn } from "@/lib/utils";
 import { formatDuration } from "@/lib/format";
 import { usePlayerStore } from "@/store/playerStore";
@@ -185,14 +186,14 @@ export function NowPlayingView() {
 
             {/* Progress bar */}
             <div className="w-full space-y-1.5">
-              <Slider
-                value={[currentTimeSecs]}
-                max={displayDuration || 1}
-                onValueChange={(v) => {
-                  const secs = Array.isArray(v) ? v[0] : v;
-                  seek(secs / (displayDuration || 1));
-                }}
-                className="w-full"
+              <Waveform
+                audioUrl={currentSong.audioUrl ?? currentSong.id}
+                peaks={currentSong.waveformPeaks as number[] | null}
+                currentTime={currentTimeSecs}
+                duration={displayDuration}
+                onSeek={(secs) => seek(secs / (displayDuration || 1))}
+                height={64}
+                variant="full"
               />
               <div className="flex justify-between text-xs text-zinc-500">
                 <span>{formatDuration(currentTimeSecs)}</span>

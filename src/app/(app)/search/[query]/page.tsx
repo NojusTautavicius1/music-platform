@@ -39,6 +39,7 @@ export default async function SearchResultsPage({ params, searchParams }: Props)
         duration: true,
         coverUrl: true,
         audioUrl: true,
+        waveformPeaks: true,
       },
     }),
 
@@ -77,11 +78,16 @@ export default async function SearchResultsPage({ params, searchParams }: Props)
 
   const artists = artistRows.map((r) => r.artist);
 
+  const typedSongs = songs.map((s) => ({
+    ...s,
+    waveformPeaks: s.waveformPeaks as number[] | null,
+  }));
+
   return (
     <SearchResultsView
       query={query}
       tab={tab}
-      songs={songs}
+      songs={typedSongs}
       playlists={playlists}
       artists={artists}
       userPlaylists={userPlaylists}

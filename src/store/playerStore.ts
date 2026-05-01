@@ -9,6 +9,7 @@ export type PlayerSong = {
   duration: number;
   coverUrl: string | null;
   audioUrl: string | null;
+  waveformPeaks?: number[] | null;
 };
 
 export type RepeatMode = "off" | "one" | "all";

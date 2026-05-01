@@ -79,6 +79,7 @@ export default async function PlaylistPage({ params }: Props) {
                 duration: true,
                 coverUrl: true,
                 audioUrl: true,
+                waveformPeaks: true,
               },
             },
           },
@@ -140,10 +141,13 @@ export default async function PlaylistPage({ params }: Props) {
         take: 30,
         select: {
           id: true, title: true, artist: true, album: true,
-          genre: true, duration: true, coverUrl: true, audioUrl: true,
+          genre: true, duration: true, coverUrl: true, audioUrl: true, waveformPeaks: true,
         },
       });
-      suggestedSongs.push(...shuffleTake(candidates, 5));
+      suggestedSongs.push(...shuffleTake(candidates, 5).map((c) => ({
+        ...c,
+        waveformPeaks: c.waveformPeaks as number[] | null,
+      })));
     }
   }
 
@@ -162,6 +166,7 @@ export default async function PlaylistPage({ params }: Props) {
     duration: ps.song.duration,
     coverUrl: ps.song.coverUrl,
     audioUrl: ps.song.audioUrl,
+    waveformPeaks: ps.song.waveformPeaks as number[] | null,
     isLiked: likedSongIds.has(ps.song.id),
   }));
 

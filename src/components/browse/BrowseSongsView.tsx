@@ -22,6 +22,7 @@ type BrowseSong = {
   duration: number;
   coverUrl: string | null;
   audioUrl: string | null;
+  waveformPeaks?: number[] | null;
 };
 
 type UserPlaylist = { id: string; name: string };
@@ -216,6 +217,7 @@ function SongRow({
     duration: song.duration,
     coverUrl: song.coverUrl,
     audioUrl: song.audioUrl,
+    waveformPeaks: song.waveformPeaks,
   };
 
   function handlePlay() {
@@ -342,6 +344,7 @@ export function BrowseSongsView({
     duration: s.duration,
     coverUrl: s.coverUrl,
     audioUrl: s.audioUrl,
+    waveformPeaks: s.waveformPeaks,
   }));
 
   const pushParams = useCallback(

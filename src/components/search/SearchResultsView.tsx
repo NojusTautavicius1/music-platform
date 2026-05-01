@@ -24,6 +24,7 @@ type SongResult = {
   duration: number;
   coverUrl: string | null;
   audioUrl: string | null;
+  waveformPeaks?: number[] | null;
 };
 
 type PlaylistResult = {
@@ -122,6 +123,7 @@ function SongRow({
       duration: song.duration,
       coverUrl: song.coverUrl,
       audioUrl: song.audioUrl,
+      waveformPeaks: song.waveformPeaks,
     };
     if (isActive) {
       togglePlay();
@@ -269,6 +271,7 @@ function TopResultCard({
       duration: s.duration,
       coverUrl: s.coverUrl,
       audioUrl: s.audioUrl,
+      waveformPeaks: s.waveformPeaks,
     };
     const queue = songs.map((song) => ({
       id: song.id,
@@ -278,6 +281,7 @@ function TopResultCard({
       duration: song.duration,
       coverUrl: song.coverUrl,
       audioUrl: song.audioUrl,
+      waveformPeaks: song.waveformPeaks,
     }));
 
     return (
@@ -362,6 +366,7 @@ export function SearchResultsView({
     duration: s.duration,
     coverUrl: s.coverUrl,
     audioUrl: s.audioUrl,
+    waveformPeaks: s.waveformPeaks,
   }));
 
   const showLoadMore = activeTab === "songs" && songs.length < songCount;

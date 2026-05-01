@@ -87,6 +87,7 @@ export type SongInPlaylist = {
   duration: number;
   coverUrl: string | null;
   audioUrl: string | null;
+  waveformPeaks?: number[] | null;
   isLiked?: boolean;
 };
 
@@ -104,6 +105,7 @@ export type SuggestedSong = {
   duration: number;
   coverUrl: string | null;
   audioUrl: string | null;
+  waveformPeaks?: number[] | null;
 };
 
 const editFormSchema = z.object({
@@ -1033,6 +1035,7 @@ export function PlaylistView({
       duration: song.duration,
       coverUrl: song.coverUrl,
       audioUrl: song.audioUrl,
+      waveformPeaks: song.waveformPeaks,
       isLiked: false,
     };
     setDisplaySongs((prev) => [...prev, newSong]);
@@ -1117,6 +1120,7 @@ export function PlaylistView({
     duration: s.duration,
     coverUrl: s.coverUrl,
     audioUrl: s.audioUrl,
+    waveformPeaks: s.waveformPeaks,
   }));
 
   const filtered = displaySongs.filter(
@@ -1179,6 +1183,7 @@ export function PlaylistView({
       duration: song.duration,
       coverUrl: song.coverUrl,
       audioUrl: song.audioUrl,
+      waveformPeaks: song.waveformPeaks,
     };
     const { queue: currentQueue, setQueue } = usePlayerStore.getState();
     setQueue([...currentQueue, playerSong]);
@@ -1222,6 +1227,7 @@ export function PlaylistView({
       duration: song.duration,
       coverUrl: song.coverUrl,
       audioUrl: song.audioUrl,
+      waveformPeaks: song.waveformPeaks,
     };
     if (currentSong?.id === song.songId) {
       togglePlay();
