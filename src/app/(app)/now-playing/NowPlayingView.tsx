@@ -23,10 +23,12 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Waveform } from "@/components/player/Waveform";
 import { cn } from "@/lib/utils";
-import { formatDuration } from "@/lib/format";
+import { formatDuration, formatPlayCount } from "@/lib/format";
 import { usePlayerStore } from "@/store/playerStore";
 import { toggleLike } from "@/app/actions/like";
 import { CoverGradient } from "@/components/playlist/CoverGradient";
+import { LyricsPanel } from "@/components/lyrics/LyricsPanel";
+import type { LyricsAnalysis } from "@/app/api/lyrics/[songId]/route";
 
 export function NowPlayingView() {
   const router = useRouter();
@@ -34,14 +36,18 @@ export function NowPlayingView() {
   const [isLiked, setIsLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [lyricsAnalysis, setLyricsAnalysis] = useState<LyricsAnalysis | null>(null);
   const shareTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Read store after mount to avoid hydration mismatch
   useEffect(() => setMounted(true), []);
 
-  // Reset like state when song changes
+  // Reset like state and lyrics analysis when song changes
   const currentSongId = usePlayerStore((s) => s.currentSong?.id);
-  useEffect(() => { setIsLiked(false); }, [currentSongId]);
+  useEffect(() => {
+    setIsLiked(false);
+    setLyricsAnalysis(null);
+  }, [currentSongId]);
 
   const currentSong  = usePlayerStore((s) => s.currentSong);
   const isPlaying    = usePlayerStore((s) => s.isPlaying);
@@ -185,11 +191,44 @@ export function NowPlayingView() {
             {/* Song info + actions */}
             <div className="flex items-start justify-between w-full gap-4">
               <div className="min-w-0">
-                <h1 className="text-3xl font-bold text-white leading-tight truncate">
+                <h1 className="text-3xl font-extrabold text-white leading-tight truncate">
                   {currentSong.title}
                 </h1>
                 <p className="text-lg text-zinc-300 mt-1 truncate">
                   {currentSong.artist}
+                </p>
+                {/* Audio feature badges */}
+                {currentSong.analyzedAt ? (
+                  <div className="flex items-center flex-wrap gap-1.5 mt-2">
+                    {currentSong.bpm != null && (
+                      <span className="px-2 py-0.5 rounded-full bg-white/8 border border-white/10 text-xs text-zinc-300 tabular-nums">
+                        {Math.round(currentSong.bpm)} BPM
+                      </span>
+                    )}
+                    {currentSong.key && (
+                      <span className="px-2 py-0.5 rounded-full bg-white/8 border border-white/10 text-xs text-zinc-300">
+                        {currentSong.key}
+                      </span>
+                    )}
+                    {currentSong.mood && (
+                      <span className="px-2 py-0.5 rounded-full bg-white/8 border border-white/10 text-xs text-zinc-300 capitalize">
+                        {currentSong.mood}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-xs text-zinc-600 mt-2 italic">Analyzing…</p>
+                )}
+                {lyricsAnalysis && (
+                  <div className="flex items-center gap-1.5 mt-1.5">
+                    <span className="px-2 py-0.5 rounded-full bg-brand-purple/15 border border-brand-purple/30 text-xs text-[#C4B5FD] capitalize">
+                      Lyrics: {lyricsAnalysis.mood}
+                      {lyricsAnalysis.themes[0] ? ` · ${lyricsAnalysis.themes[0]}` : ""}
+                    </span>
+                  </div>
+                )}
+                <p className="text-xs text-zinc-500 mt-1.5">
+                  {formatPlayCount(currentSong.playCount ?? 0)} plays
                 </p>
               </div>
               <div className="flex items-center gap-3 shrink-0 pt-1">
@@ -306,7 +345,9 @@ export function NowPlayingView() {
               <Volume2 size={16} className="text-zinc-500 shrink-0" />
               <Slider
                 value={[Math.round(volume * 100)]}
+                min={0}
                 max={100}
+                aria-label="Volume"
                 onValueChange={(v) => {
                   const pct = Array.isArray(v) ? v[0] : v;
                   setVolume(pct / 100);
@@ -325,17 +366,18 @@ export function NowPlayingView() {
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 60, opacity: 0 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
-                className="w-80 shrink-0 h-full max-h-130 rounded-xl bg-white/5 backdrop-blur-sm flex flex-col items-center justify-center gap-4 p-8"
+                className="w-80 shrink-0 h-full max-h-130 rounded-xl bg-white/5 backdrop-blur-sm flex flex-col overflow-hidden"
               >
-                <Music2 size={48} className="text-zinc-600" />
-                <div className="text-center">
-                  <p className="text-base font-semibold text-zinc-300">
-                    Lyrics coming soon
-                  </p>
-                  <p className="text-sm text-zinc-600 mt-1">
-                    We&apos;re working on it.
+                <div className="px-4 pt-4 pb-2 shrink-0 border-b border-white/10">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
+                    Lyrics
                   </p>
                 </div>
+                <LyricsPanel
+                  songId={currentSong.id}
+                  currentTime={currentTimeSecs}
+                  onAnalysis={setLyricsAnalysis}
+                />
               </motion.div>
             )}
           </AnimatePresence>

@@ -3,6 +3,7 @@ import { Home, Search, Library, LayoutGrid, Plus, Heart } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getPlaylistPlayCounts } from "@/lib/playCounts";
 import { CreatePlaylistDialog } from "@/components/playlist/CreatePlaylistDialog";
 import { NavItem } from "./NavItem";
 import { SidebarPlaylistList } from "./SidebarPlaylistList";
@@ -23,6 +24,12 @@ export async function SidebarContent() {
       ? prisma.likedSong.count({ where: { user: { email } } })
       : 0,
   ]);
+
+  const playCountMap = await getPlaylistPlayCounts(playlists.map((playlist) => playlist.id));
+  const playlistsWithCounts = playlists.map((playlist) => ({
+    ...playlist,
+    playCount: playCountMap.get(playlist.id) ?? 0,
+  }));
 
   return (
     <>
@@ -82,7 +89,7 @@ export async function SidebarContent() {
 
       {/* Playlists */}
       <ScrollArea className="flex-1 px-3 pb-4">
-        <SidebarPlaylistList playlists={playlists} />
+        <SidebarPlaylistList playlists={playlistsWithCounts} />
       </ScrollArea>
     </>
   );

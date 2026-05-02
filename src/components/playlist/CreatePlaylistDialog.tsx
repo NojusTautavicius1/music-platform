@@ -106,7 +106,7 @@ export function CreatePlaylistDialog({ children, open, onOpenChange }: Props) {
               id="pl-name"
               autoFocus
               placeholder="My awesome playlist"
-              className="bg-white/5 border-white/10 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-[#8B5CF6]/50"
+              className="bg-white/5 border-white/15 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-orange-500/40"
               {...register("name")}
             />
             {errors.name && (

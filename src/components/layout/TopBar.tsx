@@ -116,7 +116,7 @@ export function TopBar({ user, signOutAction }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="What do you want to listen to?"
-            className="flex-1 pl-9 bg-white/5 border-white/10 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-[#8B5CF6]/50 h-9 rounded-full"
+            className="flex-1 pl-9 bg-white/5 border-white/15 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-orange-500/40 h-9 rounded-full"
           />
           <button
             type="button"
@@ -135,7 +135,7 @@ export function TopBar({ user, signOutAction }: Props) {
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <button className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B5CF6]/60">
+              <button className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/40">
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} />
                   <AvatarFallback className="bg-linear-to-br from-[#8B5CF6] to-[#EC4899] text-white text-xs font-semibold">

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { SearchResultsView } from "@/components/search/SearchResultsView";
+import { getArtistMonthlyListeners, getPlaylistPlayCounts, getSongPlayCounts } from "@/lib/playCounts";
 
 type Props = {
   params: Promise<{ query: string }>;
@@ -76,11 +77,14 @@ export default async function SearchResultsPage({ params, searchParams }: Props)
       : [],
   ]);
 
-  const artists = artistRows.map((r) => r.artist);
+  const playCountMap = await getSongPlayCounts(songs.map((song) => song.id));
+  const artists = await getArtistMonthlyListeners(artistRows.map((r) => r.artist));
+  const playlistPlayCounts = await getPlaylistPlayCounts(playlists.map((playlist) => playlist.id));
 
   const typedSongs = songs.map((s) => ({
     ...s,
     waveformPeaks: s.waveformPeaks as number[] | null,
+    playCount: playCountMap.get(s.id) ?? 0,
   }));
 
   return (
@@ -88,8 +92,14 @@ export default async function SearchResultsPage({ params, searchParams }: Props)
       query={query}
       tab={tab}
       songs={typedSongs}
-      playlists={playlists}
-      artists={artists}
+      playlists={playlists.map((playlist) => ({
+        ...playlist,
+        playCount: playlistPlayCounts.get(playlist.id) ?? 0,
+      }))}
+      artists={artistRows.map((row) => ({
+        name: row.artist,
+        monthlyListeners: artists.get(row.artist) ?? 0,
+      }))}
       userPlaylists={userPlaylists}
       songCount={songCount}
       songPage={songPage}

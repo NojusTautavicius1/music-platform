@@ -97,22 +97,16 @@ async function loadSongsByIds(songIds: string[]): Promise<RecommendationSong[]> 
   });
 }
 
-async function getUserIdOrThrow() {
+async function getUserId(): Promise<string | null> {
   const session = await auth();
-  if (!session?.user?.email) {
-    throw new Error("Not authenticated");
-  }
+  if (!session?.user?.email) return null;
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     select: { id: true },
   });
 
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  return user.id;
+  return user?.id ?? null;
 }
 
 // FUTURE: replace this heuristic with the AI agent's recommendation pipeline. Keep this function's signature stable.
@@ -120,7 +114,8 @@ export async function suggestSongsForPlaylist(
   playlistId: string,
   options: SuggestSongsOptions = {}
 ): Promise<RecommendationSong[]> {
-  const userId = await getUserIdOrThrow();
+  const userId = await getUserId();
+  if (!userId) return [];
   const limit = options.limit ?? DEFAULT_LIMIT;
   const seed = options.seed ?? `${playlistId}:${Date.now()}`;
 

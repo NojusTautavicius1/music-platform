@@ -1,6 +1,7 @@
 import { auth, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { PageTransition } from "@/components/shared/PageTransition";
+import { OfflineBanner } from "@/components/shared/OfflineBanner";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SidebarContent } from "@/components/layout/SidebarContent";
 import { TopBar } from "@/components/layout/TopBar";
@@ -26,6 +27,7 @@ export default async function AppLayout({
 
   return (
     <div className="h-screen flex flex-col bg-[#0A0A0F] text-zinc-100 overflow-hidden">
+      <OfflineBanner />
       {/* Skip to main content — screen readers / keyboard */}
       <a
         href="#main-content"

@@ -1,10 +1,17 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getSongPlayCount } from "@/lib/playCounts";
+
+const SongIdSchema = z.object({ songId: z.string().min(1) });
 
 export async function recordPlay(songId: string): Promise<void> {
+  const parsed = SongIdSchema.safeParse({ songId });
+  if (!parsed.success) return;
+
   const session = await auth();
   if (!session?.user?.email) return;
 
@@ -28,4 +35,10 @@ export async function recordPlay(songId: string): Promise<void> {
   await prisma.playHistory.create({ data: { userId: user.id, songId } });
   revalidatePath("/");
   revalidatePath("/stats");
+  revalidateTag("play-counts", "default");
+}
+
+/** Returns the total global play count for a song (for client components). */
+export async function fetchSongPlayCount(songId: string): Promise<number> {
+  return getSongPlayCount(songId);
 }

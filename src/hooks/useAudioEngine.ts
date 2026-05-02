@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Howl } from "howler";
+import { toast } from "sonner";
 import { usePlayerStore } from "@/store/playerStore";
 import { recordPlay } from "@/app/actions/playHistory";
 
@@ -65,16 +66,6 @@ export function useAudioEngine() {
           },
           onplay() {
             startRaf(howl);
-            // Record fresh start only (position near 0 = not a resume after pause)
-            const pos = howl.seek() as number;
-            if (pos < 1 && song?.id) {
-              const now = Date.now();
-              const last = lastPlayRef.current;
-              if (!last || last.songId !== song.id || now - last.time > 30_000) {
-                lastPlayRef.current = { songId: song.id, time: now };
-                recordPlay(song.id).catch(() => {});
-              }
-            }
           },
           onpause() {
             cancelAnimationFrame(rafRef.current);
@@ -84,6 +75,16 @@ export function useAudioEngine() {
           },
           onend() {
             cancelAnimationFrame(rafRef.current);
+            // Record play on song completion (not on start) — guard against
+            // repeat-one double-fires by checking lastPlayRef.
+            if (song?.id) {
+              const now = Date.now();
+              const last = lastPlayRef.current;
+              if (!last || last.songId !== song.id || now - last.time > 30_000) {
+                lastPlayRef.current = { songId: song.id, time: now };
+                recordPlay(song.id).catch(() => {});
+              }
+            }
             const { repeatMode } = usePlayerStore.getState();
             if (repeatMode === "one") {
               howl.seek(0);
@@ -94,6 +95,8 @@ export function useAudioEngine() {
           },
           onloaderror(_id, err) {
             console.error("[AudioEngine] load error:", err);
+            toast.error("Couldn't load this song");
+            usePlayerStore.getState().next();
           },
         });
 

@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "date-fns", "framer-motion"],
   },
   images: {
+    localPatterns: [
+      { pathname: "/api/og" },
+      { pathname: "/covers/**" },
+      { pathname: "/audio/**" },
+    ],
     remotePatterns: [
       { hostname: "picsum.photos" },
       { hostname: "placehold.co" },

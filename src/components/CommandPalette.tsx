@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Command } from "cmdk";
 import {
   Plus,
@@ -20,6 +21,7 @@ import {
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
 import { CreatePlaylistDialog } from "@/components/playlist/CreatePlaylistDialog";
+import { DialogTitle } from "@/components/ui/dialog";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
 import { globalSearch, getRecentPlays } from "@/app/actions/search";
 import { useUIStore } from "@/store/uiStore";
@@ -187,6 +189,7 @@ export function CommandPalette() {
     <>
       <CreatePlaylistDialog open={createOpen} onOpenChange={setCreateOpen} />
       <Command.Dialog open={open} onOpenChange={setOpen} label="Command palette">
+        <DialogTitle className="sr-only">Command palette</DialogTitle>
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
         <Command
           className="fixed left-1/2 top-24 z-50 w-[90vw] max-w-[640px] -translate-x-1/2 overflow-hidden rounded-xl border border-white/10 bg-[#1A1A1C] shadow-2xl"
@@ -252,8 +255,7 @@ export function CommandPalette() {
                   >
                     <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center overflow-hidden">
                       {song.coverUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={song.coverUrl} alt="" className="w-full h-full object-cover" />
+                        <Image src={song.coverUrl} alt="" width={24} height={24} className="w-full h-full object-cover" />
                       ) : (
                         <Music2 size={14} className="text-zinc-500" />
                       )}
@@ -284,8 +286,7 @@ export function CommandPalette() {
                       >
                         <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center overflow-hidden">
                           {song.coverUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={song.coverUrl} alt="" className="w-full h-full object-cover" />
+                            <Image src={song.coverUrl} alt="" width={24} height={24} className="w-full h-full object-cover" />
                           ) : (
                             <Music2 size={14} className="text-zinc-500" />
                           )}
@@ -313,8 +314,7 @@ export function CommandPalette() {
                       >
                         <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center overflow-hidden">
                           {playlist.coverUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={playlist.coverUrl} alt="" className="w-full h-full object-cover" />
+                            <Image src={playlist.coverUrl} alt="" width={24} height={24} className="w-full h-full object-cover" />
                           ) : (
                             <Music2 size={14} className="text-zinc-500" />
                           )}
@@ -344,8 +344,7 @@ export function CommandPalette() {
                       >
                         <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center overflow-hidden">
                           {playlist.coverUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={playlist.coverUrl} alt="" className="w-full h-full object-cover" />
+                            <Image src={playlist.coverUrl} alt="" width={24} height={24} className="w-full h-full object-cover" />
                           ) : (
                             <Music2 size={14} className="text-zinc-500" />
                           )}

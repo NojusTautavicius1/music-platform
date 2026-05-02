@@ -10,6 +10,17 @@ export type PlayerSong = {
   coverUrl: string | null;
   audioUrl: string | null;
   waveformPeaks?: number[] | null;
+  playCount?: number;
+  bpm?: number | null;
+  key?: string | null;
+  mood?: string | null;
+  energy?: number | null;
+  valence?: number | null;
+  danceability?: number | null;
+  acousticness?: number | null;
+  instrumentalness?: number | null;
+  loudness?: number | null;
+  analyzedAt?: Date | string | null;
 };
 
 export type RepeatMode = "off" | "one" | "all";

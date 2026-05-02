@@ -76,7 +76,7 @@ export default async function LikedSongsPage() {
 
         <div className="relative flex gap-6 items-end w-full">
           {/* Cover — gradient square with heart */}
-          <div className="shrink-0 w-58 h-58 rounded-md shadow-2xl overflow-hidden bg-linear-to-br from-[#8B5CF6] to-[#3B82F6] flex items-center justify-center">
+          <div className="shrink-0 w-58 h-58 rounded-md shadow-2xl overflow-hidden bg-linear-to-br from-brand-orange via-brand-magenta to-brand-purple flex items-center justify-center">
             <Heart size={72} fill="white" className="text-white opacity-90" />
           </div>
 

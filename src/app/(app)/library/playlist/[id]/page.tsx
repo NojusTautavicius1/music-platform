@@ -81,6 +81,8 @@ export default async function PlaylistPage({ params }: Props) {
                 coverUrl: true,
                 audioUrl: true,
                 waveformPeaks: true,
+                license: true,
+                licenseAttribution: true,
               },
             },
           },
@@ -143,6 +145,7 @@ export default async function PlaylistPage({ params }: Props) {
         select: {
           id: true, title: true, artist: true, album: true,
           genre: true, duration: true, coverUrl: true, audioUrl: true, waveformPeaks: true,
+          license: true, licenseAttribution: true,
         },
       });
       suggestedSongs.push(...shuffleTake(candidates, 5).map((c) => ({
@@ -169,6 +172,8 @@ export default async function PlaylistPage({ params }: Props) {
     audioUrl: ps.song.audioUrl,
     waveformPeaks: ps.song.waveformPeaks as number[] | null,
     isLiked: likedSongIds.has(ps.song.id),
+    license: ps.song.license,
+    licenseAttribution: ps.song.licenseAttribution,
   }));
 
   const jsonLd = {

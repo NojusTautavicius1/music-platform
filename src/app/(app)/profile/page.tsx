@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
+import { getPlaylistPlayCounts } from "@/lib/playCounts";
 
 export async function generateMetadata(): Promise<Metadata> {
   const session = await auth();
@@ -75,11 +76,12 @@ export default async function ProfilePage() {
     year: "numeric",
     month: "long",
   });
+  const playCountMap = await getPlaylistPlayCounts(publicPlaylistsList.map((playlist) => playlist.id));
 
   return (
     <div className="pb-16">
       <section className="relative">
-        <div className="h-64 w-full bg-gradient-to-r from-purple-500/40 via-pink-500/30 to-rose-500/40" />
+        <div className="h-64 w-full bg-gradient-to-r from-brand-orange/40 via-brand-magenta/30 to-brand-purple/40" />
         <div className="max-w-[1200px] mx-auto px-4 md:px-8">
           <div className="-mt-16 flex flex-col md:flex-row gap-6 items-start">
             <div className="relative w-36 h-36 rounded-2xl overflow-hidden ring-4 ring-[#0A0A0F] bg-white/10">
@@ -143,6 +145,7 @@ export default async function ProfilePage() {
                   coverUrl={playlist.coverUrl}
                   size="md"
                   fluid
+                  playCount={playCountMap.get(playlist.id) ?? 0}
                 />
               ))}
             </div>
@@ -165,7 +168,7 @@ export default async function ProfilePage() {
                     </div>
                     <div className="mt-2 h-1.5 rounded-full bg-white/5 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-linear-to-r from-purple-500 to-pink-500"
+                        className="h-full rounded-full bg-linear-to-r from-brand-orange to-brand-magenta"
                         style={{ width: `${Math.round((count / maxArtistCount) * 100)}%` }}
                       />
                     </div>

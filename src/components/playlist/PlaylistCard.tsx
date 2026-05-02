@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatPlayCount } from "@/lib/format";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
   fluid?: boolean;
   href?: string;
   songs?: PlayerSong[];
+  playCount?: number;
 };
 
 const SIZE_PX = { sm: 160, md: 180, lg: 240 } as const;
@@ -29,6 +31,7 @@ export function PlaylistCard({
   fluid = false,
   href,
   songs,
+  playCount,
 }: Props) {
   const play = usePlayerStore((s) => s.play);
   const px = SIZE_PX[size];
@@ -45,7 +48,7 @@ export function PlaylistCard({
   return (
     <Link
       href={dest}
-      className="group block rounded-xl p-3 hover:bg-white/5 transition-all duration-200 hover:-translate-y-0.5"
+      className="group block rounded-xl p-3 hover:bg-orange-500/5 transition-all duration-200 hover:-translate-y-0.5"
       style={fluid ? undefined : { width: px }}
     >
       {/* Cover */}
@@ -73,8 +76,9 @@ export function PlaylistCard({
           onClick={handlePlayClick}
           aria-label={`Play ${title}`}
           className={cn(
-            "absolute bottom-2 right-2 w-10 h-10 rounded-full",
-            "bg-linear-to-br from-[#8B5CF6] to-[#EC4899]",
+            "absolute top-2 right-2 w-10 h-10 rounded-full",
+            "bg-linear-to-br from-brand-orange to-brand-magenta",
+            "hover:shadow-[0_0_24px_rgba(255,85,0,0.5)]",
             "flex items-center justify-center shadow-xl",
             "opacity-0 translate-y-2",
             "group-hover:opacity-100 group-hover:translate-y-0",
@@ -83,6 +87,12 @@ export function PlaylistCard({
         >
           <Play size={16} fill="white" className="text-white ml-0.5" />
         </button>
+
+        {typeof playCount === "number" && playCount > 0 && (
+          <div className="absolute bottom-2 right-2 rounded-full bg-black/45 px-2 py-0.5 text-[11px] font-semibold text-white/90 backdrop-blur-sm opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
+            ▶ {formatPlayCount(playCount)}
+          </div>
+        )}
       </div>
 
       {/* Text */}

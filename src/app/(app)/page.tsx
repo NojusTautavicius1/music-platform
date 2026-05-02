@@ -13,6 +13,7 @@ import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import { MixCard } from "@/components/shared/MixCard";
 import { MixRefreshTrigger } from "@/components/shared/MixRefreshTrigger";
 import { GENRE_COLORS, FEATURED_GENRES } from "@/lib/genreColors";
+import { getPlaylistPlayCounts, getTrendingSongs } from "@/lib/playCounts";
 
 // ─── Skeleton helpers ─────────────────────────────────────────────────────────
 
@@ -51,7 +52,6 @@ function GridSkeleton({
   gridClass,
 }: {
   count: number;
-  size: number;
   gridClass: string;
 }) {
   return (
@@ -74,7 +74,7 @@ function GridSkeleton({
 
 const STALE_MS = 24 * 60 * 60 * 1000; // 24 h
 
-async function MadeForYouSection({ userId }: { userId?: string | null }) {
+async function MadeForYouSection({ userId, serverNow }: { userId?: string | null; serverNow: number }) {
   if (!userId) {
     // Unauthenticated: show public playlists as a teaser
     const playlists = await prisma.playlist.findMany({
@@ -84,6 +84,7 @@ async function MadeForYouSection({ userId }: { userId?: string | null }) {
       select: { id: true, name: true, description: true, coverUrl: true },
     });
     if (playlists.length === 0) return null;
+    const playCountMap = await getPlaylistPlayCounts(playlists.map((playlist) => playlist.id));
     return (
       <section>
         <h2 className="text-2xl font-bold text-zinc-100 mb-6">Made for you</h2>
@@ -96,6 +97,7 @@ async function MadeForYouSection({ userId }: { userId?: string | null }) {
                 subtitle={p.description ?? "Playlist"}
                 coverUrl={p.coverUrl}
                 size="lg"
+                playCount={playCountMap.get(p.id) ?? 0}
               />
             </div>
           ))}
@@ -111,7 +113,7 @@ async function MadeForYouSection({ userId }: { userId?: string | null }) {
 
   const needsRefresh =
     mixes.length < 4 ||
-    mixes.some((m) => Date.now() - m.generatedAt.getTime() > STALE_MS);
+    mixes.some((m) => serverNow - m.generatedAt.getTime() > STALE_MS);
 
   if (mixes.length === 0) {
     return (
@@ -275,6 +277,7 @@ async function JumpBackInSection({ userId }: { userId?: string | null }) {
     .slice(0, 4);
 
   if (playlists.length === 0) return null;
+  const playCountMap = await getPlaylistPlayCounts(playlists.map((playlist) => playlist.id));
 
   return (
     <section>
@@ -289,6 +292,35 @@ async function JumpBackInSection({ userId }: { userId?: string | null }) {
             coverUrl={p.coverUrl}
             size="md"
             fluid
+            playCount={playCountMap.get(p.id) ?? 0}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── Section: Trending now ───────────────────────────────────────────────────
+
+async function TrendingNowSection() {
+  const trending = await getTrendingSongs(7, 8);
+  if (trending.length === 0) return null;
+
+  return (
+    <section>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-6">Trending now</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1">
+        {trending.map(({ song, playCount }) => (
+          <PlaylistCard
+            key={song.id}
+            id={song.id}
+            title={song.title}
+            subtitle={song.artist}
+            coverUrl={song.coverUrl}
+            size="md"
+            fluid
+            href={`/song/${song.id}`}
+            playCount={playCount}
           />
         ))}
       </div>
@@ -338,7 +370,10 @@ export default async function HomePage() {
     ? (await prisma.user.findUnique({ where: { email }, select: { id: true } }))?.id
     : null;
 
-  const hour = new Date().getHours();
+  // Capture a single server-side timestamp to avoid impure Date.now() calls in sub-components
+  // eslint-disable-next-line react-hooks/purity -- async server component, not a client render cycle
+  const serverNow = Date.now();
+  const hour = new Date(serverNow).getHours();
   const greeting =
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
@@ -346,7 +381,7 @@ export default async function HomePage() {
     <div className="p-4 md:p-8 space-y-12 max-w-[1600px]">
       {/* Greeting */}
       <div>
-        <h1 className="text-3xl md:text-5xl font-bold leading-tight pb-1 bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-5xl font-extrabold leading-tight pb-1 bg-linear-to-r from-brand-orange to-brand-magenta bg-clip-text text-transparent">
           {greeting}, {firstName}
         </h1>
         <p className="text-zinc-500 mt-2 text-base">
@@ -356,7 +391,7 @@ export default async function HomePage() {
 
       {/* Made for you */}
       <Suspense fallback={<HorizontalSkeleton count={4} size={216} />}>
-        <MadeForYouSection userId={userId} />
+        <MadeForYouSection userId={userId} serverNow={serverNow} />
       </Suspense>
 
       {/* Recently played */}
@@ -364,7 +399,6 @@ export default async function HomePage() {
         fallback={
           <GridSkeleton
             count={6}
-            size={180}
             gridClass="grid-cols-2 sm:grid-cols-3 lg:grid-cols-6"
           />
         }
@@ -372,12 +406,23 @@ export default async function HomePage() {
         <RecentlyPlayedSection userId={userId} />
       </Suspense>
 
+      {/* Trending now */}
+      <Suspense
+        fallback={
+          <GridSkeleton
+            count={8}
+            gridClass="grid-cols-2 sm:grid-cols-4 lg:grid-cols-8"
+          />
+        }
+      >
+        <TrendingNowSection />
+      </Suspense>
+
       {/* Jump back in */}
       <Suspense
         fallback={
           <GridSkeleton
             count={4}
-            size={180}
             gridClass="grid-cols-2 sm:grid-cols-4"
           />
         }
@@ -412,7 +457,6 @@ export default async function HomePage() {
         fallback={
           <GridSkeleton
             count={8}
-            size={160}
             gridClass="grid-cols-2 sm:grid-cols-4 lg:grid-cols-8"
           />
         }

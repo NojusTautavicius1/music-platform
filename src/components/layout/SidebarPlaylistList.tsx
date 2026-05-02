@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   DndContext,
@@ -20,6 +21,7 @@ type Playlist = {
   id: string;
   name: string;
   coverUrl: string | null;
+  playCount?: number;
 };
 
 function PlaylistItem({
@@ -70,10 +72,11 @@ function PlaylistItem({
         tabIndex={overlay ? -1 : undefined}
       >
         {playlist.coverUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={playlist.coverUrl}
             alt={playlist.name}
+            width={28}
+            height={28}
             className="w-7 h-7 rounded object-cover shrink-0"
           />
         ) : (
@@ -83,6 +86,12 @@ function PlaylistItem({
           {playlist.name}
         </p>
       </Link>
+
+      {typeof playlist.playCount === "number" && playlist.playCount > 0 && (
+        <span className="text-[11px] text-zinc-600 shrink-0 tabular-nums">
+          ▶ {playlist.playCount.toLocaleString()}
+        </span>
+      )}
     </div>
   );
 }

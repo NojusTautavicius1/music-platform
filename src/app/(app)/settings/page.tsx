@@ -3,19 +3,31 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SettingsForm } from "@/components/settings/SettingsForm";
 
+export type Attribution = { license: string; licenseAttribution: string };
+
 export default async function SettingsPage() {
   const session = await auth();
   if (!session?.user?.email) redirect("/login");
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: {
-      id: true,
-      name: true,
-      preferences: true,
-    },
-  });
+  const [user, rawAttributions] = await Promise.all([
+    prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true, name: true, preferences: true },
+    }),
+    prisma.song.findMany({
+      where: {
+        licenseAttribution: { not: null },
+        license: { not: null },
+      },
+      distinct: ["licenseAttribution"],
+      select: { license: true, licenseAttribution: true },
+      orderBy: { licenseAttribution: "asc" },
+    }),
+  ]);
   if (!user) redirect("/login");
+
+  const attributions: Attribution[] = (rawAttributions as Array<{ license: string | null; licenseAttribution: string | null }>)
+    .filter((r): r is Attribution => r.license !== null && r.licenseAttribution !== null);
 
   const p = user.preferences;
   const preferences = {
@@ -40,6 +52,7 @@ export default async function SettingsPage() {
         name={user.name ?? ""}
         email={session.user.email}
         preferences={preferences}
+        attributions={attributions}
       />
     </div>
   );

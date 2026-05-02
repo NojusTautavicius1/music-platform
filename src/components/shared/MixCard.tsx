@@ -28,7 +28,7 @@ export function MixCard({ kind, name, description, gradientFrom, gradientTo, son
   return (
     <Link
       href={`/mixes/${kind}`}
-      className="group block rounded-xl p-3 hover:bg-white/5 transition-all duration-200 hover:-translate-y-0.5 shrink-0"
+      className="group block rounded-xl p-3 hover:bg-orange-500/5 transition-all duration-200 hover:-translate-y-0.5 shrink-0"
       style={{ width: 216 }}
     >
       {/* Gradient cover */}

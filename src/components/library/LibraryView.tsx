@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import { CreatePlaylistDialog } from "@/components/playlist/CreatePlaylistDialog";
 import { Plus, LayoutGrid, List, ChevronDown, Music2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ export type LibraryPlaylist = {
   createdAt: string;
   updatedAt: string;
   _count: { songs: number };
+  playCount?: number;
 };
 
 type SortMode = "recent" | "alpha";
@@ -231,6 +233,7 @@ export function LibraryView({ playlists }: Props) {
               coverUrl={p.coverUrl}
               size="md"
               fluid
+              playCount={p.playCount}
             />
           ))}
         </div>
@@ -245,10 +248,11 @@ export function LibraryView({ playlists }: Props) {
             >
               <div className="relative w-12 h-12 rounded shrink-0 overflow-hidden">
                 {p.coverUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={p.coverUrl}
                     alt={p.name}
+                    width={48}
+                    height={48}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -266,11 +270,14 @@ export function LibraryView({ playlists }: Props) {
                     : `${p._count.songs} song${p._count.songs === 1 ? "" : "s"}`}
                 </p>
               </div>
-              {p.isPublic && (
-                <span className="ml-auto text-xs text-zinc-600 shrink-0">
-                  Public
-                </span>
-              )}
+              <div className="ml-auto flex flex-col items-end gap-0.5 shrink-0 text-right">
+                {typeof p.playCount === "number" && p.playCount > 0 && (
+                  <span className="text-xs text-zinc-600">▶ {p.playCount.toLocaleString()}</span>
+                )}
+                {p.isPublic && (
+                  <span className="text-xs text-zinc-600">Public</span>
+                )}
+              </div>
             </a>
           ))}
         </div>

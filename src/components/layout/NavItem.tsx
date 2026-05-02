@@ -20,8 +20,8 @@ export function NavItem({ href, icon, children }: Props) {
       className={cn(
         "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
         isActive
-          ? "bg-white/10 text-white"
-          : "text-zinc-400 hover:text-white hover:bg-white/5"
+          ? "bg-white/10 text-white border-l-2 border-brand-orange"
+          : "text-zinc-400 hover:text-white hover:bg-white/5 border-l-2 border-transparent"
       )}
     >
       {icon}

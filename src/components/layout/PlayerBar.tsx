@@ -78,7 +78,9 @@ function VolumeControl() {
       >
         <Slider
           value={[Math.round(displayVolume * 100)]}
+          min={0}
           max={100}
+          aria-label="Volume"
           onValueChange={(v) => {
             const pct = Array.isArray(v) ? v[0] : v;
             setVolume(pct / 100);
@@ -169,10 +171,10 @@ export function PlayerBar() {
   const onNowPlaying = pathname === "/now-playing";
 
   const ACTIVE = "text-[#8B5CF6]";
-  const QUEUE_ACTIVE = "text-transparent bg-linear-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text";
+  const QUEUE_ACTIVE = "text-transparent bg-linear-to-r from-brand-orange to-brand-magenta bg-clip-text";
 
   return (
-    <footer className="shrink-0 bg-[#18181F] border-t border-white/5">
+    <footer className="shrink-0 bg-[#18181F] border-t border-white/5 bg-linear-to-b from-transparent to-black/20">
       {/* ── Mobile mini player (< md) ──────────────────────────────── */}
       <div
         className="md:hidden flex items-center gap-3 px-4 h-16 cursor-pointer"
@@ -208,7 +210,7 @@ export function PlayerBar() {
             e.stopPropagation();
             togglePlay();
           }}
-          className="w-9 h-9 rounded-full bg-linear-to-br from-[#8B5CF6] to-[#EC4899] flex items-center justify-center shrink-0 shadow-lg"
+          className="w-9 h-9 rounded-full bg-linear-to-br from-brand-orange to-brand-magenta flex items-center justify-center shrink-0 shadow-lg hover:shadow-[0_0_24px_rgba(255,85,0,0.5)] transition-shadow"
           aria-label={isPlaying ? "Pause" : "Play"}
         >
           {isPlaying ? (
@@ -296,7 +298,7 @@ export function PlayerBar() {
 
             <button
               onClick={togglePlay}
-              className="w-10 h-10 rounded-full bg-linear-to-br from-[#8B5CF6] to-[#EC4899] flex items-center justify-center hover:scale-105 transition-transform shadow-lg"
+              className="w-10 h-10 rounded-full bg-linear-to-br from-brand-orange to-brand-magenta flex items-center justify-center hover:scale-105 transition-transform shadow-lg hover:shadow-[0_0_24px_rgba(255,85,0,0.5)]"
               aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? (

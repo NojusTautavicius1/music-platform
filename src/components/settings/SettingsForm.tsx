@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { usePlayerStore } from "@/store/playerStore";
 import { updateDisplayName, updatePreferences, deleteAccount } from "@/app/actions/settings";
+import type { Attribution } from "@/app/(app)/settings/page";
 
 
 type Preferences = {
@@ -30,6 +31,7 @@ type Props = {
   name: string;
   email: string;
   preferences: Preferences;
+  attributions: Attribution[];
 };
 
 type TabKey = "account" | "playback" | "notifications" | "privacy" | "about";
@@ -42,7 +44,7 @@ const TAB_LABELS: Array<{ key: TabKey; label: string }> = [
   { key: "about", label: "About" },
 ];
 
-export function SettingsForm({ name, email, preferences }: Props) {
+export function SettingsForm({ name, email, preferences, attributions }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>("account");
   const [displayName, setDisplayName] = useState(name);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -186,7 +188,9 @@ export function SettingsForm({ name, email, preferences }: Props) {
             </div>
             <Slider
               value={[Math.round(defaultVolume * 100)]}
+              min={0}
               max={100}
+              aria-label="Default volume"
               onValueChange={(v) => {
                 const pct = Array.isArray(v) ? v[0] : v;
                 setDefaultVolume(pct / 100);
@@ -201,7 +205,9 @@ export function SettingsForm({ name, email, preferences }: Props) {
             </div>
             <Slider
               value={[crossfadeSeconds]}
+              min={0}
               max={12}
+              aria-label="Crossfade duration"
               onValueChange={(v) => {
                 const next = Array.isArray(v) ? v[0] : v;
                 setCrossfadeSeconds(next);
@@ -340,6 +346,24 @@ export function SettingsForm({ name, email, preferences }: Props) {
             <p className="text-sm text-zinc-200">Made by</p>
             <p className="text-xs text-zinc-500">Svetaines</p>
           </div>
+
+          {attributions.length > 0 && (
+            <div className="rounded-xl border border-white/5 bg-white/5 p-4 space-y-3">
+              <p className="text-sm text-zinc-200">Music Attributions</p>
+              <p className="text-xs text-zinc-500">
+                Music in this library is licensed under Creative Commons. Thank you to all artists.
+              </p>
+              <ul className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+                {attributions.map((a, i) => (
+                  <li key={i} className="text-xs text-zinc-500">
+                    <span className="text-zinc-400">{a.licenseAttribution}</span>
+                    <span className="mx-1.5 text-zinc-700">·</span>
+                    <span className="text-zinc-600">{a.license}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </section>
       )}
 

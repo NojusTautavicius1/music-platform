@@ -2,9 +2,9 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { formatDuration } from "@/lib/format";
+import { formatDuration, formatPlayCount } from "@/lib/format";
 import { GENRE_COLORS } from "@/lib/genreColors";
-import { Headphones, Music2, Users } from "lucide-react";
+import { Headphones, Music2, Users, Activity } from "lucide-react";
 
 export default async function StatsPage() {
   const session = await auth();
@@ -86,7 +86,7 @@ export default async function StatsPage() {
     .slice(0, 6)
     .map(([genre, count]) => {
       const key = genre.toLowerCase();
-      const gradient = GENRE_COLORS[key]?.gradient ?? "from-purple-500 to-pink-500";
+      const gradient = GENRE_COLORS[key]?.gradient ?? "from-brand-orange to-brand-magenta";
       return { genre, count, gradient };
     });
 
@@ -141,6 +141,76 @@ export default async function StatsPage() {
 
   const maxActivity = Math.max(...activityDays.map((d) => d.count), 1);
 
+  const thisWeekRows = await prisma.playHistory.groupBy({
+    by: ["songId"],
+    where: {
+      playedAt: { gte: sevenDaysAgo },
+      user: { preferences: { showActivity: true } },
+    },
+    _count: { songId: true },
+  });
+
+  const previousWeekRows = await prisma.playHistory.groupBy({
+    by: ["songId"],
+    where: {
+      playedAt: { gte: new Date(now - 14 * 24 * 60 * 60 * 1000), lt: sevenDaysAgo },
+      user: { preferences: { showActivity: true } },
+    },
+    _count: { songId: true },
+  });
+
+  const weekCounts = new Map(thisWeekRows.map((row) => [row.songId, row._count.songId] as const));
+  const previousCounts = new Map(previousWeekRows.map((row) => [row.songId, row._count.songId] as const));
+  const trendingRows = [...weekCounts.entries()]
+    .map(([songId, plays]) => ({
+      songId,
+      plays,
+      growth: plays - (previousCounts.get(songId) ?? 0),
+    }))
+    .filter((row) => row.plays > 0)
+    .sort((a, b) => b.growth - a.growth || b.plays - a.plays)
+    .slice(0, 8);
+
+  const trendingSongIds = trendingRows.map((row) => row.songId);
+  const trendingSongs = trendingSongIds.length
+    ? await prisma.song.findMany({
+        where: { id: { in: trendingSongIds } },
+        select: { id: true, title: true, artist: true, coverUrl: true, duration: true },
+      })
+    : [];
+  const trendingSongById = new Map(trendingSongs.map((s) => [s.id, s]));
+  const trendingSongsOrdered = trendingRows.flatMap((row) => {
+    const song = trendingSongById.get(row.songId);
+    return song ? [{ song, plays: row.plays, growth: row.growth }] : [];
+  });
+
+  // Audio analysis stats — average BPM, top mood, most-played key from user's listened songs
+  const listenedSongIds = allPlayCounts.map((r) => r.songId);
+  const analyzedSongs = listenedSongIds.length
+    ? await prisma.song.findMany({
+        where: { id: { in: listenedSongIds }, analyzedAt: { not: null } },
+        select: { id: true, bpm: true, mood: true, key: true },
+      })
+    : [];
+
+  let avgBpm: number | null = null;
+  let topMood: string | null = null;
+  let topKey: string | null = null;
+
+  if (analyzedSongs.length > 0) {
+    const bpms = analyzedSongs.filter((s) => s.bpm != null).map((s) => s.bpm as number);
+    if (bpms.length > 0) avgBpm = Math.round(bpms.reduce((a, b) => a + b, 0) / bpms.length);
+
+    const moodMap = new Map<string, number>();
+    const keyMap = new Map<string, number>();
+    for (const s of analyzedSongs) {
+      if (s.mood) moodMap.set(s.mood, (moodMap.get(s.mood) ?? 0) + 1);
+      if (s.key) keyMap.set(s.key, (keyMap.get(s.key) ?? 0) + 1);
+    }
+    topMood = [...moodMap.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+    topKey = [...keyMap.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+  }
+
   function activityStyle(count: number) {
     const intensity = count === 0 ? 0.08 : 0.2 + (count / maxActivity) * 0.8;
     return {
@@ -153,7 +223,7 @@ export default async function StatsPage() {
       <section className="space-y-6">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Your music year</p>
-          <h1 className="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-purple-400 via-pink-400 to-rose-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-brand-orange to-brand-magenta bg-clip-text text-transparent">
             Your music year
           </h1>
         </div>
@@ -196,11 +266,11 @@ export default async function StatsPage() {
                 <div className="flex-1">
                   <div className="flex items-center justify-between text-sm text-zinc-200">
                     <span className="truncate">{artist}</span>
-                    <span className="text-xs text-zinc-500">{count} plays</span>
+                      <span className="text-xs text-zinc-500">{formatPlayCount(count)} plays</span>
                   </div>
                   <div className="mt-2 h-2 rounded-full bg-white/5 overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-linear-to-r from-purple-500 to-pink-500"
+                      className="h-full rounded-full bg-linear-to-r from-brand-orange to-brand-magenta"
                       style={{ width: `${Math.round((count / maxArtistCount) * 100)}%` }}
                     />
                   </div>
@@ -235,7 +305,43 @@ export default async function StatsPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-xl font-bold text-zinc-100">Most played songs</h2>
+        <h2 className="text-xl font-bold text-zinc-100">Trending this week</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {trendingSongsOrdered.length === 0 && (
+            <p className="text-sm text-zinc-500">No global trend yet.</p>
+          )}
+          {trendingSongsOrdered.map((row, idx) => (
+            <div
+              key={row.song.id}
+              className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/5 px-3 py-2"
+            >
+              <span className="w-6 text-right text-sm text-zinc-500">{idx + 1}</span>
+              <div className="relative w-10 h-10 shrink-0 rounded overflow-hidden bg-white/10">
+                {row.song.coverUrl ? (
+                  <Image
+                    src={row.song.coverUrl}
+                    alt={row.song.title}
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                  />
+                ) : null}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-zinc-200 truncate">{row.song.title}</p>
+                <p className="text-xs text-zinc-500 truncate">{row.song.artist}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-zinc-500">{formatPlayCount(row.plays)} plays</p>
+                <p className="text-xs text-zinc-600">+{Math.max(0, row.growth).toLocaleString()} growth</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-xl font-bold text-zinc-100">Most played by you</h2>
         <div className="space-y-2">
           {mostPlayedSongs.length === 0 && (
             <p className="text-sm text-zinc-500">No listening history yet.</p>
@@ -262,7 +368,7 @@ export default async function StatsPage() {
                 <p className="text-xs text-zinc-500 truncate">{row.song.artist}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-zinc-500">{row.plays} plays</p>
+                <p className="text-xs text-zinc-500">{formatPlayCount(row.plays)} plays</p>
                 <p className="text-xs text-zinc-600">{formatDuration(row.song.duration)}</p>
               </div>
             </div>
@@ -285,6 +391,40 @@ export default async function StatsPage() {
           ))}
         </div>
       </section>
+
+      {(avgBpm != null || topMood || topKey) && (
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Activity size={18} className="text-purple-400" />
+            <h2 className="text-xl font-bold text-zinc-100">Your music in numbers</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {avgBpm != null && (
+              <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
+                <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Avg BPM you listen to</p>
+                <p className="mt-3 text-4xl font-bold text-zinc-100 tabular-nums">{avgBpm}</p>
+                <p className="text-xs text-zinc-600 mt-1">
+                  {avgBpm < 80 ? "slow & chill" : avgBpm < 110 ? "mid-tempo" : avgBpm < 140 ? "upbeat" : "high energy"}
+                </p>
+              </div>
+            )}
+            {topMood && (
+              <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
+                <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Top mood</p>
+                <p className="mt-3 text-4xl font-bold text-zinc-100 capitalize">{topMood}</p>
+                <p className="text-xs text-zinc-600 mt-1">most common in your history</p>
+              </div>
+            )}
+            {topKey && (
+              <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
+                <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Most-played key</p>
+                <p className="mt-3 text-4xl font-bold text-zinc-100">{topKey}</p>
+                <p className="text-xs text-zinc-600 mt-1">musical key you gravitate to</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

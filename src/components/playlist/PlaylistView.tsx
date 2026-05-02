@@ -29,6 +29,7 @@ import {
   Sparkles,
   Music,
   GripVertical,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -60,11 +61,12 @@ import {
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@/lib/utils";
-import { formatDuration } from "@/lib/format";
+import { formatDuration, formatPlayCount } from "@/lib/format";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useDndSensors } from "@/hooks/useDndSensors";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
 import { PlaylistSuggestionsSection } from "@/components/playlist/PlaylistSuggestionsSection";
+import { LyricsDialog } from "@/components/lyrics/LyricsDialog";
 import { toggleLike } from "@/app/actions/like";
 import type { RecommendationSong } from "@/app/actions/recommendations";
 import {
@@ -91,6 +93,9 @@ export type SongInPlaylist = {
   audioUrl: string | null;
   waveformPeaks?: number[] | null;
   isLiked?: boolean;
+  playCount?: number;
+  license?: string | null;
+  licenseAttribution?: string | null;
 };
 
 export type UserPlaylist = {
@@ -136,6 +141,9 @@ type SongRowProps = {
   onAddToQueue: () => void;
   onGoToArtist: () => void;
   onShare: () => void;
+  onViewLyrics: () => void;
+  playCount?: number;
+  canReorder?: boolean;
   /** overlay=true renders the DragOverlay ghost — no sortable hooks, no interactions */
   overlay?: boolean;
 };
@@ -153,6 +161,9 @@ function SongRow({
   onAddToQueue,
   onGoToArtist,
   onShare,
+  onViewLyrics,
+  playCount,
+  canReorder = false,
   overlay = false,
 }: SongRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -166,7 +177,10 @@ function SongRow({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: overlay ? "__overlay__" : song.songId, disabled: overlay || !isOwner });
+  } = useSortable({
+    id: overlay ? "__overlay__" : song.songId,
+    disabled: overlay || !isOwner || !canReorder,
+  });
 
   const style: React.CSSProperties = overlay
     ? {}
@@ -244,7 +258,21 @@ function SongRow({
           )}>
             {song.title}
           </p>
-          <p className="text-xs text-zinc-400 truncate">{song.artist}</p>
+          <p className="text-xs text-zinc-400 truncate italic">{song.artist}</p>
+          {(song.license || song.licenseAttribution) && (
+            <p className="text-xs text-zinc-600 truncate">
+              {[
+                song.license ? `License: ${song.license}` : null,
+                song.licenseAttribution,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          )}
+          <p className="mt-0.5 flex items-center gap-1 text-xs text-zinc-500 truncate">
+            <Play size={10} className="shrink-0 text-zinc-600" fill="currentColor" />
+            <span>{formatPlayCount(playCount ?? song.playCount ?? 0)} plays</span>
+          </p>
         </div>
 
         {/* Duration */}
@@ -257,9 +285,9 @@ function SongRow({
       <div
         onClick={overlay ? undefined : onPlay}
         className={cn(
-          "hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_140px_8rem] items-center h-14 px-2 rounded-lg cursor-pointer group",
+          "hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_120px_140px_8rem] items-center h-14 px-2 rounded-lg cursor-pointer group",
           "hover:bg-white/5 transition-colors",
-          isActive && "bg-white/5",
+          isActive && "bg-white/5 border-l-2 border-brand-orange",
           isDragging && "opacity-40 scale-[0.99]",
           overlay && "opacity-90 bg-[#18181F] shadow-xl ring-1 ring-white/10 rounded-lg"
         )}
@@ -318,7 +346,17 @@ function SongRow({
             )}>
               {song.title}
             </p>
-            <p className="text-xs text-zinc-400 truncate">{song.artist}</p>
+            <p className="text-xs text-zinc-400 truncate italic">{song.artist}</p>
+            {(song.license || song.licenseAttribution) && (
+              <p className="text-xs text-zinc-600 truncate">
+                {[
+                  song.license ? `License: ${song.license}` : null,
+                  song.licenseAttribution,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            )}
           </div>
         </div>
 
@@ -326,6 +364,13 @@ function SongRow({
         <div className="min-w-0 pr-4">
           <p className="text-sm text-zinc-400 line-clamp-1">
             {song.album ?? "—"}
+          </p>
+        </div>
+
+        <div className="min-w-0 pr-4">
+          <p className="flex items-center gap-1 text-sm text-zinc-400 truncate">
+            <Play size={12} className="shrink-0 text-zinc-600" fill="currentColor" />
+            <span>{formatPlayCount(playCount ?? song.playCount ?? 0)}</span>
           </p>
         </div>
 
@@ -458,6 +503,13 @@ function SongRow({
               >
                 <Link2 size={14} />
                 Share
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+                onClick={onViewLyrics}
+              >
+                <FileText size={14} />
+                View lyrics
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -645,7 +697,7 @@ function EditPlaylistDialog({ open, onOpenChange, playlist }: EditPlaylistDialog
                 <Input
                   id="edit-name"
                   placeholder="Playlist name"
-                  className="bg-white/5 border-white/10 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-[#8B5CF6]/50"
+                  className="bg-white/5 border-white/15 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-orange-500/40"
                   {...register("name")}
                 />
                 {errors.name && (
@@ -698,7 +750,7 @@ function EditPlaylistDialog({ open, onOpenChange, playlist }: EditPlaylistDialog
             <button
               type="submit"
               disabled={isSubmitting || isUploading}
-              className="flex items-center gap-2 px-5 py-2 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#EC4899] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
+              className="flex items-center gap-2 px-5 py-2 rounded-full bg-linear-to-r from-brand-orange to-brand-magenta text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"
             >
               {(isSubmitting || isUploading) && (
                 <Loader2 size={14} className="animate-spin" />
@@ -926,7 +978,7 @@ function FindMoreSection({
                 value={query}
                 onChange={(e) => handleQueryChange(e.target.value)}
                 placeholder="Search all songs…"
-                className="w-full h-9 pl-8 pr-3 rounded-full border border-white/10 bg-white/5 text-zinc-200 text-sm placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#8B5CF6]/50"
+                className="w-full h-9 pl-8 pr-3 rounded-full border border-white/15 bg-white/5 text-zinc-200 text-sm placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-orange-500/40"
                 autoFocus
               />
             </div>
@@ -988,8 +1040,10 @@ export function PlaylistView({
   const [isPlaylistLiked, setIsPlaylistLiked] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [lyricsDialogSong, setLyricsDialogSong] = useState<{ id: string; title: string; artist: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [sortMode, setSortMode] = useState<"custom" | "mostPlayed">("custom");
   const [displaySongs, setDisplaySongs] = useState(songs);
   const pendingRemovals = useRef(
     new Map<string, { song: SongInPlaylist; index: number; timeoutId: number }>()
@@ -1081,6 +1135,10 @@ export function PlaylistView({
   }
 
   function handleDragEnd(event: DragEndEvent) {
+    if (sortMode !== "custom") {
+      setActiveDragId(null);
+      return;
+    }
     setActiveDragId(null);
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -1106,7 +1164,12 @@ export function PlaylistView({
   const isPlaying = usePlayerStore((s) => s.isPlaying);
   const togglePlay = usePlayerStore((s) => s.togglePlay);
 
-  const queue: PlayerSong[] = displaySongs.map((s) => ({
+  const sortedSongs = useMemo(() => {
+    if (sortMode !== "mostPlayed") return displaySongs;
+    return [...displaySongs].sort((a, b) => (b.playCount ?? 0) - (a.playCount ?? 0));
+  }, [displaySongs, sortMode]);
+
+  const queue: PlayerSong[] = sortedSongs.map((s) => ({
     id: s.songId,
     title: s.title,
     artist: s.artist,
@@ -1115,9 +1178,10 @@ export function PlaylistView({
     coverUrl: s.coverUrl,
     audioUrl: s.audioUrl,
     waveformPeaks: s.waveformPeaks,
+    playCount: s.playCount,
   }));
 
-  const filtered = displaySongs.filter(
+  const filtered = sortedSongs.filter(
     (s) =>
       s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -1178,6 +1242,7 @@ export function PlaylistView({
       coverUrl: song.coverUrl,
       audioUrl: song.audioUrl,
       waveformPeaks: song.waveformPeaks,
+      playCount: song.playCount,
     };
     const { queue: currentQueue, setQueue } = usePlayerStore.getState();
     setQueue([...currentQueue, playerSong]);
@@ -1222,6 +1287,7 @@ export function PlaylistView({
       coverUrl: song.coverUrl,
       audioUrl: song.audioUrl,
       waveformPeaks: song.waveformPeaks,
+      playCount: song.playCount,
     };
     if (currentSong?.id === song.songId) {
       togglePlay();
@@ -1246,7 +1312,7 @@ export function PlaylistView({
               handlePlaySong(songs[0]);
             }
           }}
-          className="h-14 w-14 rounded-full bg-linear-to-br from-[#8B5CF6] to-[#EC4899] flex items-center justify-center hover:scale-105 transition-transform shadow-lg shrink-0"
+          className="h-14 w-14 rounded-full bg-linear-to-br from-brand-orange to-brand-magenta flex items-center justify-center hover:scale-105 transition-transform shadow-lg shrink-0 hover:shadow-[0_0_24px_rgba(255,85,0,0.5)]"
           aria-label="Play playlist"
         >
           {currentSong &&
@@ -1316,6 +1382,37 @@ export function PlaylistView({
 
         <div className="flex-1" />
 
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-sm text-zinc-300 hover:text-zinc-100 transition-colors">
+                {sortMode === "custom" ? "Custom order" : "Most played"}
+                <ChevronDown size={14} />
+              </button>
+            }
+          />
+          <DropdownMenuContent
+            side="bottom"
+            align="end"
+            className="w-48 bg-[#18181F] border-white/10 text-zinc-100"
+          >
+            <DropdownMenuItem
+              className="cursor-pointer focus:bg-white/10 focus:text-white"
+              onClick={() => setSortMode("custom")}
+            >
+              Custom order
+              {sortMode === "custom" && <span className="ml-auto text-[#8B5CF6]">✓</span>}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer focus:bg-white/10 focus:text-white"
+              onClick={() => setSortMode("mostPlayed")}
+            >
+              Most played
+              {sortMode === "mostPlayed" && <span className="ml-auto text-[#8B5CF6]">✓</span>}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {/* Search in playlist — hidden on mobile to save space */}
         <div className="relative hidden sm:block">
           <Search
@@ -1326,7 +1423,7 @@ export function PlaylistView({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search in playlist"
-            className="pl-8 h-8 max-w-50 bg-white/5 border-white/10 text-zinc-100 placeholder:text-zinc-500 text-sm rounded-full focus-visible:ring-[#8B5CF6]/50"
+            className="pl-8 h-8 max-w-50 bg-white/5 border-white/15 text-zinc-100 placeholder:text-zinc-500 text-sm rounded-full focus-visible:ring-orange-500/40"
           />
         </div>
       </div>
@@ -1350,12 +1447,13 @@ export function PlaylistView({
         ) : (
           <>
             {/* Desktop table header — hidden on mobile */}
-            <div className="hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_140px_8rem] items-center px-2 py-2 border-b border-white/10 mb-1 sticky top-0 z-10 bg-[#0A0A0F]">
+            <div className="hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_120px_140px_8rem] items-center px-2 py-2 border-b border-white/10 mb-1 sticky top-0 z-10 bg-[#0A0A0F]">
               <span />
               <span className="text-xs text-zinc-500 text-center">#</span>
-              <span className="text-xs text-zinc-500 uppercase tracking-wider">Title</span>
-              <span className="text-xs text-zinc-500 uppercase tracking-wider">Album</span>
-              <span className="text-xs text-zinc-500 uppercase tracking-wider">Date Added</span>
+              <span className="text-xs text-zinc-500 uppercase tracking-widest">Title</span>
+              <span className="text-xs text-zinc-500 uppercase tracking-widest">Album</span>
+              <span className="text-xs text-zinc-500 uppercase tracking-widest">Plays</span>
+              <span className="text-xs text-zinc-500 uppercase tracking-widest">Date Added</span>
               <span className="flex justify-end text-zinc-500"><Clock size={14} /></span>
             </div>
 
@@ -1390,6 +1488,9 @@ export function PlaylistView({
                     onAddToQueue={() => handleAddToQueue(song)}
                     onGoToArtist={() => handleGoToArtist(song)}
                     onShare={handleShare}
+                    onViewLyrics={() => setLyricsDialogSong({ id: song.songId, title: song.title, artist: song.artist })}
+                    playCount={song.playCount}
+                    canReorder={sortMode === "custom"}
                   />
                 ))}
               </SortableContext>
@@ -1413,6 +1514,9 @@ export function PlaylistView({
                       onAddToQueue={() => {}}
                       onGoToArtist={() => {}}
                       onShare={() => {}}
+                      onViewLyrics={() => {}}
+                      playCount={song.playCount}
+                      canReorder={sortMode === "custom"}
                       overlay
                     />
                   );
@@ -1460,6 +1564,14 @@ export function PlaylistView({
           playlistName={playlistName}
           onConfirm={handleDeletePlaylist}
           isDeleting={isDeleting}
+        />
+
+        <LyricsDialog
+          open={lyricsDialogSong !== null}
+          onClose={() => setLyricsDialogSong(null)}
+          songId={lyricsDialogSong?.id ?? null}
+          songTitle={lyricsDialogSong?.title}
+          songArtist={lyricsDialogSong?.artist}
         />
 
       {isPending && null}

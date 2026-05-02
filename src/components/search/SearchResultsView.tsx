@@ -8,7 +8,7 @@ import { Play, Search, Music, User as UserIcon, Disc3, Plus } from "lucide-react
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { formatDuration } from "@/lib/format";
+import { formatDuration, formatPlayCount } from "@/lib/format";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
 import { PlaylistCard } from "@/components/playlist/PlaylistCard";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -25,6 +25,7 @@ type SongResult = {
   coverUrl: string | null;
   audioUrl: string | null;
   waveformPeaks?: number[] | null;
+  playCount?: number;
 };
 
 type PlaylistResult = {
@@ -33,6 +34,7 @@ type PlaylistResult = {
   description: string | null;
   coverUrl: string | null;
   _count: { songs: number };
+  playCount?: number;
 };
 
 type UserPlaylist = {
@@ -45,7 +47,7 @@ type Props = {
   tab: string;
   songs: SongResult[];
   playlists: PlaylistResult[];
-  artists: string[];
+  artists: { name: string; monthlyListeners: number }[];
   userPlaylists: UserPlaylist[];
   songCount: number;
   songPage: number;
@@ -124,6 +126,7 @@ function SongRow({
       coverUrl: song.coverUrl,
       audioUrl: song.audioUrl,
       waveformPeaks: song.waveformPeaks,
+      playCount: song.playCount,
     };
     if (isActive) {
       togglePlay();
@@ -171,6 +174,10 @@ function SongRow({
           {song.title}
         </p>
         <p className="text-xs text-zinc-400 truncate">{song.artist}</p>
+          <p className="mt-0.5 flex items-center gap-1 text-xs text-zinc-500 truncate">
+            <Play size={10} className="shrink-0 text-zinc-600" fill="currentColor" />
+            <span>{formatPlayCount(song.playCount ?? 0)} plays</span>
+          </p>
       </div>
 
       {showAdd && userPlaylists.length > 0 && (
@@ -318,7 +325,7 @@ function TopResultCard({
 
 // ─── Artist card ──────────────────────────────────────────────────────────────
 
-function ArtistCard({ name }: { name: string }) {
+function ArtistCard({ name, monthlyListeners }: { name: string; monthlyListeners: number }) {
   const initials = name
     .split(" ")
     .map((w) => w[0])
@@ -334,6 +341,7 @@ function ArtistCard({ name }: { name: string }) {
       <div className="text-center">
         <p className="text-sm font-medium text-zinc-100 truncate max-w-[120px]">{name}</p>
         <p className="text-xs text-zinc-500">Artist</p>
+        <p className="text-xs text-zinc-600 mt-1">{formatPlayCount(monthlyListeners)} monthly listeners</p>
       </div>
     </div>
   );
@@ -367,6 +375,7 @@ export function SearchResultsView({
     coverUrl: s.coverUrl,
     audioUrl: s.audioUrl,
     waveformPeaks: s.waveformPeaks,
+    playCount: s.playCount,
   }));
 
   const showLoadMore = activeTab === "songs" && songs.length < songCount;
@@ -438,7 +447,7 @@ export function SearchResultsView({
                 <h2 className="text-lg font-bold text-zinc-100 mb-4">Artists</h2>
                 <div className="flex gap-2 flex-wrap">
                   {artists.slice(0, 6).map((artist) => (
-                    <ArtistCard key={artist} name={artist} />
+                    <ArtistCard key={artist.name} name={artist.name} monthlyListeners={artist.monthlyListeners} />
                   ))}
                 </div>
               </div>
@@ -461,6 +470,7 @@ export function SearchResultsView({
                         }
                         coverUrl={p.coverUrl}
                         size="md"
+                        playCount={p.playCount}
                       />
                     </div>
                   ))}
@@ -511,7 +521,7 @@ export function SearchResultsView({
           ) : (
             <div className="flex flex-wrap gap-2">
               {artists.map((artist) => (
-                <ArtistCard key={artist} name={artist} />
+                <ArtistCard key={artist.name} name={artist.name} monthlyListeners={artist.monthlyListeners} />
               ))}
             </div>
           )
@@ -544,6 +554,7 @@ export function SearchResultsView({
                   }
                   coverUrl={p.coverUrl}
                   size="md"
+                  playCount={p.playCount}
                 />
               ))}
             </div>

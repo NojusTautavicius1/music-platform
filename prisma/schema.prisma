@@ -74,16 +74,40 @@ model VerificationToken {
 }
 
 model Song {
-  id             String   @id @default(cuid())
-  title          String
-  artist         String
-  album          String?
-  genre          String?
-  duration       Int
-  audioUrl       String?
-  coverUrl       String?
-  waveformPeaks  Json?
-  createdAt      DateTime @default(now())
+  id                 String   @id @default(cuid())
+  title              String
+  artist             String
+  album              String?
+  genre              String?
+  duration           Int
+  audioUrl           String?
+  coverUrl           String?
+  waveformPeaks      Json?
+  createdAt          DateTime @default(now())
+
+  // Music file metadata (populated by import script)
+  filePath           String?
+  fileSize           Int?
+  mimeType           String?
+  bitrate            Int?
+  sampleRate         Int?
+  license            String?
+  licenseAttribution String?
+  sourceUrl          String?
+
+  // Audio analysis fields (populated by audio-analyzer/analyze.py)
+  bpm               Float?
+  key               String?
+  energy            Float?
+  valence           Float?
+  danceability      Float?
+  acousticness      Float?
+  instrumentalness  Float?
+  mood              String?
+  loudness          Float?
+  analyzedAt        DateTime?
+
+  lyrics    Lyrics?
 
   playlists PlaylistSong[]
   likedBy   LikedSong[]
@@ -92,6 +116,8 @@ model Song {
   @@index([title])
   @@index([artist])
   @@index([genre])
+  @@index([mood])
+  @@index([bpm])
 }
 
 model Playlist {
@@ -147,6 +173,25 @@ model PlayHistory {
   song Song @relation(fields: [songId], references: [id], onDelete: Cascade)
 
   @@index([userId, playedAt])
+}
+
+model Lyrics {
+  id          String   @id @default(cuid())
+  songId      String   @unique
+  plainText   String?  @db.Text
+  syncedJson  Json?
+  language    String?
+  source      String   @default("lrclib")
+  fetchedAt   DateTime @default(now())
+
+  // AI lyrical analysis
+  sentiment   Float?
+  themes      String[]
+  mood        String?
+  keyPhrases  String[]
+  analyzedAt  DateTime?
+
+  song Song @relation(fields: [songId], references: [id], onDelete: Cascade)
 }
 
 model GeneratedPlaylist {

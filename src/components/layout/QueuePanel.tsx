@@ -16,6 +16,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
 import { useDndSensors } from "@/hooks/useDndSensors";
 import { cn } from "@/lib/utils";
+import { formatPlayCount } from "@/lib/format";
 
 export function QueuePanel() {
   const showQueue = usePlayerStore((s) => s.showQueue);
@@ -198,7 +199,7 @@ export function QueuePanel() {
 
 // ─── Now Playing Row ──────────────────────────────────────────────────────────
 
-function NowPlayingRow({ song }: { song: { title: string; artist: string; coverUrl: string | null } }) {
+function NowPlayingRow({ song }: { song: { title: string; artist: string; coverUrl: string | null; playCount?: number } }) {
   return (
     <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-white/5">
       <div className="relative w-10 h-10 rounded shrink-0 overflow-hidden">
@@ -211,6 +212,7 @@ function NowPlayingRow({ song }: { song: { title: string; artist: string; coverU
       <div className="min-w-0">
         <p className="text-sm font-medium text-[#8B5CF6] truncate">{song.title}</p>
         <p className="text-xs text-zinc-400 truncate">{song.artist}</p>
+        <p className="text-xs text-zinc-600 mt-0.5">{formatPlayCount(song.playCount ?? 0)} plays</p>
       </div>
     </div>
   );
@@ -276,6 +278,10 @@ function QueueRow({ id, song, onPlay, onRemove, overlay = false }: QueueRowProps
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-zinc-100 truncate">{song.title}</p>
         <p className="text-xs text-zinc-400 truncate">{song.artist}</p>
+        <p className="mt-0.5 flex items-center gap-1 text-xs text-zinc-600 truncate">
+          <span className="inline-block w-2 h-2 rounded-full bg-zinc-600/70" />
+          <span>{formatPlayCount(song.playCount ?? 0)} plays</span>
+        </p>
       </div>
 
       {/* Remove */}

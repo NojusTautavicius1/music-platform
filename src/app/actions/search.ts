@@ -1,7 +1,10 @@
 "use server";
 
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+
+const SearchQuerySchema = z.object({ query: z.string().max(500) });
 
 type SearchResult = {
   id: string;
@@ -21,10 +24,13 @@ type GlobalSearchResult = {
 };
 
 export async function globalSearch(query: string): Promise<GlobalSearchResult> {
+  const parsedQuery = SearchQuerySchema.safeParse({ query });
+  if (!parsedQuery.success) return { songs: [], playlists: [], artists: [], ownPlaylists: [] };
+
   const session = await auth();
   if (!session?.user?.email) return { songs: [], playlists: [], artists: [], ownPlaylists: [] };
 
-  const trimmed = query.trim();
+  const trimmed = parsedQuery.data.query.trim();
   if (!trimmed) return { songs: [], playlists: [], artists: [], ownPlaylists: [] };
 
   const [songs, playlists, artists, user] = await Promise.all([

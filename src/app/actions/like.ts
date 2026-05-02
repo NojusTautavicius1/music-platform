@@ -1,8 +1,11 @@
 "use server";
 
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+
+const SongIdSchema = z.object({ songId: z.string().min(1) });
 
 export async function toggleLike(
   songId: string
@@ -11,6 +14,9 @@ export async function toggleLike(
   if (!session?.user?.email) {
     return { ok: false, error: "Not authenticated" };
   }
+
+  const parsed = SongIdSchema.safeParse({ songId });
+  if (!parsed.success) return { ok: false, error: "Invalid input" };
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
