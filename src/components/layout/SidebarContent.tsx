@@ -36,7 +36,7 @@ export async function SidebarContent() {
       {/* Logo */}
       <div className="px-6 py-5 shrink-0">
         <Link href="/">
-          <span className="text-2xl font-bold bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">
+          <span className="text-2xl font-bold bg-gradient-to-r from-brand-orange to-brand-magenta bg-clip-text text-transparent">
             Sonara
           </span>
         </Link>
@@ -75,7 +75,7 @@ export async function SidebarContent() {
           href="/library/liked"
           className="flex items-center gap-3 px-3 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors text-sm font-medium"
         >
-          <div className="w-8 h-8 rounded bg-linear-to-br from-[#8B5CF6] to-[#3B82F6] flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded bg-linear-to-br from-brand-orange to-brand-magenta flex items-center justify-center shrink-0">
             <Heart size={14} fill="white" className="text-white" />
           </div>
           <span className="flex-1 min-w-0 truncate">Liked Songs</span>

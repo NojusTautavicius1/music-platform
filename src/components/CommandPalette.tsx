@@ -210,7 +210,7 @@ export function CommandPalette() {
                   <Command.Item
                     key={action.id}
                     onSelect={action.action}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-white/10"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-orange-500/10 aria-selected:text-white cursor-pointer transition-colors"
                   >
                     <action.icon size={18} className="text-zinc-400" />
                     <span className="flex-1">{action.label}</span>
@@ -236,7 +236,7 @@ export function CommandPalette() {
                     router.push(item.href);
                     setOpen(false);
                   }}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-white/10"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-orange-500/10 aria-selected:text-white cursor-pointer transition-colors"
                 >
                   <item.icon size={18} className="text-zinc-400" />
                   <span className="flex-1">{item.label}</span>
@@ -251,7 +251,7 @@ export function CommandPalette() {
                   <Command.Item
                     key={song.id}
                     onSelect={() => handlePlaySong(song)}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-white/10"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-orange-500/10 aria-selected:text-white cursor-pointer transition-colors"
                   >
                     <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center overflow-hidden">
                       {song.coverUrl ? (
@@ -282,7 +282,7 @@ export function CommandPalette() {
                       <Command.Item
                         key={song.id}
                         onSelect={() => handlePlaySong(song)}
-                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-white/10"
+                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-orange-500/10 aria-selected:text-white cursor-pointer transition-colors"
                       >
                         <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center overflow-hidden">
                           {song.coverUrl ? (
@@ -310,7 +310,7 @@ export function CommandPalette() {
                           router.push(`/library/playlist/${playlist.id}`);
                           setOpen(false);
                         }}
-                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-white/10"
+                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-orange-500/10 aria-selected:text-white cursor-pointer transition-colors"
                       >
                         <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center overflow-hidden">
                           {playlist.coverUrl ? (
@@ -340,7 +340,7 @@ export function CommandPalette() {
                           router.push(`/library/playlist/${playlist.id}`);
                           setOpen(false);
                         }}
-                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-white/10"
+                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-orange-500/10 aria-selected:text-white cursor-pointer transition-colors"
                       >
                         <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center overflow-hidden">
                           {playlist.coverUrl ? (
@@ -370,7 +370,7 @@ export function CommandPalette() {
                           router.push(`/search/${encodeURIComponent(artist.title)}`);
                           setOpen(false);
                         }}
-                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-white/10"
+                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-200 aria-selected:bg-orange-500/10 aria-selected:text-white cursor-pointer transition-colors"
                       >
                         <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center overflow-hidden">
                           <User size={14} className="text-zinc-500" />

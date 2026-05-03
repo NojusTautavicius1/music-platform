@@ -47,7 +47,7 @@ export function BottomNav({ user, signOutAction }: Props) {
             className={cn(
               "flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-medium transition-colors",
               pathname === href
-                ? "text-white"
+                ? "text-[#FF5500]"
                 : "text-zinc-500 hover:text-zinc-300"
             )}
           >
@@ -76,7 +76,7 @@ export function BottomNav({ user, signOutAction }: Props) {
           <div className="flex items-center gap-3 px-2 py-4">
             <Avatar className="w-12 h-12 shrink-0">
               <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} />
-              <AvatarFallback className="bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] text-white font-semibold">
+              <AvatarFallback className="bg-linear-to-br from-brand-orange to-brand-magenta text-white font-semibold">
                 {initials}
               </AvatarFallback>
             </Avatar>

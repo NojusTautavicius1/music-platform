@@ -68,7 +68,7 @@ export function PlaylistCard({
             className="object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40" />
+          <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40" />
         )}
 
         {/* Play button */}

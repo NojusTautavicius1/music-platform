@@ -54,9 +54,8 @@ export function Waveform({
   const barW = variant === "full" ? 3 : 2;
   const gap = variant === "full" ? 2 : 1;
   const step = barW + gap;
-  const filledColor = variant === "full" ? "#8B5CF6" : "rgba(255,255,255,0.78)";
-  const unfilledColor =
-    variant === "full" ? "rgba(139,92,246,0.28)" : "rgba(255,255,255,0.18)";
+  const filledColor = "#FF5500";
+  const unfilledColor = variant === "full" ? "rgba(255,85,0,0.28)" : "rgba(255,85,0,0.22)";
 
   const paint = useCallback(() => {
     const canvas = canvasRef.current;

@@ -2,16 +2,16 @@ import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 export default function LoginPage() {
   return (
-    <div className="h-screen bg-[#0A0A0F] relative overflow-hidden flex items-center justify-center">
+    <div className="h-screen bg-bg-primary relative overflow-hidden flex items-center justify-center">
       {/* Ambient gradient orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#8B5CF6]/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#EC4899]/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-orange/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-magenta/20 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Card */}
-      <div className="relative bg-[#18181F] rounded-2xl p-12 w-full max-w-[420px] border border-white/10 shadow-[0_0_60px_rgba(139,92,246,0.12)]">
+      <div className="relative bg-[#18181F] rounded-2xl p-12 w-full max-w-[420px] border border-white/10 shadow-[0_0_60px_rgba(255,85,0,0.12)]">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent mb-3">
+          <h1 className="text-4xl font-bold bg-linear-to-r from-brand-orange to-brand-magenta bg-clip-text text-transparent mb-3">
             Sonara
           </h1>
           <p className="text-2xl font-semibold text-white">Welcome back</p>
@@ -72,7 +72,7 @@ export default function LoginPage() {
           <button
             disabled
             title="Coming soon"
-            className="w-full h-12 bg-gradient-to-r from-[#8B5CF6]/40 to-[#EC4899]/40 rounded-full font-semibold text-gray-500 cursor-not-allowed mt-2"
+            className="w-full h-12 bg-linear-to-r from-brand-orange/40 to-brand-magenta/40 rounded-full font-semibold text-gray-500 cursor-not-allowed mt-2"
           >
             Sign in
           </button>

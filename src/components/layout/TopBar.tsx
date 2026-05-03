@@ -138,7 +138,7 @@ export function TopBar({ user, signOutAction }: Props) {
               <button className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/40">
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} />
-                  <AvatarFallback className="bg-linear-to-br from-[#8B5CF6] to-[#EC4899] text-white text-xs font-semibold">
+                  <AvatarFallback className="bg-linear-to-br from-brand-orange to-brand-magenta text-white text-xs font-semibold">
                     {initials}
                   </AvatarFallback>
                 </Avatar>

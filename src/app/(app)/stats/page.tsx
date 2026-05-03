@@ -230,21 +230,21 @@ export default async function StatsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
-            <Headphones size={18} className="text-purple-300" />
+            <Headphones size={18} className="text-brand-orange" />
             <p className="mt-3 text-3xl font-bold text-zinc-100">
               {totalMinutes.toLocaleString()}
             </p>
             <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Total minutes listened</p>
           </div>
           <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
-            <Music2 size={18} className="text-pink-300" />
+            <Music2 size={18} className="text-brand-orange" />
             <p className="mt-3 text-3xl font-bold text-zinc-100">
               {uniqueSongCount.toLocaleString()}
             </p>
             <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Unique songs played</p>
           </div>
           <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
-            <Users size={18} className="text-rose-300" />
+            <Users size={18} className="text-brand-orange" />
             <p className="mt-3 text-3xl font-bold text-zinc-100">
               {uniqueArtistCount.toLocaleString()}
             </p>
@@ -395,7 +395,7 @@ export default async function StatsPage() {
       {(avgBpm != null || topMood || topKey) && (
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <Activity size={18} className="text-purple-400" />
+            <Activity size={18} className="text-brand-orange" />
             <h2 className="text-xl font-bold text-zinc-100">Your music in numbers</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

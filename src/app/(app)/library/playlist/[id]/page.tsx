@@ -220,7 +220,7 @@ export default async function PlaylistPage({ params }: Props) {
                 priority
               />
             ) : (
-              <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/50 to-[#EC4899]/50" />
+              <div className="w-full h-full bg-linear-to-br from-brand-orange/50 to-brand-magenta/50" />
             )}
           </div>
 

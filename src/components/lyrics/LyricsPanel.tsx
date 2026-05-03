@@ -112,7 +112,7 @@ export function LyricsPanel({ songId, currentTime, onAnalysis }: Props) {
               className={cn(
                 "text-center transition-all duration-300 leading-snug select-none px-2 py-1 rounded-lg",
                 isActive
-                  ? "text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] scale-105"
+                  ? "text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-brand-orange to-brand-magenta scale-105"
                   : isNear
                   ? "text-base text-zinc-200 opacity-70"
                   : "text-sm text-zinc-500 opacity-40"
