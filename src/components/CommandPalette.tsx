@@ -17,6 +17,7 @@ import {
   BarChart2,
   User,
   Music2,
+  Sparkles,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
@@ -63,6 +64,15 @@ export function CommandPalette() {
 
   const quickActions = useMemo(
     () => [
+      {
+        id: "ask-sonara",
+        label: "Ask Sonara",
+        icon: Sparkles,
+        action: () => {
+          router.push("/ask");
+          setOpen(false);
+        },
+      },
       {
         id: "create-playlist",
         label: "Create new playlist",

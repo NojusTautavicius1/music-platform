@@ -15,6 +15,7 @@ import { MixRefreshTrigger } from "@/components/shared/MixRefreshTrigger";
 import { GENRE_COLORS, FEATURED_GENRES } from "@/lib/genreColors";
 import { getPlaylistPlayCounts, getTrendingSongs } from "@/lib/playCounts";
 import { FlowDivider } from "@/components/shared/FlowDivider";
+import { TryAskingSection } from "@/components/shared/TryAskingSection";
 
 // ─── Skeleton helpers ─────────────────────────────────────────────────────────
 
@@ -472,6 +473,9 @@ export default async function HomePage() {
       >
         <NewReleasesSection />
       </Suspense>
+
+      {/* Try asking — AI agent showcase */}
+      <TryAskingSection />
     </div>
   );
 }

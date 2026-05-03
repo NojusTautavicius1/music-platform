@@ -9,6 +9,7 @@ const CreatePlaylistSchema = z.object({
   name: z.string().min(1, "Name is required").max(60, "Max 60 characters"),
   description: z.string().max(200, "Max 200 characters").optional(),
   isPublic: z.boolean().default(false),
+  songIds: z.array(z.string()).optional(),
 });
 
 const UpdatePlaylistSchema = z.object({
@@ -59,6 +60,16 @@ export async function createPlaylist(
         description: parsed.data.description?.trim() || null,
         isPublic: parsed.data.isPublic,
         userId: user.id,
+        ...(parsed.data.songIds?.length
+          ? {
+              songs: {
+                create: parsed.data.songIds.map((songId, position) => ({
+                  songId,
+                  position,
+                })),
+              },
+            }
+          : {}),
       },
       select: { id: true },
     });

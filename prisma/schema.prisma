@@ -23,6 +23,7 @@ model User {
   playHistory        PlayHistory[]
   preferences        UserPreferences?
   generatedPlaylists GeneratedPlaylist[]
+  agentQueries       AgentQuery[]
 }
 
 model UserPreferences {
@@ -216,4 +217,17 @@ model GeneratedPlaylist {
 
   @@unique([userId, kind])
   @@index([userId, generatedAt])
+}
+
+model AgentQuery {
+  id               String   @id @default(cuid())
+  userId           String?
+  query            String
+  resultCount      Int      @default(0)
+  agentExplanation String?  @db.Text
+  createdAt        DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
 }

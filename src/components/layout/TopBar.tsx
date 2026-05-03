@@ -12,6 +12,7 @@ import {
   Menu,
   BarChart2,
   Command,
+  Sparkles,
 } from "lucide-react";
 import {
   Avatar,
@@ -105,7 +106,7 @@ export function TopBar({ user, signOutAction }: Props) {
         </button>
       </div>
 
-      {/* Search */}
+      {/* Search + Ask Sonara */}
       <form onSubmit={handleSearch} className="flex-1 flex justify-center">
         <div className="relative w-full max-w-100 flex items-center gap-2">
           <Search
@@ -129,6 +130,21 @@ export function TopBar({ user, signOutAction }: Props) {
           </button>
         </div>
       </form>
+
+      {/* Ask Sonara pill — always visible */}
+      <button
+        type="button"
+        onClick={() => router.push("/ask")}
+        className="relative hidden sm:flex items-center gap-1.5 px-3 h-9 rounded-full text-xs font-semibold text-white shrink-0 overflow-hidden"
+        aria-label="Ask Sonara AI"
+      >
+        {/* animated gradient background */}
+        <span className="absolute inset-0 bg-linear-to-r from-orange-500 via-pink-500 to-purple-500 opacity-90" />
+        {/* subtle shimmer sweep */}
+        <span className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer-slide_2.5s_ease-in-out_infinite]" />
+        <Sparkles size={13} className="relative z-10 animate-pulse" />
+        <span className="relative z-10">Ask Sonara</span>
+      </button>
 
       {/* User avatar + dropdown — desktop only (mobile uses BottomNav profile tab) */}
       <div className="hidden md:block shrink-0">
@@ -173,6 +189,13 @@ export function TopBar({ user, signOutAction }: Props) {
             >
               <Settings size={14} />
               Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+              onClick={() => router.push("/ask")}
+            >
+              <Sparkles size={14} className="text-orange-400" />
+              Ask Sonara
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-white/10" />
             <DropdownMenuItem

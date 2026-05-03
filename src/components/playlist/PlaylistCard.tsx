@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Play } from "lucide-react";
+import { Play, Music2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatPlayCount } from "@/lib/format";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
@@ -68,7 +68,9 @@ export function PlaylistCard({
             className="object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40" />
+          <div className="w-full h-full bg-[#0A0A0F] flex items-center justify-center border border-white/5">
+            <Music2 size={32} className="text-orange-500/40" />
+          </div>
         )}
 
         {/* Play button */}

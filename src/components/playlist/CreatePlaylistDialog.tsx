@@ -31,9 +31,10 @@ type Props = {
   children?: React.ReactElement;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  initialSongIds?: string[];
 };
 
-export function CreatePlaylistDialog({ children, open, onOpenChange }: Props) {
+export function CreatePlaylistDialog({ children, open, onOpenChange, initialSongIds }: Props) {
   const router = useRouter();
   const [internalOpen, setInternalOpen] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -68,7 +69,7 @@ export function CreatePlaylistDialog({ children, open, onOpenChange }: Props) {
   async function onSubmit(values: FormValues) {
     setSubmitError(null);
     try {
-      const result = await createPlaylist(values);
+      const result = await createPlaylist({ ...values, songIds: initialSongIds });
       if (result.ok) {
         setOpen(false);
         toast.success("Playlist created");

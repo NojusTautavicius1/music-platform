@@ -17,18 +17,33 @@ export async function GET(request: Request) {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #0d0820 0%, #0a0a1a 50%, #1a0a2e 100%)",
+          background: "#09090B",
           position: "relative",
           fontFamily: "system-ui, sans-serif",
         }}
       >
-        {/* purple-pink gradient overlay */}
+        {/* subtle orange glow top-left */}
         <div
           style={{
             position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(236,72,153,0.15) 100%)",
+            top: -120,
+            left: -120,
+            width: 480,
+            height: 480,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(255,85,0,0.18) 0%, transparent 70%)",
+          }}
+        />
+        {/* subtle magenta glow bottom-right */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: -80,
+            right: -80,
+            width: 360,
+            height: 360,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(236,72,153,0.12) 0%, transparent 70%)",
           }}
         />
 
@@ -47,7 +62,7 @@ export async function GET(request: Request) {
               width: 52,
               height: 52,
               borderRadius: "14px",
-              background: "linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)",
+              background: "linear-gradient(135deg, #FF5500 0%, #EC4899 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -70,7 +85,10 @@ export async function GET(request: Request) {
         {/* Title */}
         <p
           style={{
-            color: "white",
+            background: "linear-gradient(90deg, #FF5500 0%, #FF8C00 50%, #EC4899 100%)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            color: "transparent",
             fontSize: title.length > 30 ? 48 : 60,
             fontWeight: 800,
             textAlign: "center",
@@ -88,7 +106,7 @@ export async function GET(request: Request) {
         {subtitle && (
           <p
             style={{
-              color: "rgba(161,161,170,0.9)",
+              color: "rgba(161,161,170,0.8)",
               fontSize: 28,
               marginTop: 20,
               textAlign: "center",
@@ -99,6 +117,18 @@ export async function GET(request: Request) {
             {subtitle}
           </p>
         )}
+
+        {/* bottom divider line */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 48,
+            width: 120,
+            height: 3,
+            borderRadius: 2,
+            background: "linear-gradient(90deg, #FF5500, #EC4899)",
+          }}
+        />
       </div>
     ),
     { width: 1200, height: 630 }
