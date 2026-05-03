@@ -21,7 +21,6 @@ import {
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
 import { CreatePlaylistDialog } from "@/components/playlist/CreatePlaylistDialog";
-import { DialogTitle } from "@/components/ui/dialog";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
 import { globalSearch, getRecentPlays } from "@/app/actions/search";
 import { useUIStore } from "@/store/uiStore";
@@ -189,7 +188,7 @@ export function CommandPalette() {
     <>
       <CreatePlaylistDialog open={createOpen} onOpenChange={setCreateOpen} />
       <Command.Dialog open={open} onOpenChange={setOpen} label="Command palette">
-        <DialogTitle className="sr-only">Command palette</DialogTitle>
+        <h2 className="sr-only">Command palette</h2>
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
         <Command
           className="fixed left-1/2 top-24 z-50 w-[90vw] max-w-[640px] -translate-x-1/2 overflow-hidden rounded-xl border border-white/10 bg-[#1A1A1C] shadow-2xl"
