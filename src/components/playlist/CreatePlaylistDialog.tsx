@@ -100,7 +100,7 @@ export function CreatePlaylistDialog({ children, open, onOpenChange }: Props) {
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-300" htmlFor="pl-name">
-              Name <span className="text-[#EC4899]">*</span>
+              Name <span className="text-brand-orange">*</span>
             </label>
             <Input
               id="pl-name"
@@ -110,7 +110,7 @@ export function CreatePlaylistDialog({ children, open, onOpenChange }: Props) {
               {...register("name")}
             />
             {errors.name && (
-              <p className="text-xs text-[#EC4899]">{errors.name.message}</p>
+              <p className="text-xs text-brand-orange">{errors.name.message}</p>
             )}
           </div>
 
@@ -128,7 +128,7 @@ export function CreatePlaylistDialog({ children, open, onOpenChange }: Props) {
               {...register("description")}
             />
             {errors.description && (
-              <p className="text-xs text-[#EC4899]">{errors.description.message}</p>
+              <p className="text-xs text-brand-orange">{errors.description.message}</p>
             )}
           </div>
 
@@ -154,7 +154,7 @@ export function CreatePlaylistDialog({ children, open, onOpenChange }: Props) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-5 py-2 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#EC4899] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
+              className="flex items-center gap-2 px-5 py-2 rounded-full bg-linear-to-r from-brand-orange to-brand-magenta text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
             >
               {isSubmitting && <Loader2 size={14} className="animate-spin" />}
               Create

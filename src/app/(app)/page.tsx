@@ -14,6 +14,7 @@ import { MixCard } from "@/components/shared/MixCard";
 import { MixRefreshTrigger } from "@/components/shared/MixRefreshTrigger";
 import { GENRE_COLORS, FEATURED_GENRES } from "@/lib/genreColors";
 import { getPlaylistPlayCounts, getTrendingSongs } from "@/lib/playCounts";
+import { FlowDivider } from "@/components/shared/FlowDivider";
 
 // ─── Skeleton helpers ─────────────────────────────────────────────────────────
 
@@ -87,7 +88,8 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
     const playCountMap = await getPlaylistPlayCounts(playlists.map((playlist) => playlist.id));
     return (
       <section>
-        <h2 className="text-2xl font-bold text-zinc-100 mb-6">Made for you</h2>
+        <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
+        <FlowDivider className="mb-4" />
         <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-3 px-3">
           {playlists.map((p) => (
             <div key={p.id} className="shrink-0 snap-start">
@@ -120,7 +122,8 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
       <>
         <MixRefreshTrigger needsRefresh />
         <section>
-          <h2 className="text-2xl font-bold text-zinc-100 mb-6">Made for you</h2>
+          <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
+        <FlowDivider className="mb-4" />
           <p className="text-zinc-500 text-sm">
             Your personalized mixes are being prepared…
           </p>
@@ -133,7 +136,8 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
     <>
       <MixRefreshTrigger needsRefresh={needsRefresh} />
       <section>
-        <h2 className="text-2xl font-bold text-zinc-100 mb-6">Made for you</h2>
+        <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
+        <FlowDivider className="mb-4" />
         <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-3 px-3">
           {mixes.map((mix) => (
             <div key={mix.kind} className="snap-start">
@@ -178,7 +182,8 @@ async function RecentlyPlayedSection({ userId }: { userId?: string | null }) {
       if (orderedSongs.length > 0) {
         return (
           <section>
-            <h2 className="text-2xl font-bold text-zinc-100 mb-6">Recently played</h2>
+            <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Recently played</h2>
+        <FlowDivider className="mb-4" />
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
               {orderedSongs.map((s) => (
                 <PlaylistCard
@@ -210,7 +215,7 @@ async function RecentlyPlayedSection({ userId }: { userId?: string | null }) {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-6">Recently played</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-6 section-heading">Recently played</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
         {songs.map((s) => (
           <PlaylistCard
@@ -281,7 +286,8 @@ async function JumpBackInSection({ userId }: { userId?: string | null }) {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-6">Jump back in</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Jump back in</h2>
+      <FlowDivider className="mb-4" />
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-1">
         {playlists.map((p) => (
           <PlaylistCard
@@ -308,7 +314,8 @@ async function TrendingNowSection() {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-6">Trending now</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Trending now</h2>
+      <FlowDivider className="mb-4" />
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1">
         {trending.map(({ song, playCount }) => (
           <PlaylistCard
@@ -341,7 +348,8 @@ async function NewReleasesSection() {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-6">New releases</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">New releases</h2>
+      <FlowDivider className="mb-4" />
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1">
         {songs.map((s) => (
           <PlaylistCard
@@ -378,10 +386,10 @@ export default async function HomePage() {
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="p-4 md:p-8 space-y-12 max-w-[1600px]">
+    <div className="p-4 md:p-8 space-y-12 max-w-400">
       {/* Greeting */}
       <div>
-        <h1 className="text-3xl md:text-5xl font-extrabold leading-tight pb-1 bg-linear-to-r from-brand-orange to-brand-magenta bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-5xl font-extrabold leading-tight pb-1 greeting-shimmer">
           {greeting}, {firstName}
         </h1>
         <p className="text-zinc-500 mt-2 text-base">
@@ -432,9 +440,10 @@ export default async function HomePage() {
 
       {/* Genre chips — static, no Suspense needed */}
       <section>
-        <h2 className="text-2xl font-bold text-zinc-100 mb-6">
+        <h2 className="text-2xl font-bold text-zinc-100 mb-2">
           Your top genres
         </h2>
+        <FlowDivider className="mb-4" />
         <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
           {FEATURED_GENRES.map((genre) => {
             const cfg = GENRE_COLORS[genre];
@@ -443,7 +452,7 @@ export default async function HomePage() {
               <Link
                 key={genre}
                 href={`/search/${encodeURIComponent(genre)}`}
-                className={`shrink-0 px-6 py-3 rounded-full bg-gradient-to-r ${cfg.gradient} text-white font-bold text-sm whitespace-nowrap hover:scale-105 transition-transform shadow-md`}
+                className={`shrink-0 px-6 py-3 rounded-full bg-linear-to-r ${cfg.gradient} text-white font-bold text-sm whitespace-nowrap hover:scale-105 transition-transform shadow-md`}
               >
                 {cfg.label}
               </Link>

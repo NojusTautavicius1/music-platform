@@ -113,14 +113,14 @@ export function QueuePanel() {
             <div className="px-5 py-2.5 flex items-center justify-between bg-white/[0.03] border-b border-white/5 shrink-0">
               <p className="text-xs text-zinc-500">
                 Shuffle:{" "}
-                <span className="text-[#8B5CF6] font-medium">{playedCount}</span>
+                <span className="text-brand-orange font-medium">{playedCount}</span>
                 {" of "}
                 <span className="font-medium text-zinc-400">{totalSongs}</span>
                 {" songs played"}
               </p>
               <button
                 onClick={resetShuffleHistory}
-                className="w-5 h-5 flex items-center justify-center text-zinc-600 hover:text-[#8B5CF6] transition-colors"
+                className="w-5 h-5 flex items-center justify-center text-zinc-600 hover:text-brand-orange transition-colors"
                 aria-label="Reshuffle from beginning"
                 title="Reshuffle"
               >
@@ -206,11 +206,11 @@ function NowPlayingRow({ song }: { song: { title: string; artist: string; coverU
         {song.coverUrl ? (
           <Image src={song.coverUrl} alt={song.title} fill sizes="40px" className="object-cover" />
         ) : (
-          <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30" />
+          <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
         )}
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-medium text-[#8B5CF6] truncate">{song.title}</p>
+        <p className="text-sm font-medium text-brand-orange truncate">{song.title}</p>
         <p className="text-xs text-zinc-400 truncate">{song.artist}</p>
         <p className="text-xs text-zinc-600 mt-0.5">{formatPlayCount(song.playCount ?? 0)} plays</p>
       </div>
@@ -270,7 +270,7 @@ function QueueRow({ id, song, onPlay, onRemove, overlay = false }: QueueRowProps
         {song.coverUrl ? (
           <Image src={song.coverUrl} alt={song.title} fill sizes="36px" className="object-cover" />
         ) : (
-          <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30" />
+          <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
         )}
       </div>
 

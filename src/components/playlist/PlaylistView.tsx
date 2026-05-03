@@ -211,7 +211,7 @@ function SongRow({
     <div ref={overlay ? undefined : setNodeRef} style={style} {...(overlay ? {} : attributes)}>
       {/* drop indicator line above this row while dragging over it */}
       {isDragging && (
-        <div className="h-0.5 mx-2 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#EC4899] opacity-80" />
+        <div className="h-0.5 mx-2 rounded-full bg-linear-to-r from-brand-orange to-brand-magenta opacity-80" />
       )}
 
       {/* ── Mobile card (< md) ───────────────────────────────────── */}
@@ -246,7 +246,7 @@ function SongRow({
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30" />
+            <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
           )}
         </div>
 
@@ -254,7 +254,7 @@ function SongRow({
         <div className="flex-1 min-w-0">
           <p className={cn(
             "text-sm font-medium truncate",
-            isActive ? "text-[#8B5CF6]" : "text-zinc-100"
+            isActive ? "text-brand-orange" : "text-zinc-100"
           )}>
             {song.title}
           </p>
@@ -285,8 +285,8 @@ function SongRow({
       <div
         onClick={overlay ? undefined : onPlay}
         className={cn(
-          "hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_120px_140px_8rem] items-center h-14 px-2 rounded-lg cursor-pointer group",
-          "hover:bg-white/5 transition-colors",
+          "hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_120px_140px_8rem] items-center h-14 px-2 rounded-lg cursor-pointer group song-row-hover",
+          "transition-colors",
           isActive && "bg-white/5 border-l-2 border-brand-orange",
           isDragging && "opacity-40 scale-[0.99]",
           overlay && "opacity-90 bg-[#18181F] shadow-xl ring-1 ring-white/10 rounded-lg"
@@ -309,7 +309,7 @@ function SongRow({
         {/* # / play icon */}
         <div className="flex items-center justify-center">
           {isActive ? (
-            <Pause size={14} fill="#8B5CF6" className="text-[#8B5CF6]" />
+            <Pause size={14} fill="#FF5500" className="text-brand-orange" />
           ) : (
             <>
               <span className="text-sm text-zinc-400 group-hover:hidden">
@@ -336,13 +336,13 @@ function SongRow({
                 className="object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30" />
+              <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
             )}
           </div>
           <div className="min-w-0">
             <p className={cn(
               "text-sm font-medium truncate",
-              isActive ? "text-[#8B5CF6]" : "text-zinc-100"
+              isActive ? "text-brand-orange" : "text-zinc-100"
             )}>
               {song.title}
             </p>
@@ -395,7 +395,7 @@ function SongRow({
               size={14}
               className={cn(
                 isLiked
-                  ? "fill-[#EC4899] text-[#EC4899]"
+                  ? "fill-brand-orange text-brand-orange"
                   : "text-zinc-500 hover:text-zinc-300"
               )}
             />
@@ -485,7 +485,7 @@ function SongRow({
                 <Heart
                   size={14}
                   className={cn(
-                    isLiked ? "fill-[#EC4899] text-[#EC4899]" : "text-zinc-400"
+                    isLiked ? "fill-brand-orange text-brand-orange" : "text-zinc-400"
                   )}
                 />
                 {isLiked ? "Unlike" : "Like"}
@@ -639,7 +639,7 @@ function EditPlaylistDialog({ open, onOpenChange, playlist }: EditPlaylistDialog
                 className={cn(
                   "relative w-[180px] h-[180px] rounded-md overflow-hidden shadow-xl",
                   "border border-white/10 bg-white/5 group cursor-pointer",
-                  isDragging && "border-[#8B5CF6]"
+                  isDragging && "border-brand-orange"
                 )}
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(e) => {
@@ -664,7 +664,7 @@ function EditPlaylistDialog({ open, onOpenChange, playlist }: EditPlaylistDialog
                     className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40" />
+                  <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40" />
                 )}
 
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-sm font-medium text-white gap-2">
@@ -692,7 +692,7 @@ function EditPlaylistDialog({ open, onOpenChange, playlist }: EditPlaylistDialog
             <div className="flex-1 space-y-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-zinc-300" htmlFor="edit-name">
-                  Name <span className="text-[#EC4899]">*</span>
+                  Name <span className="text-brand-orange">*</span>
                 </label>
                 <Input
                   id="edit-name"
@@ -701,7 +701,7 @@ function EditPlaylistDialog({ open, onOpenChange, playlist }: EditPlaylistDialog
                   {...register("name")}
                 />
                 {errors.name && (
-                  <p className="text-xs text-[#EC4899]">{errors.name.message}</p>
+                  <p className="text-xs text-brand-orange">{errors.name.message}</p>
                 )}
               </div>
 
@@ -722,7 +722,7 @@ function EditPlaylistDialog({ open, onOpenChange, playlist }: EditPlaylistDialog
                   {...register("description")}
                 />
                 {errors.description && (
-                  <p className="text-xs text-[#EC4899]">{errors.description.message}</p>
+                  <p className="text-xs text-brand-orange">{errors.description.message}</p>
                 )}
               </div>
 
@@ -832,7 +832,7 @@ function SuggestionRow({
         {song.coverUrl ? (
           <Image src={song.coverUrl} alt={song.title} fill sizes="40px" className="object-cover" />
         ) : (
-          <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30 flex items-center justify-center">
+          <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30 flex items-center justify-center">
             <Music size={14} className="text-zinc-600" />
           </div>
         )}
@@ -847,7 +847,7 @@ function SuggestionRow({
       <button
         onClick={onAdd}
         disabled={isPending}
-        className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-white/10 text-xs text-zinc-300 hover:text-white hover:bg-white/10 transition-colors shrink-0 disabled:opacity-40"
+        className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-[#FF5500]/40 text-xs text-[#FF5500] hover:bg-orange-500/10 hover:border-[#FF5500] transition-colors shrink-0 disabled:opacity-40"
         aria-label={`Add ${song.title}`}
       >
         {isPending ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
@@ -881,7 +881,7 @@ function RecommendedSection({
   return (
     <div className="px-4 md:px-8 pb-6">
       <div className="flex items-center gap-2 mb-3">
-        <Sparkles size={14} className="text-[#8B5CF6] shrink-0" />
+        <Sparkles size={14} className="text-brand-orange shrink-0" />
         <h3 className="text-sm font-semibold text-zinc-300">Suggested for this playlist</h3>
       </div>
       <div className="space-y-0.5">
@@ -1334,7 +1334,7 @@ export function PlaylistView({
             className={cn(
               "transition-colors",
               isPlaylistLiked
-                ? "fill-[#EC4899] text-[#EC4899]"
+                ? "fill-brand-orange text-brand-orange"
                 : "text-zinc-500 hover:text-zinc-300"
             )}
           />
@@ -1344,7 +1344,7 @@ export function PlaylistView({
           <>
             <button
               onClick={() => setEditOpen(true)}
-              className="h-9 px-3 rounded-full border border-white/10 text-zinc-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+              className="h-9 px-3 rounded-full border border-[#FF5500]/40 text-[#FF5500] hover:bg-orange-500/10 hover:border-[#FF5500] transition-colors flex items-center gap-2"
               aria-label="Edit playlist"
             >
               <Pencil size={16} />
@@ -1401,14 +1401,14 @@ export function PlaylistView({
               onClick={() => setSortMode("custom")}
             >
               Custom order
-              {sortMode === "custom" && <span className="ml-auto text-[#8B5CF6]">✓</span>}
+              {sortMode === "custom" && <span className="ml-auto text-brand-orange">✓</span>}
             </DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer focus:bg-white/10 focus:text-white"
               onClick={() => setSortMode("mostPlayed")}
             >
               Most played
-              {sortMode === "mostPlayed" && <span className="ml-auto text-[#8B5CF6]">✓</span>}
+              {sortMode === "mostPlayed" && <span className="ml-auto text-brand-orange">✓</span>}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

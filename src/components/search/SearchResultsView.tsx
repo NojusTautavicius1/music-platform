@@ -86,7 +86,7 @@ function CoverThumb({
       {src ? (
         <Image src={src} alt={alt} fill sizes="40px" className="object-cover" />
       ) : (
-        <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30" />
+        <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
       )}
     </div>
   );
@@ -148,7 +148,7 @@ function SongRow({
       {!compact && (
         <span className="w-5 text-center text-xs text-zinc-500 group-hover:hidden">
           {isCurrentlyPlaying ? (
-            <span className="text-[#8B5CF6]">▶</span>
+            <span className="text-brand-orange">▶</span>
           ) : (
             index + 1
           )}
@@ -168,7 +168,7 @@ function SongRow({
         <p
           className={cn(
             "text-sm font-medium truncate",
-            isActive ? "text-[#8B5CF6]" : "text-zinc-100"
+            isActive ? "text-brand-orange" : "text-zinc-100"
           )}
         >
           {song.title}
@@ -253,7 +253,7 @@ function TopResultCard({
           {p.coverUrl ? (
             <Image src={p.coverUrl} alt={p.name} fill sizes="112px" className="object-cover" />
           ) : (
-            <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40 flex items-center justify-center">
+            <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40 flex items-center justify-center">
               <Music size={32} className="text-white/50" />
             </div>
           )}
@@ -300,12 +300,12 @@ function TopResultCard({
           {s.coverUrl ? (
             <Image src={s.coverUrl} alt={s.title} fill sizes="112px" className="object-cover" />
           ) : (
-            <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40 flex items-center justify-center">
+            <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40 flex items-center justify-center">
               <Music size={32} className="text-white/50" />
             </div>
           )}
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/30 transition-opacity">
-            <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#8B5CF6] to-[#EC4899] flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-orange to-brand-magenta flex items-center justify-center shadow-lg">
               <Play size={16} fill="white" className="text-white ml-0.5" />
             </div>
           </div>
@@ -335,7 +335,7 @@ function ArtistCard({ name, monthlyListeners }: { name: string; monthlyListeners
 
   return (
     <div className="flex flex-col items-center gap-3 p-4 rounded-xl hover:bg-white/5 transition-colors cursor-default">
-      <div className="w-24 h-24 rounded-full bg-linear-to-br from-[#8B5CF6]/50 to-[#EC4899]/50 flex items-center justify-center shadow-lg">
+      <div className="w-24 h-24 rounded-full bg-linear-to-br from-brand-orange/50 to-brand-magenta/50 flex items-center justify-center shadow-lg">
         <span className="text-2xl font-bold text-white">{initials}</span>
       </div>
       <div className="text-center">
@@ -391,7 +391,7 @@ export function SearchResultsView({
             className={cn(
               "px-4 py-2.5 text-sm font-medium rounded-t-md transition-colors",
               activeTab === key
-                ? "text-zinc-100 border-b-2 border-[#8B5CF6] -mb-px"
+                ? "text-brand-orange border-b-2 border-brand-orange -mb-px"
                 : "text-zinc-500 hover:text-zinc-300"
             )}
           >

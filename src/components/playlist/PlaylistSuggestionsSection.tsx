@@ -40,7 +40,7 @@ function SuggestionRow({
         {song.coverUrl ? (
           <Image src={song.coverUrl} alt={song.title} fill sizes="24px" className="object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30">
+          <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-brand-orange/30 to-brand-magenta/30">
             <Music2 size={12} className="text-zinc-500" />
           </div>
         )}
@@ -159,7 +159,7 @@ export function PlaylistSuggestionsSection({
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
             <div className="flex items-center gap-2">
-              <Sparkles size={14} className="text-[#8B5CF6]" />
+              <Sparkles size={14} className="text-brand-orange" />
               <h3 className="text-sm font-semibold text-zinc-100">
                 {mode === "empty" ? "Let's get this playlist started" : "More like this"}
               </h3>

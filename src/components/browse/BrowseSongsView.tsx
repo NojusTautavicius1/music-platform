@@ -126,7 +126,7 @@ function AudioTooltip({ song }: { song: BrowseSong }) {
           </div>
           <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
             <div
-              className="h-full rounded-full bg-linear-to-r from-purple-500 to-pink-500"
+              className="h-full rounded-full bg-linear-to-r from-brand-orange to-brand-magenta"
               style={{ width: `${Math.round(song.valence * 100)}%` }}
             />
           </div>
@@ -369,13 +369,13 @@ function SongRow({ song, index, queue, userPlaylists }: {
           {song.coverUrl ? (
             <Image src={song.coverUrl} alt={song.title} fill sizes="40px" className="object-cover" />
           ) : (
-            <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30 flex items-center justify-center">
+            <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30 flex items-center justify-center">
               <Music size={14} className="text-zinc-600" />
             </div>
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className={cn("text-sm font-medium truncate", isActive ? "text-[#8B5CF6]" : "text-zinc-100")}>
+          <p className={cn("text-sm font-medium truncate", isActive ? "text-brand-orange" : "text-zinc-100")}>
             {song.title}
           </p>
           <p className="text-xs text-zinc-500 truncate">{song.artist}</p>
@@ -396,12 +396,12 @@ function SongRow({ song, index, queue, userPlaylists }: {
         {/* # / play */}
         <div className="flex items-center justify-center">
           {isCurrentlyPlaying ? (
-            <button onClick={(e) => { e.stopPropagation(); togglePlay(); }} className="text-[#8B5CF6]" aria-label="Pause">
+            <button onClick={(e) => { e.stopPropagation(); togglePlay(); }} className="text-brand-orange" aria-label="Pause">
               <Pause size={16} fill="currentColor" />
             </button>
           ) : (
             <>
-              <span className={cn("text-sm tabular-nums text-zinc-500 group-hover:hidden", isActive && "text-[#8B5CF6]")}>
+              <span className={cn("text-sm tabular-nums text-zinc-500 group-hover:hidden", isActive && "text-brand-orange")}>
                 {index + 1}
               </span>
               <Play size={16} className="hidden group-hover:block text-zinc-100" fill="currentColor" />
@@ -415,7 +415,7 @@ function SongRow({ song, index, queue, userPlaylists }: {
             {song.coverUrl ? (
               <Image src={song.coverUrl} alt={song.title} fill sizes="40px" className="object-cover" />
             ) : (
-              <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/30 to-[#EC4899]/30 flex items-center justify-center">
+              <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30 flex items-center justify-center">
                 <Music size={14} className="text-zinc-600" />
               </div>
             )}
@@ -430,7 +430,7 @@ function SongRow({ song, index, queue, userPlaylists }: {
                     onMouseLeave={() => setTooltipOpen(false)}
                     className="text-left"
                   >
-                    <p className={cn("text-sm font-medium truncate hover:underline", isActive ? "text-[#8B5CF6]" : "text-zinc-100")}>
+                    <p className={cn("text-sm font-medium truncate hover:underline", isActive ? "text-brand-orange" : "text-zinc-100")}>
                       {song.title}
                     </p>
                   </button>

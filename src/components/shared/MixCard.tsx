@@ -47,7 +47,8 @@ export function MixCard({ kind, name, description, gradientFrom, gradientTo, son
           aria-label={`Play ${name}`}
           className={cn(
             "absolute bottom-2 right-2 w-10 h-10 rounded-full",
-            "bg-black/30 backdrop-blur-sm",
+            "bg-linear-to-br from-brand-orange to-brand-magenta",
+            "hover:shadow-[0_0_24px_rgba(255,85,0,0.5)]",
             "flex items-center justify-center shadow-xl",
             "opacity-0 translate-y-2",
             "group-hover:opacity-100 group-hover:translate-y-0",

@@ -90,7 +90,7 @@ export default function RootError({ error, reset }: Props) {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
             onClick={reset}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#EC4899] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-linear-to-r from-brand-orange to-brand-magenta text-white text-sm font-semibold hover:opacity-90 transition-opacity"
           >
             <RefreshCw size={14} />
             Try again

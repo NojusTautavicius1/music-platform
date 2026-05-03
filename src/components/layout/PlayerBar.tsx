@@ -114,10 +114,10 @@ function DevicesPopover() {
 
         {/* This computer — always selected */}
         <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/5 mb-2">
-          <Laptop size={18} className="text-[#8B5CF6] shrink-0" />
+          <Laptop size={18} className="text-brand-orange shrink-0" />
           <div className="min-w-0">
             <p className="text-sm font-medium text-zinc-100">This computer</p>
-            <p className="text-xs text-[#8B5CF6]">Current device</p>
+            <p className="text-xs text-brand-orange">Current device</p>
           </div>
         </div>
 
@@ -170,7 +170,7 @@ export function PlayerBar() {
   const displayDuration = duration || (currentSong?.duration ?? 0);
   const onNowPlaying = pathname === "/now-playing";
 
-  const ACTIVE = "text-[#8B5CF6]";
+  const ACTIVE = "text-brand-orange";
   const QUEUE_ACTIVE = "text-transparent bg-linear-to-r from-brand-orange to-brand-magenta bg-clip-text";
 
   return (
@@ -192,7 +192,7 @@ export function PlayerBar() {
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40" />
+            <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40" />
           )}
         </div>
 
@@ -243,7 +243,7 @@ export function PlayerBar() {
                   className="object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40" />
+                <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40" />
               )}
             </motion.div>
           </AnimatePresence>
@@ -267,7 +267,7 @@ export function PlayerBar() {
               className={cn(
                 "transition-colors",
                 isLiked
-                  ? "fill-[#EC4899] text-[#EC4899]"
+                  ? "fill-brand-orange text-brand-orange"
                   : "text-zinc-500 hover:text-zinc-300"
               )}
             />
@@ -298,7 +298,10 @@ export function PlayerBar() {
 
             <button
               onClick={togglePlay}
-              className="w-10 h-10 rounded-full bg-linear-to-br from-brand-orange to-brand-magenta flex items-center justify-center hover:scale-105 transition-transform shadow-lg hover:shadow-[0_0_24px_rgba(255,85,0,0.5)]"
+              className={cn(
+                "w-10 h-10 rounded-full bg-linear-to-br from-brand-orange to-brand-magenta flex items-center justify-center hover:scale-105 transition-transform shadow-lg hover:shadow-[0_0_24px_rgba(255,85,0,0.5)]",
+                !isPlaying && !currentSong && "play-idle-pulse"
+              )}
               aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? (

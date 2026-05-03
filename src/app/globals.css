@@ -7,9 +7,9 @@
 @theme inline {
   /* ── Brand tokens ──────────────────────────────────────────────── */
   --color-brand-orange: #FF5500;
-  --color-brand-magenta: #FF1F8F;
-  --color-brand-purple: #8B5CF6;
-  --color-bg-primary: #0E0E10;
+  --color-brand-magenta: #FF7A1F;
+  --color-brand-purple: #FF5500;
+  --color-bg-primary: #0A0A0A;
   --color-bg-surface: #1A1A1C;
   --color-bg-elevated: #28282A;
   /* ── Shadcn mappings ───────────────────────────────────────────── */
@@ -54,9 +54,26 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ── Animation keyframes ───────────────────────────────────────── */
+  --animate-float-1: float-1 28s ease-in-out infinite alternate;
+  --animate-float-2: float-2 34s ease-in-out infinite alternate;
+  --animate-float-3: float-3 22s ease-in-out infinite alternate;
+  --animate-float-4: float-4 40s ease-in-out infinite alternate;
+  --animate-float-5: float-5 31s ease-in-out infinite alternate;
+  --animate-float-6: float-6 25s ease-in-out infinite alternate;
+  --animate-drift-line-1: drift-line-1 45s ease-in-out infinite alternate;
+  --animate-drift-line-2: drift-line-2 60s ease-in-out infinite alternate;
+  --animate-drift-line-3: drift-line-3 38s ease-in-out infinite alternate;
+  --animate-flow-wave: flow-wave 4s linear infinite;
 }
 
+/* ── CSS variables ─────────────────────────────────────────────────── */
 :root {
+  --orange: #FF5500;
+  --orange-hover: #FF7A1F;
+  --bg-base: #0A0A0A;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -92,7 +109,7 @@
 }
 
 .dark {
-  --background: #0E0E10;
+  --background: #0A0A0A;
   --surface: #1A1A1C;
   --surface-elevated: #28282A;
   --foreground: oklch(0.985 0 0);
@@ -119,12 +136,150 @@
   --chart-5: oklch(0.269 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: #FF5500;
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* ── Grid pattern ──────────────────────────────────────────────────── */
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-attachment: fixed;
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+}
+
+/* ── Orb / line animations ─────────────────────────────────────────── */
+@keyframes float-1 {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  100% { transform: translate(60px, -80px) scale(1.08); }
+}
+@keyframes float-2 {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  100% { transform: translate(-70px, 50px) scale(0.95); }
+}
+@keyframes float-3 {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  100% { transform: translate(40px, 90px) scale(1.05); }
+}
+@keyframes float-4 {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  100% { transform: translate(-50px, -60px) scale(1.1); }
+}
+@keyframes float-5 {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  100% { transform: translate(80px, 40px) scale(0.93); }
+}
+@keyframes float-6 {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  100% { transform: translate(-30px, -70px) scale(1.04); }
+}
+@keyframes drift-line-1 {
+  0%   { transform: translateY(0px) rotate(-15deg); }
+  100% { transform: translateY(-120px) rotate(-15deg); }
+}
+@keyframes drift-line-2 {
+  0%   { transform: translateY(0px) rotate(-25deg); }
+  100% { transform: translateY(100px) rotate(-25deg); }
+}
+@keyframes drift-line-3 {
+  0%   { transform: translateY(0px) rotate(-8deg); }
+  100% { transform: translateY(-80px) rotate(-8deg); }
+}
+@keyframes flow-wave {
+  0%   { stroke-dashoffset: 200; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* ── 1. Play button idle pulse ─────────────────────────────────────── */
+@keyframes play-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.82; transform: scale(0.97); }
+}
+.play-idle-pulse {
+  animation: play-pulse 2s ease-in-out infinite;
+}
+
+/* ── 2. Greeting shimmer ───────────────────────────────────────────── */
+@keyframes shimmer-slide {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+.greeting-shimmer {
+  background: linear-gradient(
+    90deg,
+    #FF5500 0%,
+    #FF7A1F 30%,
+    #FFAA60 50%,
+    #FF7A1F 70%,
+    #FF5500 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shimmer-slide 4s linear infinite;
+}
+
+/* ── 3. Song row left-swipe highlight ─────────────────────────────── */
+.song-row-hover {
+  position: relative;
+  overflow: hidden;
+}
+.song-row-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,85,0,0.08) 0%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 300ms ease-out;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.song-row-hover:hover::before {
+  transform: translateX(0);
+}
+
+/* ── 4. Orange custom scrollbar ───────────────────────────────────── */
+.scrollbar-orange::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-orange::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-orange::-webkit-scrollbar-thumb {
+  background: rgba(255, 85, 0, 0.35);
+  border-radius: 2px;
+}
+.scrollbar-orange::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 85, 0, 0.6);
+}
+.scrollbar-orange {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,85,0,0.35) transparent;
+}
+
+/* ── 5. Section heading fade-up on load ───────────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.section-heading {
+  animation: fade-up 0.5s ease-out both;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ambient-orb,
+  .ambient-line {
+    animation-play-state: paused !important;
+  }
 }
 
 @layer utilities {
@@ -142,9 +297,14 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: #0A0A0A;
+    @apply text-foreground;
   }
   html {
     @apply font-sans;
+  }
+  input[type="radio"],
+  input[type="checkbox"] {
+    accent-color: #FF5500;
   }
 }

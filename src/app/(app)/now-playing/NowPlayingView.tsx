@@ -70,7 +70,7 @@ export function NowPlayingView() {
   const currentTimeSecs = progress * (duration || 0);
   const displayDuration = duration || currentSong?.duration || 0;
 
-  const ACTIVE = "text-[#8B5CF6]";
+  const ACTIVE = "text-brand-orange";
 
   async function handleLike() {
     if (!currentSong || isLiking) return;
@@ -103,20 +103,20 @@ export function NowPlayingView() {
   // Don't render song-specific UI until client hydrates
   if (!mounted) {
     return (
-      <div className="h-full flex items-center justify-center bg-[#0A0A0F]">
-        <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#8B5CF6] to-[#EC4899] animate-pulse" />
+      <div className="h-full flex items-center justify-center bg-bg-primary">
+        <div className="w-10 h-10 rounded-full bg-linear-to-br from-brand-orange to-brand-magenta animate-pulse" />
       </div>
     );
   }
 
   if (!currentSong) {
     return (
-      <div className="h-full flex flex-col items-center justify-center gap-4 bg-[#0A0A0F] text-zinc-500">
+      <div className="h-full flex flex-col items-center justify-center gap-4 bg-bg-primary text-zinc-500">
         <Music2 size={64} />
         <p className="text-lg font-medium">Nothing is playing</p>
         <button
           onClick={() => router.back()}
-          className="text-sm text-[#8B5CF6] hover:underline"
+          className="text-sm text-brand-orange hover:underline"
         >
           Go back
         </button>
@@ -125,7 +125,7 @@ export function NowPlayingView() {
   }
 
   return (
-    <CoverGradient coverUrl={currentSong.coverUrl ?? ""} className="relative h-full overflow-hidden bg-[#0A0A0F] flex flex-col">
+    <CoverGradient coverUrl={currentSong.coverUrl ?? ""} className="relative h-full overflow-hidden bg-bg-primary flex flex-col">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -182,7 +182,7 @@ export function NowPlayingView() {
                   priority
                 />
               ) : (
-                <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40 flex items-center justify-center">
+                <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40 flex items-center justify-center">
                   <Music2 size={80} className="text-white/30" />
                 </div>
               )}
@@ -221,7 +221,7 @@ export function NowPlayingView() {
                 )}
                 {lyricsAnalysis && (
                   <div className="flex items-center gap-1.5 mt-1.5">
-                    <span className="px-2 py-0.5 rounded-full bg-brand-purple/15 border border-brand-purple/30 text-xs text-[#C4B5FD] capitalize">
+                    <span className="px-2 py-0.5 rounded-full bg-brand-orange/15 border border-brand-orange/30 text-xs text-brand-orange capitalize">
                       Lyrics: {lyricsAnalysis.mood}
                       {lyricsAnalysis.themes[0] ? ` · ${lyricsAnalysis.themes[0]}` : ""}
                     </span>
@@ -237,7 +237,7 @@ export function NowPlayingView() {
                   disabled={isLiking}
                   className={cn(
                     "transition-colors",
-                    isLiked ? "text-[#EC4899]" : "text-zinc-400 hover:text-[#EC4899]"
+                    isLiked ? "text-brand-orange" : "text-zinc-400 hover:text-brand-orange"
                   )}
                   aria-label={isLiked ? "Unlike" : "Like"}
                 >

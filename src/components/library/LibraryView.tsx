@@ -135,7 +135,7 @@ export function LibraryView({ playlists }: Props) {
               >
                 Recently added
                 {sort === "recent" && (
-                  <span className="ml-auto text-[#8B5CF6]">✓</span>
+                  <span className="ml-auto text-brand-orange">✓</span>
                 )}
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -144,7 +144,7 @@ export function LibraryView({ playlists }: Props) {
               >
                 Alphabetical
                 {sort === "alpha" && (
-                  <span className="ml-auto text-[#8B5CF6]">✓</span>
+                  <span className="ml-auto text-brand-orange">✓</span>
                 )}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -212,7 +212,7 @@ export function LibraryView({ playlists }: Props) {
           description="Create your first playlist to start curating"
           action={
             <CreatePlaylistDialog>
-              <button className="px-5 py-2.5 rounded-full bg-linear-to-r from-[#8B5CF6] to-[#EC4899] text-white text-sm font-semibold hover:opacity-90 transition-opacity">
+              <button className="px-5 py-2.5 rounded-full bg-linear-to-r from-brand-orange to-brand-magenta text-white text-sm font-semibold hover:opacity-90 transition-opacity">
                 Create Playlist
               </button>
             </CreatePlaylistDialog>
@@ -256,7 +256,7 @@ export function LibraryView({ playlists }: Props) {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-linear-to-br from-[#8B5CF6]/40 to-[#EC4899]/40" />
+                  <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40" />
                 )}
               </div>
               <div className="min-w-0">

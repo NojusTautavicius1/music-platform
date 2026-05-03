@@ -11,6 +11,7 @@ import { MobileSidebarSheet } from "@/components/layout/MobileSidebarSheet";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { QueuePanel } from "@/components/layout/QueuePanel";
 import { CommandPalette } from "@/components/CommandPalette";
+import { AmbientBackground } from "@/components/shared/AmbientBackground";
 
 export default async function AppLayout({
   children,
@@ -26,12 +27,13 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#0A0A0F] text-zinc-100 overflow-hidden">
+    <div className="h-screen flex flex-col bg-bg-primary text-zinc-100 overflow-hidden relative">
+      <AmbientBackground />
       <OfflineBanner />
       {/* Skip to main content — screen readers / keyboard */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[#8B5CF6] focus:text-white focus:text-sm focus:font-semibold"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-brand-orange focus:text-white focus:text-sm focus:font-semibold"
       >
         Skip to content
       </a>
@@ -47,7 +49,7 @@ export default async function AppLayout({
 
         <div className="flex-1 flex flex-col min-h-0">
           <TopBar user={session.user} signOutAction={handleSignOut} />
-          <main id="main-content" className="flex-1 overflow-y-auto">
+          <main id="main-content" className="flex-1 overflow-y-auto scrollbar-orange">
             <PageTransition>{children}</PageTransition>
           </main>
         </div>

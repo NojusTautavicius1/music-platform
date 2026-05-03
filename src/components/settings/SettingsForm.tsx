@@ -130,8 +130,8 @@ export function SettingsForm({ name, email, preferences, attributions }: Props) 
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
               activeTab === tab.key
-                ? "bg-white/10 text-white"
-                : "text-zinc-500 hover:text-zinc-200"
+                ? "bg-orange-500/15 text-[#FF5500] border border-[#FF5500]/30"
+                : "text-zinc-500 hover:text-zinc-200 border border-transparent"
             }`}
           >
             {tab.label}
@@ -152,7 +152,7 @@ export function SettingsForm({ name, email, preferences, attributions }: Props) 
               <button
                 onClick={handleSaveName}
                 disabled={isPending}
-                className="px-5 py-2 rounded-full bg-white/10 text-zinc-100 hover:bg-white/20 transition-colors"
+                className="px-5 py-2 rounded-full bg-[#FF5500] text-black font-bold hover:bg-brand-magenta hover:shadow-[0_0_24px_rgba(255,85,0,0.4)] transition-all duration-150 disabled:opacity-60"
               >
                 Save
               </button>
@@ -245,7 +245,7 @@ export function SettingsForm({ name, email, preferences, attributions }: Props) 
 
           <button
             onClick={handleSavePreferences}
-            className="px-5 py-2 rounded-full bg-white/10 text-zinc-100 hover:bg-white/20 transition-colors"
+            className="px-5 py-2 rounded-full bg-[#FF5500] text-black font-bold hover:bg-brand-magenta hover:shadow-[0_0_24px_rgba(255,85,0,0.4)] transition-all duration-150 disabled:opacity-60"
           >
             Save changes
           </button>
@@ -272,7 +272,7 @@ export function SettingsForm({ name, email, preferences, attributions }: Props) 
 
           <button
             onClick={handleSavePreferences}
-            className="px-5 py-2 rounded-full bg-white/10 text-zinc-100 hover:bg-white/20 transition-colors"
+            className="px-5 py-2 rounded-full bg-[#FF5500] text-black font-bold hover:bg-brand-magenta hover:shadow-[0_0_24px_rgba(255,85,0,0.4)] transition-all duration-150 disabled:opacity-60"
           >
             Save changes
           </button>
@@ -314,7 +314,7 @@ export function SettingsForm({ name, email, preferences, attributions }: Props) 
 
           <button
             onClick={handleSavePreferences}
-            className="px-5 py-2 rounded-full bg-white/10 text-zinc-100 hover:bg-white/20 transition-colors"
+            className="px-5 py-2 rounded-full bg-[#FF5500] text-black font-bold hover:bg-brand-magenta hover:shadow-[0_0_24px_rgba(255,85,0,0.4)] transition-all duration-150 disabled:opacity-60"
           >
             Save changes
           </button>
@@ -330,7 +330,7 @@ export function SettingsForm({ name, email, preferences, attributions }: Props) 
           <div className="rounded-xl border border-white/5 bg-white/5 p-4">
             <p className="text-sm text-zinc-200">GitHub</p>
             <a
-              className="text-xs text-purple-300 hover:text-purple-200"
+              className="text-xs text-[#FF5500] hover:underline"
               href="https://github.com"
               target="_blank"
               rel="noreferrer"
