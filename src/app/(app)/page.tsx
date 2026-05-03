@@ -88,7 +88,7 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
     const playCountMap = await getPlaylistPlayCounts(playlists.map((playlist) => playlist.id));
     return (
       <section>
-        <h2 className="text-2xl font-bold text-zinc-100 mb-2">Made for you</h2>
+        <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
         <FlowDivider className="mb-4" />
         <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-3 px-3">
           {playlists.map((p) => (
@@ -122,7 +122,7 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
       <>
         <MixRefreshTrigger needsRefresh />
         <section>
-          <h2 className="text-2xl font-bold text-zinc-100 mb-2">Made for you</h2>
+          <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
         <FlowDivider className="mb-4" />
           <p className="text-zinc-500 text-sm">
             Your personalized mixes are being prepared…
@@ -136,7 +136,7 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
     <>
       <MixRefreshTrigger needsRefresh={needsRefresh} />
       <section>
-        <h2 className="text-2xl font-bold text-zinc-100 mb-2">Made for you</h2>
+        <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
         <FlowDivider className="mb-4" />
         <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-3 px-3">
           {mixes.map((mix) => (
@@ -182,7 +182,7 @@ async function RecentlyPlayedSection({ userId }: { userId?: string | null }) {
       if (orderedSongs.length > 0) {
         return (
           <section>
-            <h2 className="text-2xl font-bold text-zinc-100 mb-2">Recently played</h2>
+            <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Recently played</h2>
         <FlowDivider className="mb-4" />
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
               {orderedSongs.map((s) => (
@@ -215,7 +215,7 @@ async function RecentlyPlayedSection({ userId }: { userId?: string | null }) {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-6">Recently played</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-6 section-heading">Recently played</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
         {songs.map((s) => (
           <PlaylistCard
@@ -286,7 +286,7 @@ async function JumpBackInSection({ userId }: { userId?: string | null }) {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-2">Jump back in</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Jump back in</h2>
       <FlowDivider className="mb-4" />
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-1">
         {playlists.map((p) => (
@@ -314,7 +314,7 @@ async function TrendingNowSection() {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-2">Trending now</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Trending now</h2>
       <FlowDivider className="mb-4" />
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1">
         {trending.map(({ song, playCount }) => (
@@ -348,7 +348,7 @@ async function NewReleasesSection() {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-2">New releases</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">New releases</h2>
       <FlowDivider className="mb-4" />
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1">
         {songs.map((s) => (
@@ -389,7 +389,7 @@ export default async function HomePage() {
     <div className="p-4 md:p-8 space-y-12 max-w-400">
       {/* Greeting */}
       <div>
-        <h1 className="text-3xl md:text-5xl font-extrabold leading-tight pb-1 bg-linear-to-r from-brand-orange to-brand-magenta bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-5xl font-extrabold leading-tight pb-1 greeting-shimmer">
           {greeting}, {firstName}
         </h1>
         <p className="text-zinc-500 mt-2 text-base">

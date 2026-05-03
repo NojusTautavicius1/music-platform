@@ -298,7 +298,10 @@ export function PlayerBar() {
 
             <button
               onClick={togglePlay}
-              className="w-10 h-10 rounded-full bg-linear-to-br from-brand-orange to-brand-magenta flex items-center justify-center hover:scale-105 transition-transform shadow-lg hover:shadow-[0_0_24px_rgba(255,85,0,0.5)]"
+              className={cn(
+                "w-10 h-10 rounded-full bg-linear-to-br from-brand-orange to-brand-magenta flex items-center justify-center hover:scale-105 transition-transform shadow-lg hover:shadow-[0_0_24px_rgba(255,85,0,0.5)]",
+                !isPlaying && !currentSong && "play-idle-pulse"
+              )}
               aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? (

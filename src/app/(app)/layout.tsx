@@ -27,7 +27,7 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="h-screen flex flex-col bg-bg-primary text-zinc-100 overflow-hidden">
+    <div className="h-screen flex flex-col bg-bg-primary text-zinc-100 overflow-hidden relative">
       <AmbientBackground />
       <OfflineBanner />
       {/* Skip to main content — screen readers / keyboard */}
@@ -49,7 +49,7 @@ export default async function AppLayout({
 
         <div className="flex-1 flex flex-col min-h-0">
           <TopBar user={session.user} signOutAction={handleSignOut} />
-          <main id="main-content" className="flex-1 overflow-y-auto">
+          <main id="main-content" className="flex-1 overflow-y-auto scrollbar-orange">
             <PageTransition>{children}</PageTransition>
           </main>
         </div>

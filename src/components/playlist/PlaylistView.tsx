@@ -285,8 +285,8 @@ function SongRow({
       <div
         onClick={overlay ? undefined : onPlay}
         className={cn(
-          "hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_120px_140px_8rem] items-center h-14 px-2 rounded-lg cursor-pointer group",
-          "hover:bg-white/5 transition-colors",
+          "hidden md:grid grid-cols-[1.5rem_2.5rem_1fr_180px_120px_140px_8rem] items-center h-14 px-2 rounded-lg cursor-pointer group song-row-hover",
+          "transition-colors",
           isActive && "bg-white/5 border-l-2 border-brand-orange",
           isDragging && "opacity-40 scale-[0.99]",
           overlay && "opacity-90 bg-[#18181F] shadow-xl ring-1 ring-white/10 rounded-lg"
