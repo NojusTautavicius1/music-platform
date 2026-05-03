@@ -86,7 +86,7 @@ function CoverThumb({
       {src ? (
         <Image src={src} alt={alt} fill sizes="40px" className="object-cover" />
       ) : (
-        <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
+        <div className="w-full h-full bg-[#0A0A0F] border border-white/5" />
       )}
     </div>
   );

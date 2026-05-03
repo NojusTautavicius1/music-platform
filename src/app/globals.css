@@ -69,6 +69,14 @@
 }
 
 /* ── CSS variables ─────────────────────────────────────────────────── */
+
+/* Light mode: re-map brand tokens to work on white backgrounds */
+:root:not(.dark) {
+  --color-bg-primary: #F4F4F6;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-elevated: #EBEBED;
+}
+
 :root {
   --orange: #FF5500;
   --orange-hover: #FF7A1F;
@@ -296,12 +304,12 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    background-color: #0A0A0A;
-    @apply text-foreground;
-  }
   html {
+    background-color: #0A0A0A;
     @apply font-sans;
+  }
+  body {
+    @apply text-foreground;
   }
   input[type="radio"],
   input[type="checkbox"] {

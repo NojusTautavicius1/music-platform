@@ -4,8 +4,7 @@ export function AmbientBackground() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 overflow-hidden"
-      style={{ zIndex: -1 }}
+      className="pointer-events-none fixed inset-0 overflow-hidden -z-10"
     >
       {/* Layer 2: grid */}
       <div className="absolute inset-0 bg-grid-pattern" />

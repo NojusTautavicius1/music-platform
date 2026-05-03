@@ -238,7 +238,7 @@ function NowPlayingRow({ song }: { song: { title: string; artist: string; coverU
         {song.coverUrl ? (
           <Image src={song.coverUrl} alt={song.title} fill sizes="40px" className="object-cover" />
         ) : (
-          <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
+          <div className="w-full h-full bg-[#0A0A0F] border border-white/5" />
         )}
       </div>
       <div className="min-w-0">
@@ -302,7 +302,7 @@ function QueueRow({ id, song, onPlay, onRemove, overlay = false }: QueueRowProps
         {song.coverUrl ? (
           <Image src={song.coverUrl} alt={song.title} fill sizes="36px" className="object-cover" />
         ) : (
-          <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
+          <div className="w-full h-full bg-[#0A0A0F] border border-white/5" />
         )}
       </div>
 
@@ -345,7 +345,7 @@ function SimilarRow({
         {song.coverUrl ? (
           <Image src={song.coverUrl} alt={song.title} fill sizes="36px" className="object-cover" />
         ) : (
-          <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
+          <div className="w-full h-full bg-[#0A0A0F] border border-white/5" />
         )}
       </div>
       <div className="flex-1 min-w-0">

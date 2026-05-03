@@ -219,7 +219,7 @@ function SongRow({
       <div
         onClick={overlay ? undefined : onPlay}
         className={cn(
-          "md:hidden flex items-center gap-3 h-16 px-1 rounded-lg cursor-pointer hover:bg-white/5 transition-colors",
+          "max-md:flex hidden items-center gap-3 h-16 px-1 rounded-lg cursor-pointer hover:bg-white/5 transition-colors",
           isDragging && "opacity-40 scale-[0.99]",
           overlay && "opacity-90 bg-[#18181F] shadow-xl rounded-lg ring-1 ring-white/10"
         )}
@@ -247,7 +247,7 @@ function SongRow({
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
+            <div className="w-full h-full bg-[#0A0A0F] border border-white/5" />
           )}
         </div>
 
@@ -337,7 +337,7 @@ function SongRow({
                 className="object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
+              <div className="w-full h-full bg-[#0A0A0F] border border-white/5" />
             )}
           </div>
           <div className="min-w-0">
@@ -665,7 +665,7 @@ function EditPlaylistDialog({ open, onOpenChange, playlist }: EditPlaylistDialog
                     className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40" />
+                  <div className="w-full h-full bg-[#0A0A0F] border border-white/5" />
                 )}
 
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-sm font-medium text-white gap-2">

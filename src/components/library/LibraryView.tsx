@@ -256,7 +256,7 @@ export function LibraryView({ playlists }: Props) {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40" />
+                  <div className="w-full h-full bg-[#0A0A0F] border border-white/5" />
                 )}
               </div>
               <div className="min-w-0">

@@ -182,8 +182,8 @@ export function NowPlayingView() {
                   priority
                 />
               ) : (
-                <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40 flex items-center justify-center">
-                  <Music2 size={80} className="text-white/30" />
+                <div className="w-full h-full bg-[#0A0A0F] border border-white/5 flex items-center justify-center">
+                  <Music2 size={80} className="text-orange-500/30" />
                 </div>
               )}
             </div>

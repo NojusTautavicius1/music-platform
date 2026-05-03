@@ -7,6 +7,7 @@ import { Command } from "cmdk";
 import {
   Plus,
   Moon,
+  Sun,
   LogOut,
   Settings,
   Home,
@@ -20,6 +21,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { CreatePlaylistDialog } from "@/components/playlist/CreatePlaylistDialog";
 import { Title as RadixDialogTitle } from "@radix-ui/react-dialog";
@@ -48,6 +50,7 @@ type SearchPayload = {
 
 export function CommandPalette() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const [query, setQuery] = useState("");
   const [recent, setRecent] = useState<SearchResult[]>([]);
   const [results, setResults] = useState<SearchPayload>({
@@ -84,10 +87,10 @@ export function CommandPalette() {
       },
       {
         id: "toggle-theme",
-        label: "Toggle theme",
-        icon: Moon,
+        label: theme === "dark" ? "Switch to light mode" : "Switch to dark mode",
+        icon: theme === "dark" ? Sun : Moon,
         action: () => {
-          toast.message("Theme toggle coming soon");
+          setTheme(theme === "dark" ? "light" : "dark");
           setOpen(false);
         },
       },

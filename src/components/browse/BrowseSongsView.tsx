@@ -196,10 +196,10 @@ function FilterBar({
   useEffect(() => { setLocalBpmMin(currentBpmMin); setLocalBpmMax(currentBpmMax); }, [currentBpmMin, currentBpmMax]);
 
   const selectCls =
-    "h-9 rounded-full border border-white/15 bg-white/5 text-zinc-200 text-sm px-3 pr-8 appearance-none cursor-pointer hover:bg-white/10 transition-colors focus:outline-none focus:ring-1 focus:ring-orange-500/40";
+    "h-9 rounded-full border border-white/15 bg-[#18181F] text-zinc-200 text-sm px-3 pr-8 appearance-none cursor-pointer hover:bg-[#222230] transition-colors focus:outline-none focus:ring-1 focus:ring-orange-500/40 [color-scheme:dark]";
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex items-center gap-3 min-w-max">
       {/* Genre */}
       <div className="relative">
         <select value={currentGenre} onChange={(e) => onGenreChange(e.target.value)} className={selectCls}>
@@ -362,15 +362,15 @@ function SongRow({ song, index, queue, userPlaylists }: {
     <>
       {/* Mobile */}
       <div
-        className="md:hidden flex items-center gap-3 px-2 h-16 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group"
+        className="max-md:flex hidden items-center gap-3 px-2 h-16 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group"
         onClick={handlePlay}
       >
         <div className="relative w-10 h-10 rounded shrink-0 overflow-hidden">
           {song.coverUrl ? (
             <Image src={song.coverUrl} alt={song.title} fill sizes="40px" className="object-cover" />
           ) : (
-            <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30 flex items-center justify-center">
-              <Music size={14} className="text-zinc-600" />
+            <div className="w-full h-full bg-[#0A0A0F] border border-white/5 flex items-center justify-center">
+              <Music size={14} className="text-orange-500/50" />
             </div>
           )}
         </div>
@@ -548,8 +548,8 @@ export function BrowseSongsView({
         <p className="text-zinc-500 text-sm">{total.toLocaleString()} songs</p>
       </div>
 
-      {/* Filter bar */}
-      <div className="px-4 md:px-8 pb-6">
+      {/* Filter bar — horizontal scroll on mobile */}
+      <div className="px-4 md:px-8 pb-6 overflow-x-auto scrollbar-hide">
         <FilterBar
           genres={genres}
           moods={moods}

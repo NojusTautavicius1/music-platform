@@ -177,7 +177,7 @@ export function PlayerBar() {
     <footer className="shrink-0 bg-[#18181F] border-t border-white/5 bg-linear-to-b from-transparent to-black/20">
       {/* ── Mobile mini player (< md) ──────────────────────────────── */}
       <div
-        className="md:hidden flex items-center gap-3 px-4 h-16 cursor-pointer"
+        className="max-md:flex hidden items-center gap-3 px-4 h-16 cursor-pointer"
         onClick={() => router.push("/now-playing")}
         role="button"
         aria-label="Open now playing"
@@ -192,7 +192,7 @@ export function PlayerBar() {
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40" />
+            <div className="w-full h-full bg-[#0A0A0F] border border-white/5" />
           )}
         </div>
 
@@ -243,7 +243,7 @@ export function PlayerBar() {
                   className="object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-linear-to-br from-brand-orange/40 to-brand-magenta/40" />
+                <div className="w-full h-full bg-[#0A0A0F] border border-white/5" />
               )}
             </motion.div>
           </AnimatePresence>

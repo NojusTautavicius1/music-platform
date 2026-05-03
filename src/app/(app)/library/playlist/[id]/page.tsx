@@ -10,7 +10,7 @@ import {
   type SuggestedSong,
 } from "@/components/playlist/PlaylistView";
 import { findSimilarSongs } from "@/lib/ai/similarity";
-import { ShareButton } from "@/components/shared/ShareButton";
+import { SharePopover } from "@/components/playlist/SharePopover";
 import { CoverGradient } from "@/components/playlist/CoverGradient";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://sonara.vercel.app";
@@ -222,8 +222,6 @@ export default async function PlaylistPage({ params }: Props) {
     })),
   };
 
-  const shareUrl = `${BASE}/library/playlist/${id}`;
-
   return (
     <div>
       <script
@@ -265,7 +263,13 @@ export default async function PlaylistPage({ params }: Props) {
               </p>
             )}
             <div className="flex items-center gap-4 mt-4 flex-wrap">
-              <ShareButton url={shareUrl} />
+              {isOwner && (
+                <SharePopover
+                  playlistId={id}
+                  isPublic={playlist.isPublic}
+                  existingSlug={playlist.shareSlug}
+                />
+              )}
             </div>
 
             <div className="flex items-center gap-2 text-sm text-zinc-300 flex-wrap mt-3">

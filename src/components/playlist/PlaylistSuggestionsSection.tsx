@@ -40,8 +40,8 @@ function SuggestionRow({
         {song.coverUrl ? (
           <Image src={song.coverUrl} alt={song.title} fill sizes="24px" className="object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-brand-orange/30 to-brand-magenta/30">
-            <Music2 size={12} className="text-zinc-500" />
+          <div className="w-full h-full flex items-center justify-center bg-[#0A0A0F] border border-white/5">
+            <Music2 size={12} className="text-orange-500/50" />
           </div>
         )}
       </div>

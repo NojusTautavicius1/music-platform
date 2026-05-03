@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { auth } from "@/lib/auth";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 
 const CreatePlaylistSchema = z.object({
@@ -408,6 +409,83 @@ export async function reorderPlaylistSongs(
   return { ok: true };
 }
 
+// ─── Bulk add songs to existing playlist ─────────────────────────────────────
+
+export async function addSongsToPlaylist(
+  playlistId: string,
+  songIds: string[]
+): Promise<{ ok: true; added: number; playlistName: string } | { ok: false; error: string }> {
+  if (!songIds.length) return { ok: false, error: "No songs provided" };
+
+  const session = await auth();
+  if (!session?.user?.email) return { ok: false, error: "Not authenticated" };
+
+  const playlist = await prisma.playlist.findUnique({
+    where: { id: playlistId },
+    include: { user: { select: { email: true } } },
+  });
+  if (!playlist || playlist.user.email !== session.user.email) {
+    return { ok: false, error: "Playlist not found" };
+  }
+
+  const existing = await prisma.playlistSong.findMany({
+    where: { playlistId },
+    select: { songId: true, position: true },
+  });
+  const existingIds = new Set(existing.map((e) => e.songId));
+  const maxPos = existing.reduce((m, e) => Math.max(m, e.position), -1);
+
+  const newIds = songIds.filter((id) => !existingIds.has(id));
+  if (!newIds.length) {
+    return { ok: true, added: 0, playlistName: playlist.name };
+  }
+
+  await prisma.playlistSong.createMany({
+    data: newIds.map((songId, i) => ({ playlistId, songId, position: maxPos + 1 + i })),
+  });
+
+  revalidatePath(`/library/playlist/${playlistId}`);
+  return { ok: true, added: newIds.length, playlistName: playlist.name };
+}
+
+// ─── Get user's playlists (for picker) ────────────────────────────────────────
+
+export type UserPlaylist = { id: string; name: string; coverUrl: string | null; songCount: number };
+
+export async function getUserPlaylists(): Promise<
+  { ok: true; playlists: UserPlaylist[] } | { ok: false; error: string }
+> {
+  const session = await auth();
+  if (!session?.user?.email) return { ok: false, error: "Not authenticated" };
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user) return { ok: false, error: "User not found" };
+
+  const playlists = await prisma.playlist.findMany({
+    where: { userId: user.id },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    select: {
+      id: true,
+      name: true,
+      coverUrl: true,
+      _count: { select: { songs: true } },
+    },
+  });
+
+  return {
+    ok: true,
+    playlists: playlists.map((p) => ({
+      id: p.id,
+      name: p.name,
+      coverUrl: p.coverUrl,
+      songCount: p._count.songs,
+    })),
+  };
+}
+
 // ─── Reorder sidebar playlists ────────────────────────────────────────────────
 // Receives the full ordered list of playlist IDs (as the user sees them) and
 // assigns each playlist a sortOrder equal to its index in that list.
@@ -439,4 +517,104 @@ export async function reorderPlaylists(
   revalidatePath("/library");
   revalidatePath("/");
   return { ok: true };
+}
+
+// ─── Generate / return shareable public link ─────────────────────────────────
+
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://sonara.vercel.app";
+
+export async function shareablePlaylist(
+  playlistId: string
+): Promise<{ ok: true; url: string; slug: string } | { ok: false; error: string }> {
+  const session = await auth();
+  if (!session?.user?.email) return { ok: false, error: "Not authenticated" };
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user) return { ok: false, error: "User not found" };
+
+  const playlist = await prisma.playlist.findUnique({
+    where: { id: playlistId },
+    select: { userId: true, isPublic: true, shareSlug: true },
+  });
+  if (!playlist || playlist.userId !== user.id) {
+    return { ok: false, error: "Playlist not found" };
+  }
+
+  if (playlist.isPublic && playlist.shareSlug) {
+    return { ok: true, url: `${BASE}/p/${playlist.shareSlug}`, slug: playlist.shareSlug };
+  }
+
+  const slug = nanoid(10);
+  await prisma.playlist.update({
+    where: { id: playlistId },
+    data: { isPublic: true, shareSlug: slug },
+  });
+
+  revalidatePath(`/library/playlist/${playlistId}`);
+  return { ok: true, url: `${BASE}/p/${slug}`, slug };
+}
+
+// ─── Make playlist private again ─────────────────────────────────────────────
+
+export async function unpublishPlaylist(
+  playlistId: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const session = await auth();
+  if (!session?.user?.email) return { ok: false, error: "Not authenticated" };
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user) return { ok: false, error: "User not found" };
+
+  const playlist = await prisma.playlist.findUnique({
+    where: { id: playlistId },
+    select: { userId: true },
+  });
+  if (!playlist || playlist.userId !== user.id) {
+    return { ok: false, error: "Playlist not found" };
+  }
+
+  await prisma.playlist.update({
+    where: { id: playlistId },
+    data: { isPublic: false },
+  });
+
+  revalidatePath(`/library/playlist/${playlistId}`);
+  return { ok: true };
+}
+
+// ─── Report a public playlist ─────────────────────────────────────────────────
+// Auto-unpublishes when reportCount reaches 3 and notifies owner (via email TBD).
+
+export async function reportPlaylist(
+  playlistId: string
+): Promise<{ ok: true; unpublished: boolean } | { ok: false; error: string }> {
+  const playlist = await prisma.playlist.findUnique({
+    where: { id: playlistId, isPublic: true },
+    select: { id: true, reportCount: true, userId: true, name: true },
+  });
+  if (!playlist) return { ok: false, error: "Playlist not found" };
+
+  const newCount = playlist.reportCount + 1;
+  const shouldUnpublish = newCount >= 3;
+
+  await prisma.playlist.update({
+    where: { id: playlistId },
+    data: {
+      reportCount: newCount,
+      reportedAt: new Date(),
+      ...(shouldUnpublish ? { isPublic: false } : {}),
+    },
+  });
+
+  if (shouldUnpublish) {
+    revalidatePath(`/p/${playlistId}`);
+  }
+
+  return { ok: true, unpublished: shouldUnpublish };
 }

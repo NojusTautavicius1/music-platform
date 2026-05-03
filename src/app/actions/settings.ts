@@ -64,6 +64,25 @@ export async function updatePreferences(input: PreferencesInput): Promise<Action
   return { ok: true };
 }
 
+export async function markOnboardingComplete(): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.email) return { ok: false, error: "Not authenticated" };
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user) return { ok: false, error: "User not found" };
+
+  await prisma.userPreferences.upsert({
+    where: { userId: user.id },
+    create: { userId: user.id, onboardingCompleted: true },
+    update: { onboardingCompleted: true },
+  });
+
+  return { ok: true };
+}
+
 export async function deleteAccount(): Promise<ActionResult> {
   const session = await auth();
   if (!session?.user?.email) return { ok: false, error: "Not authenticated" };

@@ -37,8 +37,8 @@ type SessionUser = {
 };
 
 type Props = {
-  user: SessionUser;
-  signOutAction: () => Promise<void>;
+  user: SessionUser | null;
+  signOutAction?: () => Promise<void>;
 };
 
 export function TopBar({ user, signOutAction }: Props) {
@@ -50,12 +50,14 @@ export function TopBar({ user, signOutAction }: Props) {
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen);
   const setCommandPaletteOpen = useUIStore((s) => s.setCommandPaletteOpen);
 
-  const initials = (user.name ?? user.email ?? "?")
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const initials = user
+    ? (user.name ?? user.email ?? "?")
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "?";
 
   useEffect(() => {
     if (!mounted.current) {
@@ -146,67 +148,86 @@ export function TopBar({ user, signOutAction }: Props) {
         <span className="relative z-10">Ask Sonara</span>
       </button>
 
-      {/* User avatar + dropdown — desktop only (mobile uses BottomNav profile tab) */}
+      {/* User avatar + dropdown OR guest sign-in — desktop only */}
       <div className="hidden md:block shrink-0">
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <button className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/40">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} />
-                  <AvatarFallback className="bg-linear-to-br from-brand-orange to-brand-magenta text-white text-xs font-semibold">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-              </button>
-            }
-          />
-          <DropdownMenuContent
-            align="end"
-            className="w-48 bg-[#18181F] border-white/10 text-zinc-100"
-          >
-            <div className="px-3 py-2 text-xs text-zinc-500 truncate">
-              {user.email}
-            </div>
-            <DropdownMenuSeparator className="bg-white/10" />
-            <DropdownMenuItem
-              className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
-              onClick={() => router.push("/profile")}
+        {user ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <button className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/40">
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} />
+                    <AvatarFallback className="bg-linear-to-br from-brand-orange to-brand-magenta text-white text-xs font-semibold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              }
+            />
+            <DropdownMenuContent
+              align="end"
+              className="w-48 bg-[#18181F] border-white/10 text-zinc-100"
             >
-              <User size={14} />
-              Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
-              onClick={() => router.push("/stats")}
+              <div className="px-3 py-2 text-xs text-zinc-500 truncate">
+                {user.email}
+              </div>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuItem
+                className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+                onClick={() => router.push("/profile")}
+              >
+                <User size={14} />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+                onClick={() => router.push("/stats")}
+              >
+                <BarChart2 size={14} />
+                Stats
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+                onClick={() => router.push("/settings")}
+              >
+                <Settings size={14} />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
+                onClick={() => router.push("/ask")}
+              >
+                <Sparkles size={14} className="text-orange-400" />
+                Ask Sonara
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-white/10" />
+              {signOutAction && (
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 text-red-400 focus:bg-white/10 focus:text-red-300"
+                  onClick={() => startTransition(() => signOutAction())}
+                >
+                  <LogOut size={14} />
+                  Sign out
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push("/login")}
+              className="h-8 px-3 rounded-full border border-white/15 text-xs font-semibold text-zinc-300 hover:text-white hover:border-white/30 transition-colors"
             >
-              <BarChart2 size={14} />
-              Stats
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
-              onClick={() => router.push("/settings")}
+              Sign in
+            </button>
+            <button
+              onClick={() => router.push("/login")}
+              className="h-8 px-3 rounded-full bg-linear-to-r from-brand-orange to-brand-magenta text-white text-xs font-semibold hover:opacity-90 transition-opacity"
             >
-              <Settings size={14} />
-              Settings
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer gap-2 focus:bg-white/10 focus:text-white"
-              onClick={() => router.push("/ask")}
-            >
-              <Sparkles size={14} className="text-orange-400" />
-              Ask Sonara
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-white/10" />
-            <DropdownMenuItem
-              className="cursor-pointer gap-2 text-red-400 focus:bg-white/10 focus:text-red-300"
-              onClick={() => startTransition(() => signOutAction())}
-            >
-              <LogOut size={14} />
-              Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              Sign up
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );
