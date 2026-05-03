@@ -1,9 +1,11 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider   = "postgresql"
+  extensions = [vector]
 }
 
 model User {
@@ -106,6 +108,10 @@ model Song {
   mood              String?
   loudness          Float?
   analyzedAt        DateTime?
+
+  // Embedding for semantic similarity search (text-embedding-3-small, 1536 dims)
+  embedding         Unsupported("vector(1536)")?
+  embeddingAt       DateTime?
 
   lyrics    Lyrics?
 

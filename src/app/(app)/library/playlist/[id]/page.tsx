@@ -9,6 +9,7 @@ import {
   type SongInPlaylist,
   type SuggestedSong,
 } from "@/components/playlist/PlaylistView";
+import { findSimilarSongs } from "@/lib/ai/similarity";
 import { ShareButton } from "@/components/shared/ShareButton";
 import { CoverGradient } from "@/components/playlist/CoverGradient";
 
@@ -124,9 +125,9 @@ export default async function PlaylistPage({ params }: Props) {
       })
     : [];
 
-  // Aggregate genres already in this playlist, then find up to 20 songs with
-  // those genres not already in the playlist; shuffle in JS and take 5.
   const playlistSongIds = playlist.songs.map((ps) => ps.song.id);
+
+  // Genre-based suggestions (shown in playlist empty state / suggestions panel)
   const suggestedSongs: SuggestedSong[] = [];
   if (isOwner && playlist.songs.length > 0) {
     const genreRows = await prisma.song.findMany({
@@ -152,6 +153,32 @@ export default async function PlaylistPage({ params }: Props) {
         ...c,
         waveformPeaks: c.waveformPeaks as number[] | null,
       })));
+    }
+  }
+
+  // Embedding-based "More like this" from the first song that has an embedding
+  let moreLikeSongs: SuggestedSong[] = [];
+  if (playlist.songs.length > 0) {
+    const seedSong = await prisma.song.findFirst({
+      where: { id: { in: playlistSongIds }, embeddingAt: { not: null } },
+      select: { id: true },
+    });
+    if (seedSong) {
+      const similar = await findSimilarSongs(seedSong.id, 8).catch(() => []);
+      moreLikeSongs = similar
+        .filter((s) => !playlistSongIds.includes(s.id))
+        .slice(0, 6)
+        .map((s) => ({
+          id: s.id,
+          title: s.title,
+          artist: s.artist,
+          album: s.album,
+          genre: s.genre,
+          duration: s.duration,
+          coverUrl: s.coverUrl,
+          audioUrl: s.audioUrl,
+          waveformPeaks: s.waveformPeaks as number[] | null,
+        }));
     }
   }
 
@@ -281,6 +308,7 @@ export default async function PlaylistPage({ params }: Props) {
         songs={songs}
         userPlaylists={userPlaylists}
         suggestedSongs={suggestedSongs}
+        moreLikeSongs={moreLikeSongs}
       />
     </div>
   );

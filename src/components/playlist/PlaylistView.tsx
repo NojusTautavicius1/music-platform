@@ -124,6 +124,7 @@ type Props = {
   songs: SongInPlaylist[];
   userPlaylists?: UserPlaylist[];
   suggestedSongs?: SuggestedSong[];
+  moreLikeSongs?: SuggestedSong[];
 };
 
 // ─── Song Row (desktop table row) ────────────────────────────────────────────
@@ -863,10 +864,12 @@ function RecommendedSection({
   songs,
   alreadyInSet,
   onAdd,
+  label = "Suggested for this playlist",
 }: {
   songs: SuggestedSong[];
   alreadyInSet: Set<string>;
   onAdd: (song: SuggestedSong) => Promise<boolean>;
+  label?: string;
 }) {
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const visible = songs.filter((s) => !alreadyInSet.has(s.id));
@@ -882,7 +885,7 @@ function RecommendedSection({
     <div className="px-4 md:px-8 pb-6">
       <div className="flex items-center gap-2 mb-3">
         <Sparkles size={14} className="text-brand-orange shrink-0" />
-        <h3 className="text-sm font-semibold text-zinc-300">Suggested for this playlist</h3>
+        <h3 className="text-sm font-semibold text-zinc-300">{label}</h3>
       </div>
       <div className="space-y-0.5">
         {visible.map((song) => (
@@ -1034,6 +1037,7 @@ export function PlaylistView({
   songs,
   userPlaylists = [],
   suggestedSongs = [],
+  moreLikeSongs = [],
 }: Props) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -1537,7 +1541,17 @@ export function PlaylistView({
         )}
       </div>
 
-      {/* ── Recommendations + Find More (owners only) ──────────────── */}
+      {/* ── More like this (embedding-based, visible to all) ────────── */}
+      {moreLikeSongs.length > 0 && (
+        <RecommendedSection
+          songs={moreLikeSongs}
+          alreadyInSet={alreadyInPlaylist}
+          onAdd={handleAddFromSuggestion}
+          label="More like this"
+        />
+      )}
+
+      {/* ── Find More (owners only) ──────────────────────────────────── */}
       {isOwner && displaySongs.length > 0 && (
         <FindMoreSection
           playlistId={playlistId}

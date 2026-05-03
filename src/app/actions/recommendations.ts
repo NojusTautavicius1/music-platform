@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { findSimilarSongs } from "@/lib/ai/similarity";
 
 export type RecommendationSong = {
   id: string;
@@ -147,6 +148,34 @@ export async function suggestSongsForPlaylist(
   const existingGenres = [...new Set(playlist.songs.map((entry) => entry.song.genre).filter((genre): genre is string => Boolean(genre)))];
 
   if (existingSongIds.length > 0) {
+    // Try embedding-based similarity first (most semantically accurate)
+    const seedSong = await prisma.song.findFirst({
+      where: { id: { in: existingSongIds }, embeddingAt: { not: null } },
+      select: { id: true },
+    });
+
+    if (seedSong) {
+      const similar = await findSimilarSongs(seedSong.id, limit * 3).catch(() => []);
+      const filtered = similar
+        .filter((s) => !existingSongIds.includes(s.id))
+        .slice(0, limit);
+      if (filtered.length > 0) {
+        return filtered.map((s) => ({
+          id: s.id,
+          title: s.title,
+          artist: s.artist,
+          album: s.album,
+          genre: s.genre,
+          duration: s.duration,
+          coverUrl: s.coverUrl,
+          audioUrl: s.audioUrl,
+          waveformPeaks: s.waveformPeaks as number[] | null,
+        }));
+      }
+    }
+
+
+    // Fallback: heuristic genre/artist match
     const candidates = await prisma.song.findMany({
       where: {
         id: { notIn: existingSongIds },

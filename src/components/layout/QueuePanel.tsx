@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { X, GripVertical, RotateCcw } from "lucide-react";
+import { X, GripVertical, RotateCcw, Sparkles } from "lucide-react";
 import {
   DndContext,
   DragOverlay,
@@ -35,6 +35,19 @@ export function QueuePanel() {
 
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const sensors = useDndSensors();
+
+  type SimilarSong = { id: string; title: string; artist: string; coverUrl: string | null; audioUrl: string | null; duration: number };
+  const [similarSongs, setSimilarSongs] = useState<SimilarSong[]>([]);
+
+  useEffect(() => {
+    if (!currentSong) { setSimilarSongs([]); return; }
+    let cancelled = false;
+    fetch(`/api/songs/${currentSong.id}/similar`)
+      .then((r) => r.json())
+      .then((data: { songs: SimilarSong[] }) => { if (!cancelled) setSimilarSongs(data.songs ?? []); })
+      .catch(() => { if (!cancelled) setSimilarSongs([]); });
+    return () => { cancelled = true; };
+  }, [currentSong?.id]);
 
   const upNext = queue.slice(currentIndex + 1);
   const totalSongs = sourceQueue.length > 0 ? sourceQueue.length : queue.length;
@@ -137,6 +150,25 @@ export function QueuePanel() {
                   Now playing
                 </p>
                 <NowPlayingRow song={currentSong} />
+              </section>
+            )}
+
+            {/* Similar tracks */}
+            {similarSongs.length > 0 && (
+              <section className="px-5 pt-3 pb-2 border-t border-white/5">
+                <div className="flex items-center gap-1.5 mb-3">
+                  <Sparkles size={12} className="text-brand-orange" />
+                  <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Similar tracks</p>
+                </div>
+                <div className="space-y-0.5">
+                  {similarSongs.slice(0, 5).map((song) => (
+                    <SimilarRow key={song.id} song={song} onAdd={() => {
+                      const { queue, setQueue } = usePlayerStore.getState();
+                      const playerSong: PlayerSong = { id: song.id, title: song.title, artist: song.artist, album: null, duration: song.duration, coverUrl: song.coverUrl, audioUrl: song.audioUrl };
+                      setQueue([...queue, playerSong]);
+                    }} />
+                  ))}
+                </div>
               </section>
             )}
 
@@ -294,6 +326,42 @@ function QueueRow({ id, song, onPlay, onRemove, overlay = false }: QueueRowProps
           <X size={14} />
         </button>
       )}
+    </div>
+  );
+}
+
+// ─── Similar Row ──────────────────────────────────────────────────────────────
+
+function SimilarRow({
+  song,
+  onAdd,
+}: {
+  song: { id: string; title: string; artist: string; coverUrl: string | null; duration: number };
+  onAdd: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors group">
+      <div className="relative w-9 h-9 rounded shrink-0 overflow-hidden">
+        {song.coverUrl ? (
+          <Image src={song.coverUrl} alt={song.title} fill sizes="36px" className="object-cover" />
+        ) : (
+          <div className="w-full h-full bg-linear-to-br from-brand-orange/30 to-brand-magenta/30" />
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-zinc-100 truncate">{song.title}</p>
+        <p className="text-xs text-zinc-400 truncate">{song.artist}</p>
+      </div>
+      <button
+        onClick={onAdd}
+        title="Add to queue"
+        className="shrink-0 w-6 h-6 flex items-center justify-center text-zinc-600 hover:text-brand-orange transition-colors opacity-0 group-hover:opacity-100"
+        aria-label={`Add ${song.title} to queue`}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      </button>
     </div>
   );
 }

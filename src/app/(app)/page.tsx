@@ -452,7 +452,7 @@ export default async function HomePage() {
               <Link
                 key={genre}
                 href={`/search/${encodeURIComponent(genre)}`}
-                className={`shrink-0 px-6 py-3 rounded-full bg-linear-to-r ${cfg.gradient} text-white font-bold text-sm whitespace-nowrap hover:scale-105 transition-transform shadow-md`}
+                className="shrink-0 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-zinc-300 font-semibold text-sm whitespace-nowrap hover:border-[#FF5500]/60 hover:text-[#FF5500] hover:bg-orange-500/5 transition-all duration-200"
               >
                 {cfg.label}
               </Link>

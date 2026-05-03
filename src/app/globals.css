@@ -307,4 +307,12 @@
   input[type="checkbox"] {
     accent-color: #FF5500;
   }
+  select {
+    accent-color: #FF5500;
+    color-scheme: dark;
+  }
+  option:checked {
+    background-color: #FF5500;
+    color: #000;
+  }
 }

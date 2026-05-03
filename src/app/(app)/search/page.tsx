@@ -15,10 +15,16 @@ export default function SearchPage() {
             <Link
               key={genre}
               href={`/search/${encodeURIComponent(genre)}`}
-              className={`relative h-[220px] rounded-xl overflow-hidden bg-linear-to-br ${config.gradient} hover:scale-[1.02] transition-transform duration-200`}
+              className="relative h-45 rounded-xl overflow-hidden bg-bg-surface border border-white/10 hover:border-[#FF5500]/50 hover:scale-[1.02] transition-all duration-200 group"
             >
+              {/* Subtle orange glow on hover */}
+              <div className="absolute inset-0 bg-linear-to-br from-[#FF5500]/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+
+              {/* Left accent bar */}
+              <div className="absolute left-0 top-0 bottom-0 w-0.75 bg-linear-to-b from-[#FF5500] to-[#FF5500]/20" />
+
               {/* Genre name */}
-              <span className="absolute top-4 left-4 text-2xl font-extrabold text-white drop-shadow-md leading-tight">
+              <span className="absolute top-5 left-6 text-xl font-extrabold text-zinc-100 leading-tight group-hover:text-white transition-colors">
                 {config.label}
               </span>
 
@@ -28,7 +34,7 @@ export default function SearchPage() {
                 src={`https://picsum.photos/seed/${genre}-art/80/80`}
                 alt=""
                 aria-hidden
-                className="absolute bottom-3 right-3 w-[72px] h-[72px] rounded-md object-cover rotate-[25deg] shadow-2xl"
+                className="absolute bottom-3 right-3 w-16 h-16 rounded-md object-cover rotate-20 shadow-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-200"
               />
             </Link>
           );
