@@ -74,7 +74,14 @@ function GridSkeleton({
 
 // ─── Section: Made for you ────────────────────────────────────────────────────
 
-const STALE_MS = 24 * 60 * 60 * 1000; // 24 h
+const STALE_MS: Record<string, number> = {
+  "daily-mix-1": 24 * 60 * 60 * 1000,
+  "daily-mix-2": 24 * 60 * 60 * 1000,
+  "discover-weekly": 7 * 24 * 60 * 60 * 1000,
+  "on-repeat": 2 * 24 * 60 * 60 * 1000,
+};
+
+const ALL_KINDS = ["daily-mix-1", "daily-mix-2", "discover-weekly", "on-repeat"];
 
 async function MadeForYouSection({ userId, serverNow }: { userId?: string | null; serverNow: number }) {
   if (!userId) {
@@ -114,14 +121,19 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
     orderBy: { kind: "asc" },
   });
 
-  const needsRefresh =
-    mixes.length < 4 ||
-    mixes.some((m) => serverNow - m.generatedAt.getTime() > STALE_MS);
+  const existingKinds = new Set(mixes.map((m) => m.kind));
+  const staleKinds = [
+    ...ALL_KINDS.filter((k) => !existingKinds.has(k)),
+    ...mixes
+      .filter((m) => serverNow - m.generatedAt.getTime() > (STALE_MS[m.kind] ?? STALE_MS["daily-mix-1"]))
+      .map((m) => m.kind),
+  ];
+  const needsRefresh = staleKinds.length > 0;
 
   if (mixes.length === 0) {
     return (
       <>
-        <MixRefreshTrigger needsRefresh />
+        <MixRefreshTrigger needsRefresh kinds={ALL_KINDS} />
         <section>
           <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
         <FlowDivider className="mb-4" />
@@ -135,7 +147,7 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
 
   return (
     <>
-      <MixRefreshTrigger needsRefresh={needsRefresh} />
+      <MixRefreshTrigger needsRefresh={needsRefresh} kinds={staleKinds} />
       <section>
         <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
         <FlowDivider className="mb-4" />

@@ -14,6 +14,84 @@ type Props = {
   songs?: PlayerSong[];
 };
 
+function MixArtwork({ kind }: { kind: string }) {
+  if (kind === "daily-mix-1" || kind === "daily-mix-2") {
+    // Vinyl record rings
+    return (
+      <svg viewBox="0 0 192 192" className="absolute inset-0 w-full h-full opacity-20">
+        <circle cx="96" cy="96" r="88" fill="none" stroke="white" strokeWidth="2" />
+        <circle cx="96" cy="96" r="72" fill="none" stroke="white" strokeWidth="1.5" />
+        <circle cx="96" cy="96" r="56" fill="none" stroke="white" strokeWidth="1.5" />
+        <circle cx="96" cy="96" r="40" fill="none" stroke="white" strokeWidth="1.5" />
+        <circle cx="96" cy="96" r="24" fill="none" stroke="white" strokeWidth="1.5" />
+        <circle cx="96" cy="96" r="10" fill="white" opacity="0.6" />
+        <circle cx="96" cy="96" r="4" fill="white" />
+        {/* Highlight arc */}
+        <path d="M 40 96 A 56 56 0 0 1 152 96" fill="none" stroke="white" strokeWidth="3" opacity="0.15" />
+      </svg>
+    );
+  }
+
+  if (kind === "discover-weekly") {
+    // Radar / sonar rings with dots
+    return (
+      <svg viewBox="0 0 192 192" className="absolute inset-0 w-full h-full opacity-20">
+        <circle cx="96" cy="96" r="80" fill="none" stroke="white" strokeWidth="1.5" strokeDasharray="4 6" />
+        <circle cx="96" cy="96" r="56" fill="none" stroke="white" strokeWidth="1.5" strokeDasharray="4 6" />
+        <circle cx="96" cy="96" r="32" fill="none" stroke="white" strokeWidth="1.5" strokeDasharray="4 6" />
+        {/* Crosshairs */}
+        <line x1="96" y1="12" x2="96" y2="180" stroke="white" strokeWidth="1" opacity="0.5" />
+        <line x1="12" y1="96" x2="180" y2="96" stroke="white" strokeWidth="1" opacity="0.5" />
+        {/* Sweep line */}
+        <line x1="96" y1="96" x2="170" y2="38" stroke="white" strokeWidth="2" opacity="0.7" />
+        {/* Dots */}
+        <circle cx="140" cy="60" r="5" fill="white" opacity="0.9" />
+        <circle cx="60" cy="130" r="3.5" fill="white" opacity="0.7" />
+        <circle cx="155" cy="115" r="3" fill="white" opacity="0.5" />
+        <circle cx="96" cy="96" r="5" fill="white" />
+      </svg>
+    );
+  }
+
+  if (kind === "on-repeat") {
+    // Sound bars
+    const bars = [16, 28, 44, 36, 52, 64, 48, 38, 56, 44, 30, 20];
+    const barW = 10;
+    const gap = 4;
+    const total = bars.length * (barW + gap) - gap;
+    const startX = (192 - total) / 2;
+    return (
+      <svg viewBox="0 0 192 192" className="absolute inset-0 w-full h-full opacity-20">
+        {bars.map((h, i) => (
+          <rect
+            key={i}
+            x={startX + i * (barW + gap)}
+            y={96 - h / 2}
+            width={barW}
+            height={h}
+            rx="5"
+            fill="white"
+            opacity={0.5 + (i % 3) * 0.15}
+          />
+        ))}
+        {/* Repeat arrows */}
+        <path
+          d="M 56 148 Q 96 160 136 148"
+          fill="none"
+          stroke="white"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          opacity="0.6"
+        />
+        <polygon points="148,142 136,155 130,143" fill="white" opacity="0.6" />
+        <polygon points="44,142 56,155 62,143" fill="white" opacity="0.6" />
+      </svg>
+    );
+  }
+
+  return null;
+}
+
 export function MixCard({ kind, name, description, gradientFrom, gradientTo, songs }: Props) {
   const play = usePlayerStore((s) => s.play);
 
@@ -40,6 +118,7 @@ export function MixCard({ kind, name, description, gradientFrom, gradientTo, son
           className="w-full h-full"
           style={{ background: `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})` }}
         />
+        <MixArtwork kind={kind} />
 
         {/* Play button */}
         <button

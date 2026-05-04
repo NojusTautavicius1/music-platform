@@ -8,14 +8,14 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 const GRADIENTS = [
-  { from: "#8B5CF6", to: "#EC4899" },
-  { from: "#3B82F6", to: "#8B5CF6" },
-  { from: "#10B981", to: "#3B82F6" },
-  { from: "#F59E0B", to: "#EC4899" },
-  { from: "#EF4444", to: "#F59E0B" },
-  { from: "#06B6D4", to: "#10B981" },
-  { from: "#8B5CF6", to: "#06B6D4" },
-  { from: "#EC4899", to: "#F59E0B" },
+  { from: "#FF5500", to: "#FF0080" }, // daily-mix-1: brand orange → magenta
+  { from: "#7C3AED", to: "#2563EB" }, // daily-mix-2: violet → blue
+  { from: "#059669", to: "#0891B2" }, // discover-weekly: emerald → cyan
+  { from: "#DC2626", to: "#EA580C" }, // on-repeat: red → orange
+  { from: "#9333EA", to: "#EC4899" },
+  { from: "#0EA5E9", to: "#6366F1" },
+  { from: "#F59E0B", to: "#EF4444" },
+  { from: "#10B981", to: "#8B5CF6" },
 ] as const;
 
 // AI INTEGRATION POINT: swap this body for embedding-based similarity search.
@@ -37,7 +37,10 @@ async function selectSongsForGenre(
   return songs.map((s) => s.id);
 }
 
-export async function regenerateForUser(userId: string): Promise<void> {
+export async function regenerateForUser(
+  userId: string,
+  kinds?: string[]
+): Promise<void> {
   const since60 = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
   const since30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
@@ -114,9 +117,11 @@ export async function regenerateForUser(userId: string): Promise<void> {
     songIds: string[];
   };
 
+  const wantKind = (k: string) => !kinds || kinds.includes(k);
+
   const mixes: MixData[] = [];
 
-  if (topGenres[0]) {
+  if (wantKind("daily-mix-1") && topGenres[0]) {
     const { songIds, gradient } = await buildDailyMix(topGenres[0], 0);
     mixes.push({
       kind: "daily-mix-1",
@@ -128,7 +133,7 @@ export async function regenerateForUser(userId: string): Promise<void> {
     });
   }
 
-  if (topGenres[1]) {
+  if (wantKind("daily-mix-2") && topGenres[1]) {
     const { songIds, gradient } = await buildDailyMix(topGenres[1], 2);
     mixes.push({
       kind: "daily-mix-2",
@@ -140,51 +145,55 @@ export async function regenerateForUser(userId: string): Promise<void> {
     });
   }
 
-  // Discover Weekly: songs in top genres never played, up to 30
-  const discoverWhere =
-    topGenres.length > 0
-      ? { genre: { in: topGenres }, id: { notIn: [...playedSongIds] } }
-      : { id: { notIn: [...playedSongIds] } };
+  if (wantKind("discover-weekly")) {
+    // Discover Weekly: songs in top genres never played, up to 30
+    const discoverWhere =
+      topGenres.length > 0
+        ? { genre: { in: topGenres }, id: { notIn: [...playedSongIds] } }
+        : { id: { notIn: [...playedSongIds] } };
 
-  const discoverSongs = await prisma.song.findMany({
-    where: discoverWhere,
-    select: { id: true },
-    orderBy: { id: "asc" },
-    take: 30,
-  });
+    const discoverSongs = await prisma.song.findMany({
+      where: discoverWhere,
+      select: { id: true },
+      orderBy: { id: "asc" },
+      take: 30,
+    });
 
-  const discoverGradient = getGradient(4);
-  mixes.push({
-    kind: "discover-weekly",
-    name: "Discover Weekly",
-    description: "Fresh tracks in your taste profile you've never heard",
-    gradientFrom: discoverGradient.from,
-    gradientTo: discoverGradient.to,
-    songIds: discoverSongs.map((s) => s.id),
-  });
-
-  // On Repeat: top 25 most-played from last 30 days
-  const recentPlayCount = new Map<string, number>();
-  for (const h of history) {
-    if (h.playedAt >= since30) {
-      recentPlayCount.set(h.songId, (recentPlayCount.get(h.songId) ?? 0) + 1);
-    }
+    const discoverGradient = getGradient(4);
+    mixes.push({
+      kind: "discover-weekly",
+      name: "Discover Weekly",
+      description: "Fresh tracks in your taste profile you've never heard",
+      gradientFrom: discoverGradient.from,
+      gradientTo: discoverGradient.to,
+      songIds: discoverSongs.map((s) => s.id),
+    });
   }
 
-  const onRepeatIds = [...recentPlayCount.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 25)
-    .map(([id]) => id);
+  if (wantKind("on-repeat")) {
+    // On Repeat: top 25 most-played from last 30 days
+    const recentPlayCount = new Map<string, number>();
+    for (const h of history) {
+      if (h.playedAt >= since30) {
+        recentPlayCount.set(h.songId, (recentPlayCount.get(h.songId) ?? 0) + 1);
+      }
+    }
 
-  const repeatGradient = getGradient(6);
-  mixes.push({
-    kind: "on-repeat",
-    name: "On Repeat",
-    description: "The songs you can't stop playing this month",
-    gradientFrom: repeatGradient.from,
-    gradientTo: repeatGradient.to,
-    songIds: onRepeatIds,
-  });
+    const onRepeatIds = [...recentPlayCount.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 25)
+      .map(([id]) => id);
+
+    const repeatGradient = getGradient(6);
+    mixes.push({
+      kind: "on-repeat",
+      name: "On Repeat",
+      description: "The songs you can't stop playing this month",
+      gradientFrom: repeatGradient.from,
+      gradientTo: repeatGradient.to,
+      songIds: onRepeatIds,
+    });
+  }
 
   await Promise.all(
     mixes.map((mix) =>
@@ -213,7 +222,7 @@ export async function regenerateForUser(userId: string): Promise<void> {
 }
 
 /** Called from the client (fire-and-forget) to lazily refresh stale mixes. */
-export async function triggerMixRefresh(): Promise<void> {
+export async function triggerMixRefresh(kinds?: string[]): Promise<void> {
   const session = await auth();
   if (!session?.user?.email) return;
 
@@ -223,5 +232,5 @@ export async function triggerMixRefresh(): Promise<void> {
   });
   if (!user) return;
 
-  await regenerateForUser(user.id);
+  await regenerateForUser(user.id, kinds);
 }
