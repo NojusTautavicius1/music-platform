@@ -4,13 +4,13 @@ import Link from "next/link";
 
 export default function LoginPage() {
   return (
-    <div className="h-screen bg-bg-primary relative overflow-hidden flex items-center justify-center">
+    <div className="min-h-screen bg-bg-primary relative overflow-hidden flex items-center justify-center px-4 py-8">
       {/* Ambient gradient orbs */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-orange/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-magenta/20 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Card */}
-      <div className="relative bg-[#18181F] rounded-2xl p-12 w-full max-w-105 border border-white/10 shadow-[0_0_60px_rgba(255,85,0,0.12)]">
+      <div className="relative bg-[#18181F] rounded-2xl p-6 sm:p-12 w-full max-w-md border border-white/10 shadow-[0_0_60px_rgba(255,85,0,0.12)]">
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-linear-to-r from-brand-orange to-brand-magenta bg-clip-text text-transparent mb-3">

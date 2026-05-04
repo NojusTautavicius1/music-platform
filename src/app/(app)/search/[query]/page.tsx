@@ -22,6 +22,7 @@ export default async function SearchResultsPage({ params, searchParams }: Props)
       { title: { contains: query, mode: "insensitive" as const } },
       { artist: { contains: query, mode: "insensitive" as const } },
       { album: { contains: query, mode: "insensitive" as const } },
+      { genre: { contains: query, mode: "insensitive" as const } },
     ],
   };
 

@@ -39,6 +39,7 @@ export async function globalSearch(query: string): Promise<GlobalSearchResult> {
         OR: [
           { title: { contains: trimmed, mode: "insensitive" } },
           { artist: { contains: trimmed, mode: "insensitive" } },
+          { genre: { contains: trimmed, mode: "insensitive" } },
         ],
       },
       take: 5,

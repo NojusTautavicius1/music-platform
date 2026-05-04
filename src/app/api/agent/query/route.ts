@@ -15,10 +15,38 @@ const RawAgentResponseSchema = z.object({
   songs: z.array(RawSongSchema),
 });
 
+const RATE_LIMIT = 5;
+const WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body?.query || typeof body.query !== "string") {
     return NextResponse.json({ error: "query is required" }, { status: 400 });
+  }
+
+  // Rate limiting — check per authenticated user
+  const session = await auth().catch(() => null);
+  const email = session?.user?.email;
+  if (email) {
+    const user = await prisma.user.findUnique({ where: { email }, select: { id: true } }).catch(() => null);
+    if (user) {
+      const windowStart = new Date(Date.now() - WINDOW_MS);
+      const used = await prisma.agentQuery.count({
+        where: { userId: user.id, createdAt: { gte: windowStart } },
+      }).catch(() => 0);
+
+      if (used >= RATE_LIMIT) {
+        const oldest = await prisma.agentQuery.findFirst({
+          where: { userId: user.id, createdAt: { gte: windowStart } },
+          orderBy: { createdAt: "asc" },
+          select: { createdAt: true },
+        }).catch(() => null);
+        const resetAt = oldest
+          ? new Date(oldest.createdAt.getTime() + WINDOW_MS).toISOString()
+          : new Date(Date.now() + WINDOW_MS).toISOString();
+        return NextResponse.json({ error: "rate_limit", used, limit: RATE_LIMIT, resetAt }, { status: 429 });
+      }
+    }
   }
 
   const agentUrl = process.env.MUSIC_AGENT_URL ?? "http://localhost:4567";
@@ -67,8 +95,6 @@ export async function POST(req: NextRequest) {
     };
   });
 
-  const session = await auth().catch(() => null);
-  const email = session?.user?.email;
   if (email) {
     const user = await prisma.user.findUnique({ where: { email }, select: { id: true } }).catch(() => null);
     if (user) {

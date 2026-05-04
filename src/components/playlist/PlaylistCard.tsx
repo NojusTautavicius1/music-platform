@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Play, Music2 } from "lucide-react";
+import { Play, Pause, Music2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatPlayCount } from "@/lib/format";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
@@ -92,13 +92,15 @@ export function PlaylistCard({
             "hover:shadow-[0_0_24px_rgba(255,85,0,0.5)]",
             "flex items-center justify-center shadow-xl",
             "transition-all duration-200 pointer-events-none",
-            isActive && isPlaying
+            isActive
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0"
           )}
           aria-hidden="true"
         >
-          <Play size={16} fill="white" className="text-white ml-0.5" />
+          {isActive && isPlaying
+            ? <Pause size={16} fill="white" className="text-white" />
+            : <Play size={16} fill="white" className="text-white ml-0.5" />}
         </div>
       ) : (
         <button
@@ -110,12 +112,14 @@ export function PlaylistCard({
             "hover:shadow-[0_0_24px_rgba(255,85,0,0.5)]",
             "flex items-center justify-center shadow-xl",
             "transition-all duration-200",
-            isActive && isPlaying
+            isActive
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0"
           )}
         >
-          <Play size={16} fill="white" className="text-white ml-0.5" />
+          {isActive && isPlaying
+            ? <Pause size={16} fill="white" className="text-white" />
+            : <Play size={16} fill="white" className="text-white ml-0.5" />}
         </button>
       )}
 

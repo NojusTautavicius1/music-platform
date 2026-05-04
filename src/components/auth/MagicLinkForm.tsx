@@ -19,6 +19,7 @@ export function MagicLinkForm() {
       return;
     }
     setError("");
+    sessionStorage.setItem("magic-link-email", trimmed);
     startTransition(() => {
       signIn("resend", { email: trimmed, redirectTo: "/" });
     });

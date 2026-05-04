@@ -1528,28 +1528,9 @@ export function PlaylistView({
               </DragOverlay>
             </DndContext>
 
-            {isOwner && (
-              <PlaylistSuggestionsSection
-                playlistId={playlistId}
-                mode="more"
-                initialSongs={suggestedSongs}
-                alreadyInPlaylist={alreadyInPlaylist}
-                onAddSong={handleAddFromSuggestion}
-              />
-            )}
           </>
         )}
       </div>
-
-      {/* ── More like this (embedding-based, visible to all) ────────── */}
-      {moreLikeSongs.length > 0 && (
-        <RecommendedSection
-          songs={moreLikeSongs}
-          alreadyInSet={alreadyInPlaylist}
-          onAdd={handleAddFromSuggestion}
-          label="More like this"
-        />
-      )}
 
       {/* ── Find More (owners only) ──────────────────────────────────── */}
       {isOwner && displaySongs.length > 0 && (

@@ -138,7 +138,7 @@ export function NowPlayingView() {
       {/* ── Relative content ──────────────────────────────────────── */}
       <div className="relative z-10 flex flex-col h-full">
         {/* Top bar */}
-        <div className="flex items-center gap-4 px-6 pt-6 pb-2 shrink-0">
+        <div className="flex items-center gap-4 px-4 sm:px-6 pt-4 sm:pt-6 pb-2 shrink-0">
           <button
             onClick={() => router.back()}
             className="w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
@@ -167,7 +167,7 @@ export function NowPlayingView() {
         </div>
 
         {/* Main content row */}
-        <div className="flex-1 flex items-center justify-center gap-8 px-8 py-4 min-h-0">
+        <div className="flex-1 flex items-center justify-center gap-8 px-4 sm:px-8 py-4 min-h-0 relative">
           {/* ── Center column ────────────────────────────────────── */}
           <div className="flex flex-col items-center gap-6 w-full max-w-120 shrink-0">
             {/* Cover art */}
@@ -357,28 +357,59 @@ export function NowPlayingView() {
             </div>
           </div>
 
-          {/* ── Lyrics panel (animated) ──────────────────────────── */}
+          {/* ── Lyrics panel: side panel on md+, full overlay on mobile ── */}
           <AnimatePresence>
             {showLyrics && (
-              <motion.div
-                key="lyrics"
-                initial={{ x: 60, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: 60, opacity: 0 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
-                className="w-80 shrink-0 h-full max-h-130 rounded-xl bg-white/5 backdrop-blur-sm flex flex-col overflow-hidden"
-              >
-                <div className="px-4 pt-4 pb-2 shrink-0 border-b border-white/10">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
-                    Lyrics
-                  </p>
-                </div>
-                <LyricsPanel
-                  songId={currentSong.id}
-                  currentTime={currentTimeSecs}
-                  onAnalysis={setLyricsAnalysis}
-                />
-              </motion.div>
+              <>
+                {/* Mobile: full-screen overlay */}
+                <motion.div
+                  key="lyrics-mobile"
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  exit={{ y: "100%" }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="md:hidden absolute inset-0 z-20 bg-[#0A0A0F]/95 backdrop-blur-md rounded-xl flex flex-col overflow-hidden"
+                >
+                  <div className="px-4 pt-4 pb-2 shrink-0 border-b border-white/10 flex items-center justify-between">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
+                      Lyrics
+                    </p>
+                    <button
+                      onClick={toggleLyrics}
+                      className="text-zinc-400 hover:text-white transition-colors p-1"
+                      aria-label="Close lyrics"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                  </div>
+                  <LyricsPanel
+                    songId={currentSong.id}
+                    currentTime={currentTimeSecs}
+                    onAnalysis={setLyricsAnalysis}
+                  />
+                </motion.div>
+
+                {/* Desktop: side panel */}
+                <motion.div
+                  key="lyrics-desktop"
+                  initial={{ x: 60, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: 60, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="hidden md:flex w-80 shrink-0 h-full max-h-130 rounded-xl bg-white/5 backdrop-blur-sm flex-col overflow-hidden"
+                >
+                  <div className="px-4 pt-4 pb-2 shrink-0 border-b border-white/10">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
+                      Lyrics
+                    </p>
+                  </div>
+                  <LyricsPanel
+                    songId={currentSong.id}
+                    currentTime={currentTimeSecs}
+                    onAnalysis={setLyricsAnalysis}
+                  />
+                </motion.div>
+              </>
             )}
           </AnimatePresence>
         </div>

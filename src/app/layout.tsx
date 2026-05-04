@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import { NextAuthProvider } from "@/components/shared/NextAuthProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -56,7 +57,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <ThemeProvider>
-          {children}
+          <NextAuthProvider>
+            {children}
+          </NextAuthProvider>
           <Toaster position="bottom-right" />
         </ThemeProvider>
       </body>

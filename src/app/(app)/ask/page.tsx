@@ -5,10 +5,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   Sparkles, Play, Pause, Plus, Music2, Loader2, AlertCircle,
-  Check, ChevronDown, ListPlus, X,
+  Check, ChevronDown, ListPlus, X, Clock,
 } from "lucide-react";
 import { toast } from "sonner";
-import { askAgent, type AgentResponse, type AgentSong } from "@/lib/ai/agentClient";
+import { askAgent, fetchUsage, RateLimitError, type AgentResponse, type AgentSong, type UsageInfo } from "@/lib/ai/agentClient";
 import { usePlayerStore } from "@/store/playerStore";
 import { CreatePlaylistDialog } from "@/components/playlist/CreatePlaylistDialog";
 import {
@@ -16,6 +16,7 @@ import {
   addSongsToPlaylist,
   type UserPlaylist,
 } from "@/app/actions/playlist";
+import Sonara3DBackground from "@/components/shared/Sonara3DBackground";
 
 const EXAMPLE_QUERIES = [
   "songs for a rainy evening",
@@ -268,6 +269,65 @@ function PlaylistPicker({
   );
 }
 
+// ─── Usage badge ──────────────────────────────────────────────────────────────
+
+function useCountdown(resetAt: string | null) {
+  const [remaining, setRemaining] = useState("");
+  useEffect(() => {
+    if (!resetAt) { setRemaining(""); return; }
+    const tick = () => {
+      const ms = new Date(resetAt).getTime() - Date.now();
+      if (ms <= 0) { setRemaining(""); return; }
+      const m = Math.floor(ms / 60000);
+      const s = Math.floor((ms % 60000) / 1000);
+      setRemaining(`${m}:${String(s).padStart(2, "0")}`);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [resetAt]);
+  return remaining;
+}
+
+function RateLimitCard({ usage }: { usage: UsageInfo | null }) {
+  const remaining = useCountdown(usage?.resetAt ?? null);
+  return (
+    <div className="flex items-start gap-3 p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-200">
+      <Clock size={18} className="shrink-0 mt-0.5 text-orange-400" />
+      <div>
+        <p className="text-sm font-semibold text-orange-300">Hourly limit reached</p>
+        <p className="text-sm text-orange-200/70 mt-0.5">
+          You&apos;ve used all {usage?.limit ?? 5} asks for this hour.
+          {remaining ? <> Resets in <span className="font-mono font-semibold text-orange-300">{remaining}</span>.</> : null}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function UsageBadge({ usage }: { usage: UsageInfo | null }) {
+  const remaining = useCountdown(usage?.resetAt ?? null);
+  if (!usage) return null;
+  const left = usage.limit - usage.used;
+  const full = left <= 0;
+  return (
+    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+      full
+        ? "bg-red-500/10 border-red-500/30 text-red-400"
+        : left <= 2
+        ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-400"
+        : "bg-white/5 border-white/10 text-zinc-400"
+    }`}>
+      <Clock size={11} />
+      {full ? (
+        <span>Resets in {remaining || "…"}</span>
+      ) : (
+        <span>{left}/{usage.limit} asks left this hour</span>
+      )}
+    </div>
+  );
+}
+
 // ─── Main page ─────────────────────────────────────────────────────────────────
 
 export default function AskPage() {
@@ -280,6 +340,7 @@ export default function AskPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AgentResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [usage, setUsage] = useState<UsageInfo | null>(null);
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -290,6 +351,10 @@ export default function AskPage() {
       setPlaceholderIdx((i) => (i + 1) % EXAMPLE_QUERIES.length);
     }, 3000);
     return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    fetchUsage().then(setUsage);
   }, []);
 
   const handleSubmit = useCallback(
@@ -308,8 +373,14 @@ export default function AskPage() {
         const data = await askAgent(trimmed);
         setResult(data);
         setSelected(new Set(data.songs.map((s) => s.id)));
+        fetchUsage().then(setUsage);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Something went wrong.");
+        if (e instanceof RateLimitError) {
+          setUsage({ used: e.used, limit: e.limit, resetAt: e.resetAt });
+          setError("rate_limit");
+        } else {
+          setError(e instanceof Error ? e.message : "Something went wrong.");
+        }
       } finally {
         setLoading(false);
       }
@@ -328,6 +399,20 @@ export default function AskPage() {
 
   function onFormSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (query.trim() === "/usage") {
+      setQuery("");
+      fetchUsage().then((u) => {
+        setUsage(u);
+        const left = u.limit - u.used;
+        toast.info(
+          left > 0
+            ? `${left}/${u.limit} asks remaining this hour`
+            : `Limit reached — resets at ${new Date(u.resetAt!).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
+          { duration: 4000 }
+        );
+      });
+      return;
+    }
     handleSubmit(query);
   }
 
@@ -357,7 +442,9 @@ export default function AskPage() {
   const allSelected = result ? selected.size === result.songs.length : false;
 
   return (
-    <div className="min-h-full p-4 md:p-8 pb-40 max-w-2xl mx-auto flex flex-col">
+    <div className="relative min-h-full">
+      <Sonara3DBackground />
+    <div className="relative z-10 p-4 md:p-8 pb-40 max-w-2xl mx-auto lg:-translate-x-16 flex flex-col">
       {/* Hero */}
       <div className="mb-8 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-medium mb-4">
@@ -367,9 +454,10 @@ export default function AskPage() {
         <h1 className="text-4xl md:text-5xl font-extrabold mb-3 bg-linear-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
           Ask anything
         </h1>
-        <p className="text-zinc-400 text-base">
+        <p className="text-zinc-400 text-base mb-3">
           Tell us a vibe, mood, activity, or song you love. We&apos;ll find what fits.
         </p>
+        <UsageBadge usage={usage} />
       </div>
 
       {/* Input */}
@@ -382,7 +470,7 @@ export default function AskPage() {
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
-                handleSubmit(query);
+                onFormSubmit(e as unknown as React.FormEvent);
               }
             }}
             placeholder={EXAMPLE_QUERIES[placeholderIdx]}
@@ -432,10 +520,14 @@ export default function AskPage() {
 
       {/* Error */}
       {error && !loading && (
-        <div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300">
-          <AlertCircle size={18} className="shrink-0 mt-0.5" />
-          <p className="text-sm">{error}</p>
-        </div>
+        error === "rate_limit" ? (
+          <RateLimitCard usage={usage} />
+        ) : (
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300">
+            <AlertCircle size={18} className="shrink-0 mt-0.5" />
+            <p className="text-sm">{error}</p>
+          </div>
+        )
       )}
 
       {/* Results */}
@@ -520,6 +612,7 @@ export default function AskPage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

@@ -18,6 +18,17 @@ const AgentResponseSchema = z.object({
 export type AgentSong = z.infer<typeof EnrichedSongSchema>;
 export type AgentResponse = z.infer<typeof AgentResponseSchema>;
 
+export class RateLimitError extends Error {
+  constructor(
+    public readonly used: number,
+    public readonly limit: number,
+    public readonly resetAt: string,
+  ) {
+    super("rate_limit");
+    this.name = "RateLimitError";
+  }
+}
+
 export async function askAgent(query: string): Promise<AgentResponse> {
   const res = await fetch("/api/agent/query", {
     method: "POST",
@@ -25,6 +36,10 @@ export async function askAgent(query: string): Promise<AgentResponse> {
     body: JSON.stringify({ query }),
   });
 
+  if (res.status === 429) {
+    const data = await res.json().catch(() => ({}));
+    throw new RateLimitError(data.used ?? 5, data.limit ?? 5, data.resetAt ?? new Date(Date.now() + 3600_000).toISOString());
+  }
   if (res.status === 503) {
     throw new Error("Our music agent is taking a break. Try again in a moment.");
   }
@@ -44,4 +59,12 @@ export async function askAgent(query: string): Promise<AgentResponse> {
   }
 
   return validated.data;
+}
+
+export type UsageInfo = { used: number; limit: number; resetAt: string | null };
+
+export async function fetchUsage(): Promise<UsageInfo> {
+  const res = await fetch("/api/agent/usage").catch(() => null);
+  if (!res?.ok) return { used: 0, limit: 5, resetAt: null };
+  return res.json();
 }
