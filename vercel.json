@@ -1,0 +1,6 @@
+{
+  "regions": ["fra1"],
+  "functions": {
+    "src/app/api/agent/query/route.ts": { "maxDuration": 60 }
+  }
+}

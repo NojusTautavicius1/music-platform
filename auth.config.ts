@@ -37,17 +37,20 @@ export const authConfig: NextAuthConfig = {
       return session
     },
   },
+  trustHost: true,
   events: {
     async createUser({ user }) {
-      // first sign-in: ensure UserPreferences row exists
-      // imported lazily to avoid edge-runtime issues in auth.config
       if (!user.id) return
-      const { prisma } = await import("@/lib/prisma")
-      await prisma.userPreferences.upsert({
-        where: { userId: user.id },
-        create: { userId: user.id },
-        update: {},
-      })
+      try {
+        const { prisma } = await import("@/lib/prisma")
+        await prisma.userPreferences.upsert({
+          where: { userId: user.id },
+          create: { userId: user.id },
+          update: {},
+        })
+      } catch {
+        // non-fatal: preferences can be created on next sign-in
+      }
     },
   },
 }
