@@ -1,5 +1,0 @@
-{
-  "functions": {
-    "src/app/api/agent/query/route.ts": { "maxDuration": 10 }
-  }
-}
