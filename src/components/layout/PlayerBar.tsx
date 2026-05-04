@@ -20,6 +20,7 @@ import {
   Maximize2,
   Minimize2,
   Laptop,
+  Music2,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Waveform } from "@/components/player/Waveform";
@@ -192,7 +193,9 @@ export function PlayerBar() {
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-[#0A0A0F] border border-white/5" />
+            <div className="w-full h-full bg-white/5 flex items-center justify-center">
+              <Music2 size={18} className="text-zinc-600" />
+            </div>
           )}
         </div>
 
