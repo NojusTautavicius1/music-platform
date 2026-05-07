@@ -20,7 +20,7 @@ export const authConfig: NextAuthConfig = {
   },
   session: { strategy: "jwt" },
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
+    authorized() {
       // middleware.ts now handles route protection; this just exposes session
       return true
     },
@@ -38,19 +38,4 @@ export const authConfig: NextAuthConfig = {
     },
   },
   trustHost: true,
-  events: {
-    async createUser({ user }) {
-      if (!user.id) return
-      try {
-        const { prisma } = await import("@/lib/prisma")
-        await prisma.userPreferences.upsert({
-          where: { userId: user.id },
-          create: { userId: user.id },
-          update: {},
-        })
-      } catch {
-        // non-fatal: preferences can be created on next sign-in
-      }
-    },
-  },
 }
