@@ -106,14 +106,10 @@ export function MixCard({ kind, name, description, gradientFrom, gradientTo, son
   return (
     <Link
       href={`/mixes/${kind}`}
-      className="group block rounded-xl p-3 hover:bg-orange-500/5 transition-all duration-200 hover:-translate-y-0.5 shrink-0"
-      style={{ width: 216 }}
+      className="group block rounded-xl p-2 sm:p-3 hover:bg-orange-500/5 transition-all duration-200 hover:-translate-y-0.5 shrink-0 w-[40vw] sm:w-54"
     >
       {/* Gradient cover */}
-      <div
-        className="relative rounded-md overflow-hidden"
-        style={{ width: 192, height: 192 }}
-      >
+      <div className="relative rounded-md overflow-hidden aspect-square w-full">
         <div
           className="w-full h-full"
           style={{ background: `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})` }}

@@ -98,7 +98,7 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
       <section>
         <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
         <FlowDivider className="mb-4" />
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-3 px-3">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
           {playlists.map((p) => (
             <div key={p.id} className="shrink-0 snap-start">
               <PlaylistCard
@@ -151,7 +151,7 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
       <section>
         <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
         <FlowDivider className="mb-4" />
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-3 px-3">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
           {mixes.map((mix) => (
             <div key={mix.kind} className="snap-start">
               <MixCard
