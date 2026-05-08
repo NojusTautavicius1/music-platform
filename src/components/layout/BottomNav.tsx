@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useTransition } from "react";
-import { Home, Search, Library, User, LogOut, Settings, LogIn, Upload } from "lucide-react";
+import { useState, useTransition, useEffect } from "react";
+import { Home, Search, Library, User, LogOut, Settings, LogIn, Upload, Sparkles, Heart, Music2, ListMusic } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,8 @@ type SessionUser = {
   email?: string | null;
   image?: string | null;
 };
+
+type UserStats = { liked: number; plays: number; playlists: number } | null;
 
 type Props = {
   user: SessionUser | null;
@@ -27,7 +29,17 @@ const NAV_TABS = [
 export function BottomNav({ user, signOutAction }: Props) {
   const pathname = usePathname();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [stats, setStats] = useState<UserStats>(null);
   const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (profileOpen && user && !stats) {
+      fetch("/api/user/stats")
+        .then((r) => r.json())
+        .then((d) => setStats(d))
+        .catch(() => {});
+    }
+  }, [profileOpen, user, stats]);
 
   const initials = user
     ? (user.name ?? user.email ?? "?")
@@ -54,6 +66,19 @@ export function BottomNav({ user, signOutAction }: Props) {
             <span>{label}</span>
           </Link>
         ))}
+
+        {user && (
+          <Link
+            href="/ask"
+            className={cn(
+              "flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-medium transition-colors",
+              pathname === "/ask" ? "text-[#FF5500]" : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            <Sparkles size={20} />
+            <span>Ask</span>
+          </Link>
+        )}
 
         {user && (
           <Link
@@ -108,6 +133,26 @@ export function BottomNav({ user, signOutAction }: Props) {
                 <p className="text-sm text-zinc-500 truncate">{user.email}</p>
               </div>
             </div>
+
+            {stats && (
+              <div className="grid grid-cols-3 gap-2 px-2 pb-3">
+                <div className="flex flex-col items-center gap-0.5 bg-white/5 rounded-xl py-2.5">
+                  <Heart size={14} className="text-[#FF5500]" />
+                  <span className="text-sm font-bold text-zinc-100">{stats.liked}</span>
+                  <span className="text-[10px] text-zinc-500">Liked</span>
+                </div>
+                <div className="flex flex-col items-center gap-0.5 bg-white/5 rounded-xl py-2.5">
+                  <Music2 size={14} className="text-[#FF5500]" />
+                  <span className="text-sm font-bold text-zinc-100">{stats.plays}</span>
+                  <span className="text-[10px] text-zinc-500">Plays</span>
+                </div>
+                <div className="flex flex-col items-center gap-0.5 bg-white/5 rounded-xl py-2.5">
+                  <ListMusic size={14} className="text-[#FF5500]" />
+                  <span className="text-sm font-bold text-zinc-100">{stats.playlists}</span>
+                  <span className="text-[10px] text-zinc-500">Playlists</span>
+                </div>
+              </div>
+            )}
 
             <div className="border-t border-white/10 pt-2 space-y-1">
               <Link
