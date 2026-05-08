@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Home, Search, Library, User, LogOut, Settings, LogIn } from "lucide-react";
+import { Home, Search, Library, User, LogOut, Settings, LogIn, Upload } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -117,6 +117,14 @@ export function BottomNav({ user, signOutAction }: Props) {
               >
                 <User size={18} />
                 Profile
+              </Link>
+              <Link
+                href="/upload"
+                onClick={() => setProfileOpen(false)}
+                className="flex items-center gap-3 w-full px-2 py-3 rounded-lg text-zinc-200 hover:text-white hover:bg-white/5 transition-colors"
+              >
+                <Upload size={18} />
+                Upload Music
               </Link>
               <Link
                 href="/settings"

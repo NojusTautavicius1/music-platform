@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, Search, Library, LayoutGrid, Plus, Heart, LogIn } from "lucide-react";
+import { Home, Search, Library, LayoutGrid, Plus, Heart, LogIn, Upload } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -49,6 +49,9 @@ export async function SidebarContent({ isGuest = false }: { isGuest?: boolean })
         <NavItem href="/browse" icon={<LayoutGrid size={20} />}>Browse</NavItem>
         {!isGuest && (
           <NavItem href="/library" icon={<Library size={20} />}>Your Library</NavItem>
+        )}
+        {!isGuest && (
+          <NavItem href="/upload" icon={<Upload size={20} />}>Upload Music</NavItem>
         )}
       </nav>
 
