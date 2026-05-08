@@ -1,5 +1,4 @@
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
-import { MagicLinkForm } from "@/components/auth/MagicLinkForm";
 import Link from "next/link";
 
 export default function LoginPage() {

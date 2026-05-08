@@ -40,6 +40,7 @@ export function QueuePanel() {
   const [similarSongs, setSimilarSongs] = useState<SimilarSong[]>([]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!currentSong) { setSimilarSongs([]); return; }
     let cancelled = false;
     fetch(`/api/songs/${currentSong.id}/similar`)
@@ -47,6 +48,7 @@ export function QueuePanel() {
       .then((data: { songs: SimilarSong[] }) => { if (!cancelled) setSimilarSongs(data.songs ?? []); })
       .catch(() => { if (!cancelled) setSimilarSongs([]); });
     return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSong?.id]);
 
   const upNext = queue.slice(currentIndex + 1);

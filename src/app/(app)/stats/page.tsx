@@ -17,6 +17,7 @@ export default async function StatsPage() {
   if (!user) redirect("/login");
 
   const userId = user.id;
+  // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
   const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
   const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);

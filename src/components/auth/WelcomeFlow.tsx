@@ -45,7 +45,7 @@ export function WelcomeFlow({ userName }: Props) {
   function toggleGenre(g: string) {
     setSelected((prev) => {
       const next = new Set(prev);
-      next.has(g) ? next.delete(g) : next.add(g);
+      if (next.has(g)) { next.delete(g); } else { next.add(g); }
       return next;
     });
   }
@@ -63,7 +63,7 @@ export function WelcomeFlow({ userName }: Props) {
         <div className="w-full max-w-lg space-y-6">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-white mb-2">Pick your top genres</h1>
-            <p className="text-zinc-400 text-sm">We'll seed your first personalized mixes.</p>
+            <p className="text-zinc-400 text-sm">We&apos;ll seed your first personalized mixes.</p>
           </div>
 
           <div className="flex flex-wrap gap-2 justify-center">

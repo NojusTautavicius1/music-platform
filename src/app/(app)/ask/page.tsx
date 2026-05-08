@@ -274,6 +274,7 @@ function PlaylistPicker({
 function useCountdown(resetAt: string | null) {
   const [remaining, setRemaining] = useState("");
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!resetAt) { setRemaining(""); return; }
     const tick = () => {
       const ms = new Date(resetAt).getTime() - Date.now();
@@ -391,6 +392,7 @@ export default function AskPage() {
   useEffect(() => {
     const q = searchParams.get("q");
     if (q && !result && !loading) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery(q);
       handleSubmit(q);
     }
@@ -424,7 +426,7 @@ export default function AskPage() {
   function toggleSong(id: string) {
     setSelected((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) { next.delete(id); } else { next.add(id); }
       return next;
     });
   }

@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
-import { toast } from "sonner";
 import { CreatePlaylistDialog } from "@/components/playlist/CreatePlaylistDialog";
 import { Title as RadixDialogTitle } from "@radix-ui/react-dialog";
 import { usePlayerStore, type PlayerSong } from "@/store/playerStore";
@@ -113,7 +112,7 @@ export function CommandPalette() {
         },
       },
     ],
-    [router, setOpen]
+    [router, setOpen, setTheme, theme]
   );
 
   const filteredQuickActions = useMemo(() => {
@@ -124,6 +123,7 @@ export function CommandPalette() {
 
   useEffect(() => {
     const stored = sessionStorage.getItem(SESSION_KEY);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored) setQuery(stored);
   }, []);
 
@@ -165,6 +165,7 @@ export function CommandPalette() {
 
     const trimmed = query.trim();
     if (!trimmed) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setResults({ songs: [], playlists: [], artists: [], ownPlaylists: [] });
       return;
     }

@@ -28,6 +28,7 @@ export function CoverGradient({ coverUrl, fallback, children, className }: Props
 
   useEffect(() => {
     if (!coverUrl) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setColor(fallback ?? DEFAULT_FALLBACK);
       return;
     }

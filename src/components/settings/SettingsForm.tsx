@@ -344,7 +344,7 @@ export function SettingsForm({ name, email, preferences, attributions }: Props) 
           </div>
           <div className="rounded-xl border border-white/5 bg-white/5 p-4">
             <p className="text-sm text-zinc-200">Made by</p>
-            <p className="text-xs text-zinc-500">Svetaines</p>
+            <p className="text-xs text-zinc-500">Nojus Tautavičius</p>
           </div>
 
           {attributions.length > 0 && (

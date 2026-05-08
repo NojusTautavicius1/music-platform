@@ -40,11 +40,13 @@ export function NowPlayingView() {
   const shareTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Read store after mount to avoid hydration mismatch
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
   // Reset like state and lyrics analysis when song changes
   const currentSongId = usePlayerStore((s) => s.currentSong?.id);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLiked(false);
     setLyricsAnalysis(null);
   }, [currentSongId]);

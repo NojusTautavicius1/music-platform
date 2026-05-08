@@ -37,6 +37,7 @@ export function LyricsPanel({ songId, currentTime, onAnalysis }: Props) {
         onAnalysis?.(null);
       })
       .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [songId]);
 
   const activeIndex = useCallback(() => {

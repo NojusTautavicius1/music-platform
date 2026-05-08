@@ -24,7 +24,7 @@ type Props = {
 };
 
 export function PublicPlaylistView({ songs, playlistName }: Props) {
-  const { play, currentSong, isPlaying, pause, toggle } = usePlayerStore();
+  const { play, currentSong, toggle } = usePlayerStore();
 
   const playerSongs = songs.map((s) => ({
     id: s.songId,
@@ -37,7 +37,8 @@ export function PublicPlaylistView({ songs, playlistName }: Props) {
     waveformPeaks: s.waveformPeaks,
   }));
 
-  function handlePlay(song: PublicSong, index: number) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function handlePlay(song: PublicSong, _index: number) {
     if (currentSong?.id === song.songId) {
       toggle();
       return;

@@ -192,8 +192,13 @@ function FilterBar({
     bpmDebounceRef.current = setTimeout(() => onBpmChange(min, max), 500);
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setLocalQuery(currentQuery); }, [currentQuery]);
-  useEffect(() => { setLocalBpmMin(currentBpmMin); setLocalBpmMax(currentBpmMax); }, [currentBpmMin, currentBpmMax]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLocalBpmMin(currentBpmMin);
+    setLocalBpmMax(currentBpmMax);
+  }, [currentBpmMin, currentBpmMax]);
 
   const selectCls =
     "h-9 rounded-full border border-white/15 bg-[#18181F] text-zinc-200 text-sm px-3 pr-8 appearance-none cursor-pointer hover:bg-[#222230] transition-colors focus:outline-none focus:ring-1 focus:ring-orange-500/40 [color-scheme:dark]";

@@ -11,6 +11,7 @@ export function GuestBanner() {
 
   useEffect(() => {
     const dismissed = localStorage.getItem(STORAGE_KEY);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!dismissed) setVisible(true);
   }, []);
 

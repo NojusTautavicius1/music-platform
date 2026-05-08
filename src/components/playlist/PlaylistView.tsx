@@ -26,7 +26,6 @@ import {
   Plus,
   ChevronDown,
   ChevronUp,
-  Sparkles,
   Music,
   GripVertical,
   FileText,
@@ -787,11 +786,11 @@ function DeletePlaylistDialog({
       <DialogContent className="bg-[#18181F] border-white/10 text-zinc-100 max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold text-zinc-100">
-            Delete "{playlistName}"?
+            Delete &quot;{playlistName}&quot;?
           </DialogTitle>
         </DialogHeader>
         <p className="text-sm text-zinc-400">
-          This can't be undone.
+          This can&apos;t be undone.
         </p>
         <div className="flex justify-end gap-3 pt-2">
           <button
@@ -858,49 +857,6 @@ function SuggestionRow({
   );
 }
 
-// ─── Recommended Section ──────────────────────────────────────────────────────
-
-function RecommendedSection({
-  songs,
-  alreadyInSet,
-  onAdd,
-  label = "Suggested for this playlist",
-}: {
-  songs: SuggestedSong[];
-  alreadyInSet: Set<string>;
-  onAdd: (song: SuggestedSong) => Promise<boolean>;
-  label?: string;
-}) {
-  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
-  const visible = songs.filter((s) => !alreadyInSet.has(s.id));
-  if (visible.length === 0) return null;
-
-  async function handleAdd(song: SuggestedSong) {
-    setPendingIds((p) => new Set([...p, song.id]));
-    await onAdd(song);
-    setPendingIds((p) => { const n = new Set(p); n.delete(song.id); return n; });
-  }
-
-  return (
-    <div className="px-4 md:px-8 pb-6">
-      <div className="flex items-center gap-2 mb-3">
-        <Sparkles size={14} className="text-brand-orange shrink-0" />
-        <h3 className="text-sm font-semibold text-zinc-300">{label}</h3>
-      </div>
-      <div className="space-y-0.5">
-        {visible.map((song) => (
-          <SuggestionRow
-            key={song.id}
-            song={song}
-            isPending={pendingIds.has(song.id)}
-            onAdd={() => handleAdd(song)}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // ─── Find More Section ────────────────────────────────────────────────────────
 
 function FindMoreSection({
@@ -935,6 +891,7 @@ function FindMoreSection({
 
   useEffect(() => {
     if (!expanded) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchResults(query, 1, false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded]);
@@ -1037,7 +994,6 @@ export function PlaylistView({
   songs,
   userPlaylists = [],
   suggestedSongs = [],
-  moreLikeSongs = [],
 }: Props) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -1059,6 +1015,7 @@ export function PlaylistView({
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDisplaySongs(songs);
     pendingRemovals.current.forEach((entry) =>
       window.clearTimeout(entry.timeoutId)
@@ -1109,7 +1066,7 @@ export function PlaylistView({
     confirmedLiked,
     (state: Set<string>, songId: string) => {
       const next = new Set(state);
-      next.has(songId) ? next.delete(songId) : next.add(songId);
+      if (next.has(songId)) { next.delete(songId); } else { next.add(songId); }
       return next;
     }
   );
@@ -1122,7 +1079,7 @@ export function PlaylistView({
       if (result.ok) {
         setConfirmedLiked((prev) => {
           const next = new Set(prev);
-          result.isLiked ? next.add(songId) : next.delete(songId);
+          if (result.isLiked) { next.add(songId); } else { next.delete(songId); }
           return next;
         });
       } else {
@@ -1253,7 +1210,8 @@ export function PlaylistView({
     toast.success("Added to queue");
   }
 
-  function handleGoToArtist(song: SongInPlaylist) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function handleGoToArtist(_song: SongInPlaylist) {
     toast(`Artist pages are coming soon`);
   }
 

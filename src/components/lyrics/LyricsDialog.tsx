@@ -19,6 +19,7 @@ export function LyricsDialog({ songId, songTitle, songArtist, open, onClose }: P
 
   useEffect(() => {
     if (!open || !songId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setPayload(null);
 
@@ -28,11 +29,6 @@ export function LyricsDialog({ songId, songTitle, songArtist, open, onClose }: P
       .catch(() => setPayload({ status: "none" }))
       .finally(() => setLoading(false));
   }, [open, songId]);
-
-  const lines =
-    payload?.status === "synced"
-      ? payload.lines
-      : null;
 
   const text =
     payload?.status === "plain"

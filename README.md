@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sonara
 
-## Getting Started
+A personalized music streaming platform with AI-powered recommendations, daily mixes, and a natural-language music agent.
 
-First, run the development server:
+## Stack
+
+- **Frontend/Backend**: Next.js 15 (App Router), TypeScript, Tailwind CSS v4
+- **Database**: PostgreSQL via Railway + Prisma ORM
+- **Auth**: Auth.js v5 (Google OAuth)
+- **Storage**: Uploadthing (audio + cover images)
+- **AI**: Anthropic Claude (recommendations, Ask Sonara)
+- **Music Agent**: Ruby/Sinatra service on Railway
+- **Deployment**: Vercel (web) + Railway (DB + agent)
+
+## Features
+
+- Upload and stream songs with waveform visualization
+- Daily mixes, Discover Weekly, On Repeat — auto-regenerated
+- Ask Sonara: natural-language music search ("songs for a rainy evening")
+- Playlist creation, sharing, and collaborative suggestions
+- Lyrics display (synced + plain text)
+- Browse by genre/BPM, smart shuffle, queue management
+- Stats page with listening history
+
+## Local Development
 
 ```bash
+# 1. Install dependencies
+npm install
+
+# 2. Set up environment
+cp .env.example .env
+# Fill in all values (see .env.example for descriptions)
+
+# 3. Run database migrations
+npx prisma migrate dev
+
+# 4. Seed demo data (optional)
+npx prisma db seed
+
+# 5. Start dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See [.env.example](.env.example) for all required variables with descriptions.
 
-## Learn More
+Key vars:
+| Variable | Where to get it |
+|---|---|
+| `DATABASE_URL` | Railway → your PostgreSQL service → Connect |
+| `AUTH_SECRET` | `openssl rand -base64 32` |
+| `GOOGLE_CLIENT_ID/SECRET` | console.cloud.google.com → OAuth 2.0 |
+| `UPLOADTHING_*` | uploadthing.com → dashboard |
+| `ANTHROPIC_API_KEY` | console.anthropic.com |
+| `MUSIC_AGENT_URL` | Railway → music-agent service → public domain |
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Vercel (web app)**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Set all env vars in Vercel dashboard. `AUTH_URL` must match your exact Vercel domain.
 
-## Deploy on Vercel
+```json
+"build": "prisma generate && next build --webpack"
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Railway (music agent)**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [../music-agent/README.md](../music-agent/README.md).
+
+## Architecture
+
+```
+Browser
+  └── Vercel (Next.js)
+        ├── Railway PostgreSQL  (Prisma)
+        ├── Uploadthing CDN     (audio/covers)
+        ├── Anthropic API       (AI recommendations)
+        └── Railway music-agent (Ruby/Sinatra → Ask Sonara)
+```
+
+## Scripts
+
+```bash
+npm run dev                              # dev server
+npm run build                            # production build
+npm run lint                             # ESLint
+npx prisma studio                        # visual DB browser
+npx prisma migrate dev --name <name>     # create migration
+```

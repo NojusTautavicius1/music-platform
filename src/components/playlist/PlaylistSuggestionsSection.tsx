@@ -83,11 +83,13 @@ export function PlaylistSuggestionsSection({
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSongs(initialSongs);
   }, [initialSongs]);
 
   useEffect(() => {
     if (mode === "empty") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpanded(true);
     }
   }, [mode]);
@@ -115,6 +117,7 @@ export function PlaylistSuggestionsSection({
   }, [mode, mountedRef, playlistId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadSuggestions();
   }, [loadSuggestions]);
 

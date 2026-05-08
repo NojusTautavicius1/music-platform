@@ -105,9 +105,9 @@ export default function Sonara3DBackground() {
       const tiltY = cmy * 0.12;
       const cosY = Math.cos(tiltX), sinY = Math.sin(tiltX);
       const cosP = Math.cos(tiltY), sinP = Math.sin(tiltY);
-      let X = x * cosY + z * sinY;
+      const X = x * cosY + z * sinY;
       let Z = -x * sinY + z * cosY;
-      let Y = y * cosP - Z * sinP;
+      const Y = y * cosP - Z * sinP;
       Z = y * sinP + Z * cosP;
       if (Z < 0.05) Z = 0.05;
       const k = FOV / Z;

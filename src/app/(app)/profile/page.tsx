@@ -25,6 +25,7 @@ export default async function ProfilePage() {
   });
   if (!user) redirect("/login");
 
+  // eslint-disable-next-line react-hooks/purity
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
   const [publicPlaylists, likedCount, playCount, publicPlaylistsList, recentPlayCounts] =

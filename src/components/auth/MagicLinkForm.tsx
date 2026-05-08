@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { signIn } from "next-auth/react";
 import { isDisposableEmail } from "@/lib/disposableEmails";
-import { Mail, Loader2 } from "lucide-react";
+import { Mail } from "lucide-react";
 
 export function MagicLinkForm() {
   const [email, setEmail] = useState("");

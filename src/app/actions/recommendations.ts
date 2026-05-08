@@ -67,6 +67,7 @@ function dedupeSongs(songs: RecommendationSong[]): RecommendationSong[] {
 }
 
 function stripScores(songs: SeededSong[]): RecommendationSong[] {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return songs.map(({ __score: _score, ...song }) => song);
 }
 
