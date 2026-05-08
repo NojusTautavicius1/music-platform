@@ -27,19 +27,6 @@ export default function LoginPage() {
           <GoogleSignInButton />
         </div>
 
-        {/* Divider */}
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/10" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-[#18181F] text-gray-400">or continue with email</span>
-          </div>
-        </div>
-
-        {/* Magic link form */}
-        <MagicLinkForm />
-
         {/* Terms */}
         <p className="text-center text-xs text-gray-500 mt-6">
           By continuing, you agree to our{" "}
