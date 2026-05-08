@@ -198,7 +198,7 @@ async function RecentlyPlayedSection({ userId }: { userId?: string | null }) {
           <section>
             <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Recently played</h2>
         <FlowDivider className="mb-4" />
-            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
               {orderedSongs.map((s, i) => (
                 <PlaylistCard
                   key={s.id}
@@ -232,7 +232,7 @@ async function RecentlyPlayedSection({ userId }: { userId?: string | null }) {
   return (
     <section>
       <h2 className="text-2xl font-bold text-zinc-100 mb-6 section-heading">New arrivals</h2>
-      <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
         {songs.map((s, i) => (
           <PlaylistCard
             key={s.id}
@@ -305,7 +305,7 @@ async function JumpBackInSection({ userId }: { userId?: string | null }) {
     <section>
       <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Jump back in</h2>
       <FlowDivider className="mb-4" />
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
         {playlists.map((p) => (
           <PlaylistCard
             key={p.id}
@@ -334,7 +334,7 @@ async function TrendingNowSection() {
     <section>
       <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Trending now</h2>
       <FlowDivider className="mb-4" />
-      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4">
         {trending.map(({ song, playCount }, i) => (
           <PlaylistCard
             key={song.id}
@@ -370,7 +370,7 @@ async function NewReleasesSection() {
     <section>
       <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">New releases</h2>
       <FlowDivider className="mb-4" />
-      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4">
         {songs.map((s, i) => (
           <PlaylistCard
             key={s.id}
@@ -439,7 +439,7 @@ export default async function HomePage() {
         fallback={
           <GridSkeleton
             count={6}
-            gridClass="grid-cols-2 sm:grid-cols-3 lg:grid-cols-6"
+            gridClass="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
           />
         }
       >
@@ -451,7 +451,7 @@ export default async function HomePage() {
         fallback={
           <GridSkeleton
             count={8}
-            gridClass="grid-cols-2 sm:grid-cols-4 lg:grid-cols-8"
+            gridClass="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8"
           />
         }
       >
@@ -498,7 +498,7 @@ export default async function HomePage() {
         fallback={
           <GridSkeleton
             count={8}
-            gridClass="grid-cols-2 sm:grid-cols-4 lg:grid-cols-8"
+            gridClass="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8"
           />
         }
       >
