@@ -46,6 +46,9 @@ export function useAudioEngine() {
 
         const howl = new Howl({
           src: [song.audioUrl],
+          // Uploadthing CDN URLs have no file extension so Howler can't detect
+          // the codec from the URL. Explicitly declare mp3 so it skips detection.
+          format: ["mp3"],
           // html5: true avoids Web Audio API autoplay restrictions on most browsers.
           // If audio still refuses to start, the user must interact with the page first
           // (clicking play satisfies the browser's autoplay policy).
