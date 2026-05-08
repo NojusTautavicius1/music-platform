@@ -110,7 +110,7 @@ export function TopBar({ user, signOutAction }: Props) {
 
       {/* Search + Ask Sonara */}
       <form onSubmit={handleSearch} className="flex-1 flex justify-center">
-        <div className="relative w-full max-w-100 flex items-center gap-2">
+        <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-100 flex items-center gap-2">
           <Search
             size={16}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"

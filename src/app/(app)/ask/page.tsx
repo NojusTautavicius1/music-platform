@@ -210,7 +210,7 @@ function PlaylistPicker({
   return (
     <div
       ref={ref}
-      className="absolute bottom-full mb-2 right-0 w-72 rounded-2xl bg-[#18181F] border border-white/10 shadow-2xl overflow-hidden z-50"
+      className="absolute bottom-full mb-2 right-0 w-[min(18rem,calc(100vw-2rem))] rounded-2xl bg-[#18181F] border border-white/10 shadow-2xl overflow-hidden z-50"
     >
       <div className="px-4 py-3 border-b border-white/8">
         <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">
@@ -444,7 +444,7 @@ export default function AskPage() {
   return (
     <div className="relative min-h-full">
       <Sonara3DBackground />
-    <div className="relative z-10 p-4 md:p-8 pb-40 max-w-2xl mx-auto lg:-translate-x-16 flex flex-col">
+    <div className="relative z-10 p-4 md:p-8 pb-40 max-w-2xl mx-auto flex flex-col">
       {/* Hero */}
       <div className="mb-8 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-medium mb-4">

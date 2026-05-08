@@ -97,7 +97,7 @@ export function QueuePanel() {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: "100%", opacity: 0 }}
           transition={{ type: "spring", stiffness: 320, damping: 32 }}
-          className="fixed top-16 right-0 bottom-[calc(90px+56px)] md:bottom-[90px] w-96 bg-[#18181F] border-l border-white/5 flex flex-col z-20 overflow-hidden"
+          className="fixed top-16 right-0 bottom-[calc(90px+56px)] md:bottom-[90px] w-full sm:w-96 bg-[#18181F] border-l border-white/5 flex flex-col z-20 overflow-hidden"
         >
           {/* Header */}
           <div className="px-5 py-4 flex items-center justify-between shrink-0 border-b border-white/5">

@@ -407,7 +407,7 @@ export default async function HomePage() {
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="p-4 md:p-8 space-y-12 max-w-400">
+    <div className="p-4 md:p-8 space-y-8 md:space-y-12 max-w-400">
       {/* Greeting */}
       <div>
         {userId ? (
@@ -484,7 +484,7 @@ export default async function HomePage() {
               <Link
                 key={genre}
                 href={`/search/${encodeURIComponent(genre)}`}
-                className="shrink-0 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-zinc-300 font-semibold text-sm whitespace-nowrap hover:border-[#FF5500]/60 hover:text-[#FF5500] hover:bg-orange-500/5 transition-all duration-200"
+                className="shrink-0 px-4 py-2 md:px-6 md:py-3 rounded-full bg-white/5 border border-white/10 text-zinc-300 font-semibold text-xs md:text-sm whitespace-nowrap hover:border-[#FF5500]/60 hover:text-[#FF5500] hover:bg-orange-500/5 transition-all duration-200"
               >
                 {cfg.label}
               </Link>
