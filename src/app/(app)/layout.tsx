@@ -62,7 +62,7 @@ export default async function AppLayout({
 
         <div className="flex-1 flex flex-col min-h-0">
           <TopBar user={user} signOutAction={user ? handleSignOut : undefined} />
-          <main id="main-content" className="flex-1 overflow-y-auto scrollbar-orange">
+          <main id="main-content" className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-orange">
             <PageTransition>{children}</PageTransition>
           </main>
         </div>

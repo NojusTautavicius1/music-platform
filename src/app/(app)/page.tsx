@@ -96,7 +96,7 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
     const playCountMap = await getPlaylistPlayCounts(playlists.map((playlist) => playlist.id));
     return (
       <section>
-        <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
         <FlowDivider className="mb-4" />
         <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-3 px-3">
           {playlists.map((p) => (
@@ -135,7 +135,7 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
       <>
         <MixRefreshTrigger needsRefresh kinds={ALL_KINDS} />
         <section>
-          <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
         <FlowDivider className="mb-4" />
           <p className="text-zinc-500 text-sm">
             Your personalized mixes are being prepared…
@@ -149,7 +149,7 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
     <>
       <MixRefreshTrigger needsRefresh={needsRefresh} kinds={staleKinds} />
       <section>
-        <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Made for you</h2>
         <FlowDivider className="mb-4" />
         <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-3 px-3">
           {mixes.map((mix) => (
@@ -196,9 +196,9 @@ async function RecentlyPlayedSection({ userId }: { userId?: string | null }) {
         const queue = orderedSongs.map((s) => ({ id: s.id, title: s.title, artist: s.artist, album: null, duration: s.duration, coverUrl: s.coverUrl, audioUrl: s.audioUrl, waveformPeaks: s.waveformPeaks as number[] | null }));
         return (
           <section>
-            <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Recently played</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Recently played</h2>
         <FlowDivider className="mb-4" />
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
               {orderedSongs.map((s, i) => (
                 <PlaylistCard
                   key={s.id}
@@ -232,7 +232,7 @@ async function RecentlyPlayedSection({ userId }: { userId?: string | null }) {
   return (
     <section>
       <h2 className="text-2xl font-bold text-zinc-100 mb-6 section-heading">New arrivals</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
         {songs.map((s, i) => (
           <PlaylistCard
             key={s.id}
@@ -303,7 +303,7 @@ async function JumpBackInSection({ userId }: { userId?: string | null }) {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Jump back in</h2>
+      <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Jump back in</h2>
       <FlowDivider className="mb-4" />
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {playlists.map((p) => (
@@ -332,9 +332,9 @@ async function TrendingNowSection() {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">Trending now</h2>
+      <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Trending now</h2>
       <FlowDivider className="mb-4" />
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
         {trending.map(({ song, playCount }, i) => (
           <PlaylistCard
             key={song.id}
@@ -368,9 +368,9 @@ async function NewReleasesSection() {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-2 section-heading">New releases</h2>
+      <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">New releases</h2>
       <FlowDivider className="mb-4" />
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
         {songs.map((s, i) => (
           <PlaylistCard
             key={s.id}
@@ -407,7 +407,7 @@ export default async function HomePage() {
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="p-4 md:p-8 space-y-8 md:space-y-12 max-w-400">
+    <div className="p-4 md:p-8 space-y-8 md:space-y-12 w-full max-w-400">
       {/* Greeting */}
       <div>
         {userId ? (
