@@ -18,6 +18,14 @@ const GRADIENTS = [
   { from: "#10B981", to: "#8B5CF6" },
 ] as const;
 
+function shuffle<T>(arr: T[]): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 // AI INTEGRATION POINT: swap this body for embedding-based similarity search.
 // Inputs (targetGenre, count, excludeIds) and outputs (Song id array) stay stable.
 async function selectSongsForGenre(
@@ -31,10 +39,9 @@ async function selectSongsForGenre(
       id: { notIn: [...excludeIds] },
     },
     select: { id: true },
-    orderBy: { id: "asc" }, // deterministic across re-runs
-    take: count,
+    take: count * 6, // fetch a pool, then randomly sample
   });
-  return songs.map((s) => s.id);
+  return shuffle(songs.map((s) => s.id)).slice(0, count);
 }
 
 export async function regenerateForUser(
@@ -97,7 +104,8 @@ export async function regenerateForUser(
     const familiarCount = Math.ceil(25 * 0.6); // 15
     const unfamiliarCount = 25 - familiarCount; // 10
 
-    const familiar = genreSongIds.slice(0, familiarCount);
+    // Take top familiar songs (by play count) but shuffle them so order varies
+    const familiar = shuffle(genreSongIds.slice(0, familiarCount * 2)).slice(0, familiarCount);
     const unfamiliar = await selectSongsForGenre(
       genre,
       unfamiliarCount,
@@ -105,7 +113,7 @@ export async function regenerateForUser(
     );
 
     const g = getGradient(gradientIdx);
-    return { songIds: [...familiar, ...unfamiliar], gradient: g };
+    return { songIds: shuffle([...familiar, ...unfamiliar]), gradient: g };
   }
 
   type MixData = {
@@ -155,8 +163,7 @@ export async function regenerateForUser(
     const discoverSongs = await prisma.song.findMany({
       where: discoverWhere,
       select: { id: true },
-      orderBy: { id: "asc" },
-      take: 30,
+      take: 120, // fetch large pool, randomly sample 30
     });
 
     const discoverGradient = getGradient(4);
@@ -166,7 +173,7 @@ export async function regenerateForUser(
       description: "Fresh tracks in your taste profile you've never heard",
       gradientFrom: discoverGradient.from,
       gradientTo: discoverGradient.to,
-      songIds: discoverSongs.map((s) => s.id),
+      songIds: shuffle(discoverSongs.map((s) => s.id)).slice(0, 30),
     });
   }
 
