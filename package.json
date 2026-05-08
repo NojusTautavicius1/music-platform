@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "prisma generate && next dev",
@@ -57,6 +57,9 @@
     "zod": "^4.3.6",
     "zustand": "^5.0.12"
   },
+  "overrides": {
+    "uuid": "^11.0.0"
+  },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
@@ -64,7 +67,7 @@
     "@faker-js/faker": "^10.4.0",
     "@tailwindcss/postcss": "^4",
     "@types/howler": "^2.2.12",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
