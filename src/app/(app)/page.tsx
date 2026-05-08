@@ -153,7 +153,7 @@ async function MadeForYouSection({ userId, serverNow }: { userId?: string | null
         <FlowDivider className="mb-4" />
         <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
           {mixes.map((mix) => (
-            <div key={mix.kind} className="snap-start">
+            <div key={mix.kind} className="shrink-0 snap-start">
               <MixCard
                 kind={mix.kind}
                 name={mix.name}
@@ -198,7 +198,7 @@ async function RecentlyPlayedSection({ userId }: { userId?: string | null }) {
           <section>
             <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Recently played</h2>
         <FlowDivider className="mb-4" />
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
+            <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
               {orderedSongs.map((s, i) => (
                 <PlaylistCard
                   key={s.id}
@@ -231,8 +231,8 @@ async function RecentlyPlayedSection({ userId }: { userId?: string | null }) {
 
   return (
     <section>
-      <h2 className="text-2xl font-bold text-zinc-100 mb-6 section-heading">New arrivals</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
+      <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">New arrivals</h2>
+      <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
         {songs.map((s, i) => (
           <PlaylistCard
             key={s.id}
@@ -305,7 +305,7 @@ async function JumpBackInSection({ userId }: { userId?: string | null }) {
     <section>
       <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Jump back in</h2>
       <FlowDivider className="mb-4" />
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
+      <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
         {playlists.map((p) => (
           <PlaylistCard
             key={p.id}
@@ -334,7 +334,7 @@ async function TrendingNowSection() {
     <section>
       <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">Trending now</h2>
       <FlowDivider className="mb-4" />
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4">
+      <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4">
         {trending.map(({ song, playCount }, i) => (
           <PlaylistCard
             key={song.id}
@@ -370,7 +370,7 @@ async function NewReleasesSection() {
     <section>
       <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2 section-heading">New releases</h2>
       <FlowDivider className="mb-4" />
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4">
+      <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4">
         {songs.map((s, i) => (
           <PlaylistCard
             key={s.id}
@@ -407,19 +407,19 @@ export default async function HomePage() {
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="p-4 md:p-8 space-y-8 md:space-y-12 w-full max-w-400">
+    <div className="px-3 py-4 md:px-8 md:py-8 space-y-6 md:space-y-12 w-full overflow-x-hidden">
       {/* Greeting */}
       <div>
         {userId ? (
           <>
-            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight pb-1 greeting-shimmer">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold leading-tight pb-1 greeting-shimmer">
               {greeting}, {firstName}
             </h1>
             <p className="text-zinc-500 mt-2 text-base">Pick up where you left off.</p>
           </>
         ) : (
           <>
-            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight pb-1 greeting-shimmer">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold leading-tight pb-1 greeting-shimmer">
               Discover music
             </h1>
             <p className="text-zinc-500 mt-2 text-base">
@@ -472,7 +472,7 @@ export default async function HomePage() {
 
       {/* Genre chips — static, no Suspense needed */}
       <section>
-        <h2 className="text-2xl font-bold text-zinc-100 mb-2">
+        <h2 className="text-xl md:text-2xl font-bold text-zinc-100 mb-2">
           Your top genres
         </h2>
         <FlowDivider className="mb-4" />

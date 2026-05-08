@@ -142,7 +142,7 @@ export function PlaylistCard({
 
   const sharedCls = cn(
     "group block rounded-xl p-2 sm:p-3 hover:bg-orange-500/5 transition-all duration-200 hover:-translate-y-0.5 text-left",
-    fluid ? "w-full" : undefined
+    fluid ? "w-full min-w-0" : undefined
   );
 
   if (song) {

@@ -60,7 +60,7 @@ export default async function AppLayout({
       <div className="flex-1 flex min-h-0">
         <Sidebar />
 
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-x-hidden">
           <TopBar user={user} signOutAction={user ? handleSignOut : undefined} />
           <main id="main-content" className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-orange">
             <PageTransition>{children}</PageTransition>
