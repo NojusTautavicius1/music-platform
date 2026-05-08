@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
       { hostname: "lh3.googleusercontent.com" },
       { hostname: "utfs.io" },
       { hostname: "uploadthing.com" },
+      { hostname: "*.ufs.sh" },
+      { hostname: "npxwutpsi4.ufs.sh" },
     ],
   },
 };
