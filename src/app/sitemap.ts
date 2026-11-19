@@ -1,13 +1,16 @@
 import { type MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
-const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://sonara.vercel.app";
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://music-platform-woad-nine.vercel.app";
+
+// Rebuilt hourly, so a DB outage during the build only leaves playlists out until the next refresh.
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const playlists = await prisma.playlist.findMany({
     where: { isPublic: true },
     select: { id: true, updatedAt: true },
-  });
+  }).catch(() => []);
 
   return [
     {
