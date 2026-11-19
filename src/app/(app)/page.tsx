@@ -16,6 +16,7 @@ import { GENRE_COLORS, FEATURED_GENRES } from "@/lib/genreColors";
 import { getPlaylistPlayCounts, getTrendingSongs } from "@/lib/playCounts";
 import { FlowDivider } from "@/components/shared/FlowDivider";
 import { TryAskingSection } from "@/components/shared/TryAskingSection";
+import { SectionBoundary } from "@/components/shared/SectionBoundary";
 
 // ─── Skeleton helpers ─────────────────────────────────────────────────────────
 
@@ -396,7 +397,7 @@ export default async function HomePage() {
   const firstName = session?.user?.name?.split(" ")[0] ?? "there";
   const email = session?.user?.email;
   const userId = email
-    ? (await prisma.user.findUnique({ where: { email }, select: { id: true } }))?.id
+    ? (await prisma.user.findUnique({ where: { email }, select: { id: true } }).catch(() => null))?.id
     : null;
 
   // Capture a single server-side timestamp to avoid impure Date.now() calls in sub-components
@@ -430,45 +431,53 @@ export default async function HomePage() {
       </div>
 
       {/* Made for you */}
-      <Suspense fallback={<HorizontalSkeleton count={4} size={216} />}>
-        <MadeForYouSection userId={userId} serverNow={serverNow} />
-      </Suspense>
+      <SectionBoundary label="Made for you">
+        <Suspense fallback={<HorizontalSkeleton count={4} size={216} />}>
+          <MadeForYouSection userId={userId} serverNow={serverNow} />
+        </Suspense>
+      </SectionBoundary>
 
       {/* Recently played */}
-      <Suspense
-        fallback={
-          <GridSkeleton
-            count={6}
-            gridClass="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
-          />
-        }
-      >
-        <RecentlyPlayedSection userId={userId} />
-      </Suspense>
+      <SectionBoundary label="Recently played">
+        <Suspense
+          fallback={
+            <GridSkeleton
+              count={6}
+              gridClass="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
+            />
+          }
+        >
+          <RecentlyPlayedSection userId={userId} />
+        </Suspense>
+      </SectionBoundary>
 
       {/* Trending now */}
-      <Suspense
-        fallback={
-          <GridSkeleton
-            count={8}
-            gridClass="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8"
-          />
-        }
-      >
-        <TrendingNowSection />
-      </Suspense>
+      <SectionBoundary label="Trending now">
+        <Suspense
+          fallback={
+            <GridSkeleton
+              count={8}
+              gridClass="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8"
+            />
+          }
+        >
+          <TrendingNowSection />
+        </Suspense>
+      </SectionBoundary>
 
       {/* Jump back in */}
-      <Suspense
-        fallback={
-          <GridSkeleton
-            count={4}
-            gridClass="grid-cols-2 sm:grid-cols-4"
-          />
-        }
-      >
-        <JumpBackInSection userId={userId} />
-      </Suspense>
+      <SectionBoundary label="Jump back in">
+        <Suspense
+          fallback={
+            <GridSkeleton
+              count={4}
+              gridClass="grid-cols-2 sm:grid-cols-4"
+            />
+          }
+        >
+          <JumpBackInSection userId={userId} />
+        </Suspense>
+      </SectionBoundary>
 
       {/* Genre chips — static, no Suspense needed */}
       <section>
@@ -494,16 +503,18 @@ export default async function HomePage() {
       </section>
 
       {/* New releases */}
-      <Suspense
-        fallback={
-          <GridSkeleton
-            count={8}
-            gridClass="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8"
-          />
-        }
-      >
-        <NewReleasesSection />
-      </Suspense>
+      <SectionBoundary label="New releases">
+        <Suspense
+          fallback={
+            <GridSkeleton
+              count={8}
+              gridClass="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8"
+            />
+          }
+        >
+          <NewReleasesSection />
+        </Suspense>
+      </SectionBoundary>
 
       {/* Try asking — AI agent showcase */}
       <TryAskingSection />
