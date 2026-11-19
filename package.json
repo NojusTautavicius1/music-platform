@@ -18,7 +18,7 @@
     "gen-embeddings": "tsx scripts/generateAllEmbeddings.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.92.0",
+    "@anthropic-ai/sdk": "^1.10.0",
     "@auth/prisma-adapter": "^2.11.2",
     "@base-ui/react": "^1.4.1",
     "@dnd-kit/core": "^6.3.1",

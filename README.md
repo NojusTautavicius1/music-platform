@@ -7,12 +7,11 @@ A personalized music streaming platform with AI-powered recommendations, daily m
 ## Stack
 
 - **Frontend/Backend**: Next.js 16 (App Router), TypeScript, Tailwind CSS v4
-- **Database**: PostgreSQL via Railway + Prisma ORM
+- **Database**: PostgreSQL + pgvector on Neon, Prisma ORM
 - **Auth**: Auth.js v5 (Google OAuth)
 - **Storage**: Uploadthing (audio + cover images)
-- **AI**: Anthropic Claude (recommendations, Ask Sonara)
-- **Music Agent**: Ruby/Sinatra service on Railway
-- **Deployment**: Vercel (web) + Railway (DB + agent)
+- **AI**: Claude with tool use for Ask Sonara (`src/lib/ai/musicAgent.ts`), OpenAI embeddings for semantic search
+- **Deployment**: Vercel (app) + Neon (database)
 
 ## Features
 
@@ -37,8 +36,9 @@ cp .env.example .env
 # 3. Run database migrations
 npx prisma migrate dev
 
-# 4. Seed demo data (optional)
-npx prisma db seed
+# 4. Import the music library (scripts/music-source/<genre>/*), then embeddings
+npm run import-music
+npm run gen-embeddings
 
 # 5. Start dev server
 npm run dev
@@ -53,12 +53,12 @@ See [.env.example](.env.example) for all required variables with descriptions.
 Key vars:
 | Variable | Where to get it |
 |---|---|
-| `DATABASE_URL` | Railway → your PostgreSQL service → Connect |
+| `DATABASE_URL` | Neon → project → Connection string |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `GOOGLE_CLIENT_ID/SECRET` | console.cloud.google.com → OAuth 2.0 |
 | `UPLOADTHING_*` | uploadthing.com → dashboard |
 | `ANTHROPIC_API_KEY` | console.anthropic.com |
-| `MUSIC_AGENT_URL` | Railway → music-agent service → public domain |
+| `OPENAI_API_KEY` | platform.openai.com (embeddings) |
 
 ## Deployment
 
@@ -70,19 +70,15 @@ Set all env vars in Vercel dashboard. `AUTH_URL` must match your exact Vercel do
 "build": "prisma generate && next build --webpack"
 ```
 
-**Railway (music agent)**
-
-The Ruby/Sinatra music agent lives in a separate repository; point `MUSIC_AGENT_URL` at its public Railway domain.
-
 ## Architecture
 
 ```
 Browser
   └── Vercel (Next.js)
-        ├── Railway PostgreSQL  (Prisma)
-        ├── Uploadthing CDN     (audio/covers)
-        ├── Anthropic API       (AI recommendations)
-        └── Railway music-agent (Ruby/Sinatra → Ask Sonara)
+        ├── Neon PostgreSQL + pgvector (Prisma)
+        ├── Uploadthing CDN            (user uploads)
+        ├── Anthropic API              (Ask Sonara agent, lyrics analysis)
+        └── OpenAI API                 (embeddings)
 ```
 
 ## Scripts

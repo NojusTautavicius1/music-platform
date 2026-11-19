@@ -1,22 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-
-const RawSongSchema = z.object({
-  id: z.union([z.string(), z.number()]).transform(String),
-  title: z.string(),
-  artist: z.string(),
-  why: z.string().optional().default(""),
-});
-
-const RawAgentResponseSchema = z.object({
-  explanation: z.string(),
-  songs: z.array(RawSongSchema),
-});
+import { askSonara, type AgentAnswer } from "@/lib/ai/musicAgent";
 
 const RATE_LIMIT = 5;
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+// Claude runs several tool calls per question
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -49,30 +40,12 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const agentUrl = process.env.MUSIC_AGENT_URL ?? "http://localhost:4567";
-
-  let agentText: string;
+  let parsed: AgentAnswer;
   try {
-    const agentRes = await fetch(`${agentUrl}/agent/query`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: body.query }),
-      signal: AbortSignal.timeout(30_000),
-    });
-    if (!agentRes.ok) throw new Error("agent error");
-    agentText = await agentRes.text();
-  } catch {
+    parsed = await askSonara(body.query);
+  } catch (error) {
+    console.error("[ask-sonara]", error);
     return NextResponse.json({ error: "agent unavailable" }, { status: 503 });
-  }
-
-  let parsed: z.infer<typeof RawAgentResponseSchema>;
-  try {
-    const json = typeof agentText === "string" ? JSON.parse(agentText) : agentText;
-    const result = RawAgentResponseSchema.safeParse(json);
-    if (!result.success) throw new Error("bad shape");
-    parsed = result.data;
-  } catch {
-    return NextResponse.json({ error: "invalid agent response" }, { status: 502 });
   }
 
   const songIds = parsed.songs.map((s) => s.id);

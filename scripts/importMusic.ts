@@ -27,7 +27,7 @@
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import * as mm from "music-metadata";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -129,6 +129,21 @@ function extractCover(
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
+/** Content hash -> song id for files already in public/audio, so a fresh database gets the same ids back. */
+function indexPublishedAudio(): Map<string, string> {
+  const byHash = new Map<string, string>();
+  if (!fs.existsSync(PUBLIC_AUDIO_DIR)) return byHash;
+  for (const name of fs.readdirSync(PUBLIC_AUDIO_DIR)) {
+    if (!SUPPORTED_EXTS.has(path.extname(name).toLowerCase())) continue;
+    byHash.set(hashFile(path.join(PUBLIC_AUDIO_DIR, name)), path.basename(name, path.extname(name)));
+  }
+  return byHash;
+}
+
+function hashFile(filePath: string): string {
+  return createHash("sha1").update(fs.readFileSync(filePath)).digest("hex");
+}
+
 async function main() {
   fs.mkdirSync(PUBLIC_AUDIO_DIR, { recursive: true });
   fs.mkdirSync(PUBLIC_COVERS_DIR, { recursive: true });
@@ -146,6 +161,8 @@ async function main() {
   }
 
   console.log(`Found ${files.length} audio file(s). Starting import…\n`);
+
+  const published = indexPublishedAudio();
 
   let imported = 0;
   let skipped = 0;
@@ -195,7 +212,7 @@ async function main() {
         select: { id: true },
       });
 
-      const id = existing?.id ?? randomUUID();
+      const id = existing?.id ?? published.get(hashFile(filePath)) ?? randomUUID();
 
       // ── 3. Copy audio to public/audio ────────────────────────────────────
       const destFilename = `${id}${ext}`;
