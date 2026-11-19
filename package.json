@@ -15,7 +15,8 @@
     "postinstall": "prisma generate",
     "extract-fma": "tsx scripts/extractFMA.ts",
     "import-music": "tsx scripts/importMusic.ts",
-    "gen-embeddings": "tsx scripts/generateAllEmbeddings.ts"
+    "gen-embeddings": "tsx scripts/generateAllEmbeddings.ts",
+    "analyze-audio": "python audio-analyzer/analyze.py && tsx scripts/applyAudioAnalysis.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.10.0",

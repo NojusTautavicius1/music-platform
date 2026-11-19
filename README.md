@@ -36,8 +36,10 @@ cp .env.example .env
 # 3. Run database migrations
 npx prisma migrate dev
 
-# 4. Import the music library (scripts/music-source/<genre>/*), then embeddings
+# 4. Import the music library (scripts/music-source/<genre>/*), measure tempo / key / mood
+#    (needs Python with `pip install librosa`), then embeddings
 npm run import-music
+npm run analyze-audio
 npm run gen-embeddings
 
 # 5. Start dev server

@@ -1,0 +1,1418 @@
+{
+ "050c0c26-a95e-4a73-b1d4-4910f6a29693": {
+  "bpm": 99.4,
+  "brightness": 2234.2,
+  "key": "C# minor",
+  "loudness": -14.91,
+  "majorness": -0.0196,
+  "onsetStrength": 1.069
+ },
+ "05d6fe27-56cd-42bc-8f01-0b91e6b76c51": {
+  "bpm": 95.7,
+  "brightness": 716.2,
+  "key": "F major",
+  "loudness": -16.01,
+  "majorness": 0.171,
+  "onsetStrength": 1.8056
+ },
+ "08e726b7-5365-428a-a926-ba0da15e7966": {
+  "bpm": 129.2,
+  "brightness": 1498.9,
+  "key": "A minor",
+  "loudness": -17.13,
+  "majorness": -0.0623,
+  "onsetStrength": 1.6647
+ },
+ "0920cd97-30b7-42bb-a3f1-700f263d96da": {
+  "bpm": 123.0,
+  "brightness": 1947.0,
+  "key": "D minor",
+  "loudness": -17.06,
+  "majorness": -0.0534,
+  "onsetStrength": 1.1341
+ },
+ "0a6b0e5f-8bac-4f42-a839-537bba62cee4": {
+  "bpm": 129.2,
+  "brightness": 2759.8,
+  "key": "F major",
+  "loudness": -16.61,
+  "majorness": 0.0324,
+  "onsetStrength": 1.5623
+ },
+ "0cdf7a3c-2e62-435c-943e-a04bc012f6ea": {
+  "bpm": 136.0,
+  "brightness": 824.5,
+  "key": "F# minor",
+  "loudness": -16.86,
+  "majorness": -0.0802,
+  "onsetStrength": 1.0149
+ },
+ "0d3e4788-26fe-4e5c-ab1f-b2e1f2405690": {
+  "bpm": 99.4,
+  "brightness": 1396.0,
+  "key": "G minor",
+  "loudness": -23.03,
+  "majorness": -0.0593,
+  "onsetStrength": 1.1665
+ },
+ "0daac526-dca4-4a15-b1c4-75244b6a61d9": {
+  "bpm": 112.3,
+  "brightness": 2207.7,
+  "key": "E minor",
+  "loudness": -13.97,
+  "majorness": -0.0328,
+  "onsetStrength": 1.4331
+ },
+ "0dbd45e7-8220-4f31-affe-ba574f40b6f3": {
+  "bpm": 129.2,
+  "brightness": 2767.2,
+  "key": "C major",
+  "loudness": -14.23,
+  "majorness": 0.1311,
+  "onsetStrength": 1.5388
+ },
+ "10aa7fe4-5c5b-4872-a015-032642b059e3": {
+  "bpm": 123.0,
+  "brightness": 1201.8,
+  "key": "E major",
+  "loudness": -14.76,
+  "majorness": 0.1503,
+  "onsetStrength": 0.9625
+ },
+ "11b4d992-cb4b-46b9-9d7f-e314972724d5": {
+  "bpm": 92.3,
+  "brightness": 1829.6,
+  "key": "F major",
+  "loudness": -19.48,
+  "majorness": 0.0097,
+  "onsetStrength": 1.2655
+ },
+ "15123171-160b-4123-aabb-efb5be7c48e6": {
+  "bpm": 89.1,
+  "brightness": 2065.7,
+  "key": "A minor",
+  "loudness": -25.12,
+  "majorness": -0.2527,
+  "onsetStrength": 1.7565
+ },
+ "164b095a-027f-457d-b9e9-fb9e0d2d87a3": {
+  "bpm": 152.0,
+  "brightness": 1505.3,
+  "key": "A# minor",
+  "loudness": -20.57,
+  "majorness": -0.1675,
+  "onsetStrength": 1.4502
+ },
+ "1770ba4b-7f92-4c3c-a6af-9fb188573c52": {
+  "bpm": 123.0,
+  "brightness": 1280.4,
+  "key": "A# minor",
+  "loudness": -24.17,
+  "majorness": -0.0938,
+  "onsetStrength": 0.8725
+ },
+ "17ce8c08-fd1a-4aba-b97e-34a5f93b51a7": {
+  "bpm": 136.0,
+  "brightness": 2605.9,
+  "key": "G# major",
+  "loudness": -21.12,
+  "majorness": 0.218,
+  "onsetStrength": 1.3982
+ },
+ "1a127c89-de8a-4e76-9ae4-3ef60b0a14d9": {
+  "bpm": 123.0,
+  "brightness": 1830.3,
+  "key": "D minor",
+  "loudness": -3.96,
+  "majorness": -0.094,
+  "onsetStrength": 1.5732
+ },
+ "1a8f8c79-4ef9-41bf-864e-5d009c0f67f5": {
+  "bpm": 117.5,
+  "brightness": 3462.2,
+  "key": "D minor",
+  "loudness": -11.08,
+  "majorness": -0.2659,
+  "onsetStrength": 1.4184
+ },
+ "1d3317d7-fabf-425f-9cb0-552aa58463d1": {
+  "bpm": 99.4,
+  "brightness": 1847.8,
+  "key": "D major",
+  "loudness": -19.23,
+  "majorness": 0.0658,
+  "onsetStrength": 1.0135
+ },
+ "1e2b0373-dd53-4351-a5db-7b2b0cdf948c": {
+  "bpm": 129.2,
+  "brightness": 1881.2,
+  "key": "G major",
+  "loudness": -30.69,
+  "majorness": 0.1748,
+  "onsetStrength": 0.8699
+ },
+ "1e9cf18c-272a-4dc3-82f7-ecc7614f3dcc": {
+  "bpm": 103.4,
+  "brightness": 1678.4,
+  "key": "D major",
+  "loudness": -27.0,
+  "majorness": 0.2377,
+  "onsetStrength": 1.0899
+ },
+ "1f7e5649-f7b7-4101-968e-f89c3358aff0": {
+  "bpm": 117.5,
+  "brightness": 1748.8,
+  "key": "C# major",
+  "loudness": -24.07,
+  "majorness": 0.2909,
+  "onsetStrength": 1.717
+ },
+ "218c02be-de54-41cc-8192-b4e1cb029ad8": {
+  "bpm": 123.0,
+  "brightness": 2548.7,
+  "key": "G# major",
+  "loudness": -11.19,
+  "majorness": 0.0632,
+  "onsetStrength": 0.9792
+ },
+ "225df73a-5d69-4d33-9d07-607ec9921246": {
+  "bpm": 103.4,
+  "brightness": 1267.1,
+  "key": "F# minor",
+  "loudness": -21.36,
+  "majorness": -0.0649,
+  "onsetStrength": 1.5398
+ },
+ "239a8fda-f750-4bcf-bb25-d49376875dae": {
+  "bpm": 99.4,
+  "brightness": 1608.4,
+  "key": "A major",
+  "loudness": -24.62,
+  "majorness": 0.1176,
+  "onsetStrength": 1.0136
+ },
+ "28d21c29-e9c5-4187-a2bb-099a855ba55d": {
+  "bpm": 152.0,
+  "brightness": 3297.7,
+  "key": "C major",
+  "loudness": -15.21,
+  "majorness": 0.0906,
+  "onsetStrength": 1.0522
+ },
+ "2b5563c2-57e9-436a-8199-e88c03498392": {
+  "bpm": 107.7,
+  "brightness": 1774.4,
+  "key": "F# minor",
+  "loudness": -18.62,
+  "majorness": -0.0542,
+  "onsetStrength": 1.3835
+ },
+ "2b7ba74d-ada7-4f40-823b-974983cd4aff": {
+  "bpm": 99.4,
+  "brightness": 2882.4,
+  "key": "C major",
+  "loudness": -18.48,
+  "majorness": 0.3076,
+  "onsetStrength": 1.5699
+ },
+ "2cd9eb1f-4838-48e7-882d-625c4208ff5f": {
+  "bpm": 123.0,
+  "brightness": 1517.8,
+  "key": "E major",
+  "loudness": -18.62,
+  "majorness": 0.1777,
+  "onsetStrength": 1.2199
+ },
+ "2d3e3857-a92a-4943-a85e-0cbd8c859e7b": {
+  "bpm": 89.1,
+  "brightness": 1702.9,
+  "key": "D major",
+  "loudness": -20.89,
+  "majorness": 0.1082,
+  "onsetStrength": 1.0083
+ },
+ "2d571ec7-171b-47cd-9ca1-7f9e51dbc3b4": {
+  "bpm": 95.7,
+  "brightness": 3138.2,
+  "key": "F minor",
+  "loudness": -27.71,
+  "majorness": -0.2382,
+  "onsetStrength": 1.2179
+ },
+ "2dca0d15-7e4a-41d2-9caf-797d81a66df7": {
+  "bpm": 136.0,
+  "brightness": 2545.5,
+  "key": "F# minor",
+  "loudness": -11.37,
+  "majorness": -0.1452,
+  "onsetStrength": 1.2944
+ },
+ "2fa6fdde-7ef4-4678-ba0a-6e8369866060": {
+  "bpm": 143.6,
+  "brightness": 1741.2,
+  "key": "G minor",
+  "loudness": -20.64,
+  "majorness": -0.3562,
+  "onsetStrength": 1.7154
+ },
+ "306028a7-c142-4387-91ff-d9627b677d3a": {
+  "bpm": 117.5,
+  "brightness": 1163.5,
+  "key": "A minor",
+  "loudness": -14.68,
+  "majorness": -0.1532,
+  "onsetStrength": 1.5823
+ },
+ "30cf1e38-8b17-4bbe-9675-28f9b3714e01": {
+  "bpm": 86.1,
+  "brightness": 1777.2,
+  "key": "A minor",
+  "loudness": -18.89,
+  "majorness": -0.0808,
+  "onsetStrength": 1.2182
+ },
+ "3278d0e3-f902-4f5b-a9b3-98b65e871ec3": {
+  "bpm": 152.0,
+  "brightness": 772.7,
+  "key": "D minor",
+  "loudness": -27.02,
+  "majorness": -0.3862,
+  "onsetStrength": 0.9944
+ },
+ "34bee7c4-3ed4-4a01-ab5f-0c3a62706eba": {
+  "bpm": 172.3,
+  "brightness": 2938.5,
+  "key": "F# minor",
+  "loudness": -15.07,
+  "majorness": -0.1632,
+  "onsetStrength": 1.4075
+ },
+ "35dd750c-bfb8-49a6-9eff-c36f13432a27": {
+  "bpm": 117.5,
+  "brightness": 2254.7,
+  "key": "D# major",
+  "loudness": -14.58,
+  "majorness": 0.0693,
+  "onsetStrength": 1.4289
+ },
+ "36e5973f-e942-485a-8307-9be70d06b749": {
+  "bpm": 99.4,
+  "brightness": 1588.1,
+  "key": "C# minor",
+  "loudness": -21.58,
+  "majorness": -0.1629,
+  "onsetStrength": 0.9613
+ },
+ "372e1905-6980-435f-ad54-fd67ca7ae3bd": {
+  "bpm": 123.0,
+  "brightness": 2937.8,
+  "key": "D# major",
+  "loudness": -21.31,
+  "majorness": 0.045,
+  "onsetStrength": 1.5071
+ },
+ "37865cce-cf35-423e-b62e-2da73515b1dc": {
+  "bpm": 123.0,
+  "brightness": 1353.4,
+  "key": "A major",
+  "loudness": -21.14,
+  "majorness": 0.1883,
+  "onsetStrength": 1.7288
+ },
+ "37ca64c3-5c77-484b-a321-fcd742609480": {
+  "bpm": 112.3,
+  "brightness": 1871.9,
+  "key": "F major",
+  "loudness": -4.65,
+  "majorness": 0.0531,
+  "onsetStrength": 2.3407
+ },
+ "39685fb2-51f0-4115-b95a-4096c7c0caec": {
+  "bpm": 152.0,
+  "brightness": 2673.4,
+  "key": "E major",
+  "loudness": -24.86,
+  "majorness": 0.2331,
+  "onsetStrength": 1.1945
+ },
+ "3a0eb1d7-9a85-4667-b86a-becd25fd1925": {
+  "bpm": 172.3,
+  "brightness": 2053.6,
+  "key": "D major",
+  "loudness": -14.57,
+  "majorness": 0.2321,
+  "onsetStrength": 1.2596
+ },
+ "3c63efd8-55df-4184-8e9b-9fc445eb036a": {
+  "bpm": 123.0,
+  "brightness": 2531.6,
+  "key": "G# major",
+  "loudness": -12.95,
+  "majorness": 0.0697,
+  "onsetStrength": 1.0882
+ },
+ "43b420ed-6dd5-41b4-8de3-f4ef833dc9e7": {
+  "bpm": 92.3,
+  "brightness": 3848.8,
+  "key": "C minor",
+  "loudness": -12.76,
+  "majorness": -0.0786,
+  "onsetStrength": 1.8545
+ },
+ "471c34c4-1986-44ae-941d-74f7cf211c7c": {
+  "bpm": 92.3,
+  "brightness": 1716.3,
+  "key": "C major",
+  "loudness": -14.6,
+  "majorness": 0.3406,
+  "onsetStrength": 1.1343
+ },
+ "47f6e6b4-d411-484a-9353-3fbea18b8f61": {
+  "bpm": 161.5,
+  "brightness": 2347.1,
+  "key": "A minor",
+  "loudness": -16.81,
+  "majorness": -0.0204,
+  "onsetStrength": 1.3011
+ },
+ "49c439d7-4310-4635-b7bb-f1651f57e0ff": {
+  "bpm": 112.3,
+  "brightness": 2962.7,
+  "key": "D major",
+  "loudness": -11.29,
+  "majorness": 0.2854,
+  "onsetStrength": 1.1775
+ },
+ "4d55b64f-57d8-4098-bfee-4a062a1d78f6": {
+  "bpm": 95.7,
+  "brightness": 2065.2,
+  "key": "D minor",
+  "loudness": -19.02,
+  "majorness": -0.0523,
+  "onsetStrength": 1.7643
+ },
+ "50a60c04-3ddb-4e42-84fe-cde97beee432": {
+  "bpm": 123.0,
+  "brightness": 2440.4,
+  "key": "A# minor",
+  "loudness": -24.9,
+  "majorness": -0.0922,
+  "onsetStrength": 1.305
+ },
+ "5142f3e0-de28-4ebe-9da3-2f08102e330b": {
+  "bpm": 99.4,
+  "brightness": 617.2,
+  "key": "D minor",
+  "loudness": -25.12,
+  "majorness": -0.1018,
+  "onsetStrength": 1.1626
+ },
+ "51675c7d-523d-407c-a4f5-230901630094": {
+  "bpm": 152.0,
+  "brightness": 1429.1,
+  "key": "C major",
+  "loudness": -24.34,
+  "majorness": 0.3421,
+  "onsetStrength": 1.2099
+ },
+ "52284c79-14f9-4047-be9d-971781fefa38": {
+  "bpm": 161.5,
+  "brightness": 3056.6,
+  "key": "C major",
+  "loudness": -16.76,
+  "majorness": 0.1206,
+  "onsetStrength": 1.8074
+ },
+ "5270a04e-be19-4070-add6-a55effcaec75": {
+  "bpm": 161.5,
+  "brightness": 2196.4,
+  "key": "C# major",
+  "loudness": -12.98,
+  "majorness": 0.1402,
+  "onsetStrength": 1.7113
+ },
+ "535299b9-5f9c-4e94-b931-f6f7fac6cf9b": {
+  "bpm": 123.0,
+  "brightness": 1614.1,
+  "key": "D minor",
+  "loudness": -20.92,
+  "majorness": -0.0157,
+  "onsetStrength": 1.6059
+ },
+ "53b9affa-f0fc-44eb-841c-668e37100a66": {
+  "bpm": 117.5,
+  "brightness": 1499.6,
+  "key": "B major",
+  "loudness": -12.48,
+  "majorness": 0.0736,
+  "onsetStrength": 1.1199
+ },
+ "53e918ec-9e54-4d99-8013-f68b85d9a42c": {
+  "bpm": 95.7,
+  "brightness": 1959.7,
+  "key": "G major",
+  "loudness": -8.66,
+  "majorness": 0.166,
+  "onsetStrength": 1.1272
+ },
+ "55c425b6-f22b-4b9f-b4d4-888f32177133": {
+  "bpm": 107.7,
+  "brightness": 2299.6,
+  "key": "A# minor",
+  "loudness": -20.82,
+  "majorness": -0.0574,
+  "onsetStrength": 2.2873
+ },
+ "5aab3b6f-02dc-41ce-b768-d227f0bbcf43": {
+  "bpm": 152.0,
+  "brightness": 1800.2,
+  "key": "F minor",
+  "loudness": -16.52,
+  "majorness": -0.337,
+  "onsetStrength": 1.359
+ },
+ "5ab81584-a046-4877-9a8c-1410cdf7f2a7": {
+  "bpm": 112.3,
+  "brightness": 2757.6,
+  "key": "G major",
+  "loudness": -15.76,
+  "majorness": 0.4043,
+  "onsetStrength": 1.2554
+ },
+ "5eba39a4-44be-4160-9522-c409177a838e": {
+  "bpm": 123.0,
+  "brightness": 1056.4,
+  "key": "B major",
+  "loudness": -9.47,
+  "majorness": 0.0846,
+  "onsetStrength": 0.8226
+ },
+ "5edd1df5-f464-4f53-8603-be7ed6544555": {
+  "bpm": 112.3,
+  "brightness": 2020.8,
+  "key": "D# minor",
+  "loudness": -15.14,
+  "majorness": -0.1811,
+  "onsetStrength": 1.3975
+ },
+ "5eeeeb5a-edfc-4995-acc7-10b6d6ae9624": {
+  "bpm": 136.0,
+  "brightness": 3004.6,
+  "key": "E major",
+  "loudness": -21.34,
+  "majorness": 0.1902,
+  "onsetStrength": 1.954
+ },
+ "5f909c25-1ac0-4c04-809d-11a75b3c262a": {
+  "bpm": 112.3,
+  "brightness": 2090.9,
+  "key": "B minor",
+  "loudness": -22.82,
+  "majorness": -0.0692,
+  "onsetStrength": 1.8769
+ },
+ "64552ddf-5d9d-45f5-b2ff-95f7baae7371": {
+  "bpm": 161.5,
+  "brightness": 2672.3,
+  "key": "F minor",
+  "loudness": -15.4,
+  "majorness": -0.0307,
+  "onsetStrength": 1.3018
+ },
+ "66740022-abc8-4530-a324-b33e5aea75b7": {
+  "bpm": 103.4,
+  "brightness": 1977.7,
+  "key": "C major",
+  "loudness": -21.02,
+  "majorness": 0.0122,
+  "onsetStrength": 1.6663
+ },
+ "687d2b8f-8a40-4c51-b7d8-8f84f59092a4": {
+  "bpm": 117.5,
+  "brightness": 3122.1,
+  "key": "F minor",
+  "loudness": -16.43,
+  "majorness": -0.0531,
+  "onsetStrength": 1.5997
+ },
+ "6a399360-4239-45bb-9285-8d821f3e2113": {
+  "bpm": 99.4,
+  "brightness": 1827.7,
+  "key": "E minor",
+  "loudness": -22.47,
+  "majorness": -0.1329,
+  "onsetStrength": 1.6633
+ },
+ "6a8fc66c-c038-4746-9c16-fa89258859ed": {
+  "bpm": 123.0,
+  "brightness": 1551.7,
+  "key": "A# major",
+  "loudness": -14.93,
+  "majorness": 0.3232,
+  "onsetStrength": 1.3041
+ },
+ "6d53dfd8-1647-4068-b12f-78286992034f": {
+  "bpm": 107.7,
+  "brightness": 1765.9,
+  "key": "D minor",
+  "loudness": -23.2,
+  "majorness": -0.1639,
+  "onsetStrength": 1.497
+ },
+ "6ea4ec3f-987e-41ba-86f8-d8ceec37ec1d": {
+  "bpm": 99.4,
+  "brightness": 1657.8,
+  "key": "D# minor",
+  "loudness": -20.58,
+  "majorness": -0.2143,
+  "onsetStrength": 1.7562
+ },
+ "71ce1619-f74c-4436-bd64-857c3545c1a5": {
+  "bpm": 107.7,
+  "brightness": 1886.8,
+  "key": "C minor",
+  "loudness": -17.02,
+  "majorness": -0.0772,
+  "onsetStrength": 1.9391
+ },
+ "786d9950-3ab6-42a5-9544-ae67d7b85777": {
+  "bpm": 129.2,
+  "brightness": 1486.9,
+  "key": "D major",
+  "loudness": -18.88,
+  "majorness": 0.0923,
+  "onsetStrength": 1.2148
+ },
+ "78e6438e-1ca8-4bdf-8e31-4587bb597062": {
+  "bpm": 129.2,
+  "brightness": 2272.3,
+  "key": "B major",
+  "loudness": -23.37,
+  "majorness": 0.0347,
+  "onsetStrength": 1.2098
+ },
+ "79c02f89-d6cd-4237-83bb-2054725e37be": {
+  "bpm": 129.2,
+  "brightness": 2799.6,
+  "key": "C minor",
+  "loudness": -19.93,
+  "majorness": -0.0622,
+  "onsetStrength": 1.5038
+ },
+ "79e40d49-ffef-4cf4-b8d9-6e92940d9e16": {
+  "bpm": 123.0,
+  "brightness": 2601.9,
+  "key": "C major",
+  "loudness": -9.2,
+  "majorness": 0.0403,
+  "onsetStrength": 1.2011
+ },
+ "7a16f14a-6541-4a44-ad48-2c49bdc7b0d7": {
+  "bpm": 117.5,
+  "brightness": 1352.1,
+  "key": "C minor",
+  "loudness": -21.89,
+  "majorness": -0.073,
+  "onsetStrength": 1.3909
+ },
+ "7c8da5e0-6c52-4f8a-bc47-eded638cafc5": {
+  "bpm": 129.2,
+  "brightness": 380.4,
+  "key": "B minor",
+  "loudness": -26.19,
+  "majorness": -0.2866,
+  "onsetStrength": 0.5273
+ },
+ "7ce241f1-7038-4016-aec7-3fc604403929": {
+  "bpm": 95.7,
+  "brightness": 2340.3,
+  "key": "C major",
+  "loudness": -9.86,
+  "majorness": 0.1089,
+  "onsetStrength": 1.1269
+ },
+ "7d7a542c-fab6-4039-9f2b-ebae93095afa": {
+  "bpm": 143.6,
+  "brightness": 2163.2,
+  "key": "B minor",
+  "loudness": -19.38,
+  "majorness": -0.0504,
+  "onsetStrength": 1.2755
+ },
+ "7fa9bf30-c153-400e-ab7e-bc0b7e8db746": {
+  "bpm": 129.2,
+  "brightness": 1779.6,
+  "key": "C# major",
+  "loudness": -20.78,
+  "majorness": 0.3112,
+  "onsetStrength": 1.2021
+ },
+ "809a5ba8-4379-4f3c-972f-8c85c5782d44": {
+  "bpm": 117.5,
+  "brightness": 2150.3,
+  "key": "C minor",
+  "loudness": -19.49,
+  "majorness": -0.1139,
+  "onsetStrength": 1.4984
+ },
+ "80ce6147-8943-4162-97dc-2c549b9e9d8a": {
+  "bpm": 99.4,
+  "brightness": 1714.2,
+  "key": "G# major",
+  "loudness": -19.98,
+  "majorness": 0.0363,
+  "onsetStrength": 1.7756
+ },
+ "81083700-42b8-4fb3-9897-b46ddf105e8f": {
+  "bpm": 117.5,
+  "brightness": 2896.5,
+  "key": "F# major",
+  "loudness": -19.31,
+  "majorness": 0.0827,
+  "onsetStrength": 0.9336
+ },
+ "81895883-1d24-4ae2-a1d5-47f39366e366": {
+  "bpm": 112.3,
+  "brightness": 3242.0,
+  "key": "G minor",
+  "loudness": -18.2,
+  "majorness": -0.2058,
+  "onsetStrength": 1.255
+ },
+ "83d614c7-3e75-405f-9fd2-919e18cc7856": {
+  "bpm": 129.2,
+  "brightness": 3165.3,
+  "key": "F# minor",
+  "loudness": -18.12,
+  "majorness": -0.065,
+  "onsetStrength": 1.0034
+ },
+ "86ece1f8-cc7e-432d-9e34-a004d1093e7e": {
+  "bpm": 123.0,
+  "brightness": 2229.4,
+  "key": "C major",
+  "loudness": -22.44,
+  "majorness": 0.1278,
+  "onsetStrength": 1.3502
+ },
+ "87818b78-7bb6-466d-b0d1-6a9e2875508e": {
+  "bpm": 117.5,
+  "brightness": 2956.0,
+  "key": "G major",
+  "loudness": -12.05,
+  "majorness": 0.1526,
+  "onsetStrength": 1.1227
+ },
+ "88377948-3953-4d5a-b137-932a86398c8f": {
+  "bpm": 61.5,
+  "brightness": 1766.2,
+  "key": "E minor",
+  "loudness": -20.71,
+  "majorness": -0.0997,
+  "onsetStrength": 1.4402
+ },
+ "886ca906-8da2-430b-8f4e-f4509966795e": {
+  "bpm": 99.4,
+  "brightness": 2363.5,
+  "key": "D major",
+  "loudness": -19.08,
+  "majorness": 0.1263,
+  "onsetStrength": 1.3214
+ },
+ "8952d5e9-6c2f-4251-b76a-31872ebf3ef4": {
+  "bpm": 143.6,
+  "brightness": 1136.2,
+  "key": "F# minor",
+  "loudness": -23.32,
+  "majorness": -0.115,
+  "onsetStrength": 0.904
+ },
+ "8c639995-742b-4baa-ab14-b2784357f7dc": {
+  "bpm": 123.0,
+  "brightness": 2401.1,
+  "key": "G minor",
+  "loudness": -13.59,
+  "majorness": -0.0758,
+  "onsetStrength": 1.7402
+ },
+ "8da8c322-ef5f-4f70-91c2-97631d16aad8": {
+  "bpm": 103.4,
+  "brightness": 1308.4,
+  "key": "D major",
+  "loudness": -17.53,
+  "majorness": 0.02,
+  "onsetStrength": 1.5377
+ },
+ "8e353c08-f30d-40c9-8cd2-5c0d40259a0e": {
+  "bpm": 123.0,
+  "brightness": 1942.1,
+  "key": "A minor",
+  "loudness": -16.89,
+  "majorness": -0.0437,
+  "onsetStrength": 1.1901
+ },
+ "8f8a4162-0edf-43d3-869c-ea353201d8dc": {
+  "bpm": 143.6,
+  "brightness": 1968.4,
+  "key": "D minor",
+  "loudness": -20.6,
+  "majorness": -0.3357,
+  "onsetStrength": 0.9317
+ },
+ "9400c012-6b9d-49d6-b597-0960048400ed": {
+  "bpm": 184.6,
+  "brightness": 723.6,
+  "key": "D# major",
+  "loudness": -11.09,
+  "majorness": 0.201,
+  "onsetStrength": 2.2221
+ },
+ "95ebefa9-04f9-4b12-a635-f6addb6d456a": {
+  "bpm": 99.4,
+  "brightness": 1924.5,
+  "key": "E minor",
+  "loudness": -18.35,
+  "majorness": -0.0055,
+  "onsetStrength": 1.1311
+ },
+ "98610bb6-b4bb-4318-ae75-bc84a985853e": {
+  "bpm": 103.4,
+  "brightness": 2594.2,
+  "key": "F major",
+  "loudness": -20.17,
+  "majorness": 0.0653,
+  "onsetStrength": 1.7612
+ },
+ "996ef188-13f6-4ed4-80cb-be769497be4e": {
+  "bpm": 136.0,
+  "brightness": 3157.6,
+  "key": "F major",
+  "loudness": -12.61,
+  "majorness": 0.0935,
+  "onsetStrength": 1.1408
+ },
+ "9a5a9fba-f986-4277-aa47-e02a9b8b31d0": {
+  "bpm": 123.0,
+  "brightness": 2111.4,
+  "key": "C minor",
+  "loudness": -10.72,
+  "majorness": -0.1717,
+  "onsetStrength": 1.335
+ },
+ "9bcd246f-d68c-423d-a18a-09d9c6651e46": {
+  "bpm": 123.0,
+  "brightness": 1321.7,
+  "key": "A# major",
+  "loudness": -12.43,
+  "majorness": 0.1449,
+  "onsetStrength": 1.0658
+ },
+ "9e350a65-4f8a-47c2-9e74-a213d9d0ed0d": {
+  "bpm": 136.0,
+  "brightness": 1388.8,
+  "key": "G# major",
+  "loudness": -20.59,
+  "majorness": 0.0445,
+  "onsetStrength": 1.4214
+ },
+ "9f0ed0cc-859f-4959-89c6-254f479be4fd": {
+  "bpm": 143.6,
+  "brightness": 1565.4,
+  "key": "F major",
+  "loudness": -20.75,
+  "majorness": 0.0558,
+  "onsetStrength": 1.1285
+ },
+ "9f631344-4cc0-4592-96ca-a8aa4e3c8202": {
+  "bpm": 112.3,
+  "brightness": 2431.5,
+  "key": "G minor",
+  "loudness": -19.34,
+  "majorness": -0.0382,
+  "onsetStrength": 1.5506
+ },
+ "a0a8e647-7b2e-41c3-aee5-b4fc38b50394": {
+  "bpm": 123.0,
+  "brightness": 1529.0,
+  "key": "A major",
+  "loudness": -26.55,
+  "majorness": 0.057,
+  "onsetStrength": 0.8385
+ },
+ "a1a63dce-c72e-499c-9df1-6b5f813ba618": {
+  "bpm": 161.5,
+  "brightness": 2476.0,
+  "key": "D# minor",
+  "loudness": -15.83,
+  "majorness": -0.0913,
+  "onsetStrength": 1.6689
+ },
+ "a38cd35c-8929-4f5c-ba8f-839bc64b4c1d": {
+  "bpm": 152.0,
+  "brightness": 2342.9,
+  "key": "A major",
+  "loudness": -17.84,
+  "majorness": 0.1777,
+  "onsetStrength": 1.1569
+ },
+ "a4a93b65-c097-496b-8350-df6ea4e561bc": {
+  "bpm": 129.2,
+  "brightness": 2675.3,
+  "key": "A minor",
+  "loudness": -12.55,
+  "majorness": -0.0528,
+  "onsetStrength": 1.5698
+ },
+ "a52f62b2-59e1-4c37-824d-e4ed4c4811f6": {
+  "bpm": 123.0,
+  "brightness": 2196.6,
+  "key": "G# major",
+  "loudness": -8.92,
+  "majorness": 0.2112,
+  "onsetStrength": 1.2571
+ },
+ "a5315fbe-1f68-4508-a2bd-d1da4bac8f36": {
+  "bpm": 117.5,
+  "brightness": 1294.1,
+  "key": "C minor",
+  "loudness": -14.8,
+  "majorness": -0.3187,
+  "onsetStrength": 0.9272
+ },
+ "a5a3c40c-ea14-4785-b8a4-edcc044f5ad3": {
+  "bpm": 152.0,
+  "brightness": 2082.9,
+  "key": "F# minor",
+  "loudness": -8.53,
+  "majorness": -0.0374,
+  "onsetStrength": 1.9709
+ },
+ "a5e21412-7460-454c-9ebc-1813595dcd9c": {
+  "bpm": 143.6,
+  "brightness": 1043.6,
+  "key": "E minor",
+  "loudness": -8.44,
+  "majorness": -0.0189,
+  "onsetStrength": 1.091
+ },
+ "a7783b2c-b086-4972-a433-6ca1a63cd8ed": {
+  "bpm": 112.3,
+  "brightness": 3211.8,
+  "key": "C minor",
+  "loudness": -11.47,
+  "majorness": -0.1279,
+  "onsetStrength": 1.4652
+ },
+ "a9bfaa5e-2119-4365-bce1-ec5635a19612": {
+  "bpm": 143.6,
+  "brightness": 2002.1,
+  "key": "D major",
+  "loudness": -11.95,
+  "majorness": 0.0982,
+  "onsetStrength": 1.1253
+ },
+ "a9c02b74-ffe8-4892-a578-d44f8c950402": {
+  "bpm": 161.5,
+  "brightness": 2127.3,
+  "key": "G# major",
+  "loudness": -15.44,
+  "majorness": 0.2881,
+  "onsetStrength": 1.4474
+ },
+ "a9efd8a5-e78f-47e2-80da-dd98a113d615": {
+  "bpm": 123.0,
+  "brightness": 1144.8,
+  "key": "A minor",
+  "loudness": -26.82,
+  "majorness": -0.0257,
+  "onsetStrength": 0.9027
+ },
+ "aaf90885-f12d-441c-95bf-aeab4d555208": {
+  "bpm": 112.3,
+  "brightness": 2248.9,
+  "key": "D# major",
+  "loudness": -6.87,
+  "majorness": 0.0704,
+  "onsetStrength": 1.0381
+ },
+ "ac360196-c956-4f8a-9232-35df3523f35b": {
+  "bpm": 161.5,
+  "brightness": 1712.4,
+  "key": "A# major",
+  "loudness": -14.62,
+  "majorness": 0.2668,
+  "onsetStrength": 1.2666
+ },
+ "b46af7b9-7400-47f0-9837-ddf1e2fb0981": {
+  "bpm": 89.1,
+  "brightness": 692.0,
+  "key": "E major",
+  "loudness": -18.81,
+  "majorness": 0.0187,
+  "onsetStrength": 1.1028
+ },
+ "b5156738-df7f-4838-9760-af0f18c3592c": {
+  "bpm": 99.4,
+  "brightness": 1889.9,
+  "key": "E minor",
+  "loudness": -4.94,
+  "majorness": -0.0768,
+  "onsetStrength": 1.9687
+ },
+ "b5b5db9b-2aa7-4e06-a8b1-e99e35058a8f": {
+  "bpm": 112.3,
+  "brightness": 1147.2,
+  "key": "F# major",
+  "loudness": -23.11,
+  "majorness": 0.1501,
+  "onsetStrength": 1.2071
+ },
+ "b64337b9-aacc-44f3-8a3c-6d81157afd9a": {
+  "bpm": 117.5,
+  "brightness": 2750.8,
+  "key": "F# minor",
+  "loudness": -19.04,
+  "majorness": -0.0865,
+  "onsetStrength": 1.3867
+ },
+ "b6b06626-8925-4c6c-a07a-b0bbd72360fe": {
+  "bpm": 123.0,
+  "brightness": 1258.4,
+  "key": "C# major",
+  "loudness": -16.87,
+  "majorness": 0.0286,
+  "onsetStrength": 1.3823
+ },
+ "b7e04256-bb8e-4bf8-8f26-985a566f3d6b": {
+  "bpm": 107.7,
+  "brightness": 2447.4,
+  "key": "G# minor",
+  "loudness": -19.73,
+  "majorness": -0.1017,
+  "onsetStrength": 1.6089
+ },
+ "b82ce635-18a6-45b3-85a3-f7735a441ef1": {
+  "bpm": 117.5,
+  "brightness": 1288.7,
+  "key": "A major",
+  "loudness": -13.64,
+  "majorness": 0.0441,
+  "onsetStrength": 1.1342
+ },
+ "b8ea6646-c7b7-4ab6-8c3a-06c8b50eed56": {
+  "bpm": 136.0,
+  "brightness": 1441.9,
+  "key": "F major",
+  "loudness": -13.96,
+  "majorness": 0.1325,
+  "onsetStrength": 1.2551
+ },
+ "b91ab663-f187-491b-9295-84db948e9cae": {
+  "bpm": 117.5,
+  "brightness": 1389.1,
+  "key": "A minor",
+  "loudness": -18.91,
+  "majorness": -0.1046,
+  "onsetStrength": 1.347
+ },
+ "bbe2a7e6-52fe-4403-8b49-70da2a29a216": {
+  "bpm": 112.3,
+  "brightness": 1296.0,
+  "key": "E minor",
+  "loudness": -14.48,
+  "majorness": -0.131,
+  "onsetStrength": 0.9511
+ },
+ "bdb40746-af6c-4daf-8ca2-3fa83066dec8": {
+  "bpm": 95.7,
+  "brightness": 3080.5,
+  "key": "C minor",
+  "loudness": -16.9,
+  "majorness": -0.1841,
+  "onsetStrength": 1.9095
+ },
+ "c09877d7-8324-4b5f-9ee1-2b00bac404db": {
+  "bpm": 123.0,
+  "brightness": 2266.0,
+  "key": "D major",
+  "loudness": -14.52,
+  "majorness": 0.3368,
+  "onsetStrength": 1.3723
+ },
+ "c0de9ba0-79b6-4ada-ba4f-decf54f1709a": {
+  "bpm": 117.5,
+  "brightness": 2203.6,
+  "key": "G minor",
+  "loudness": -10.83,
+  "majorness": -0.142,
+  "onsetStrength": 1.0873
+ },
+ "c293f578-bd62-4692-8a97-cc89ca07072b": {
+  "bpm": 99.4,
+  "brightness": 1550.1,
+  "key": "A major",
+  "loudness": -20.31,
+  "majorness": 0.1369,
+  "onsetStrength": 1.042
+ },
+ "c4ff4d7b-7706-4a02-95bd-4484cc2a949f": {
+  "bpm": 136.0,
+  "brightness": 1765.6,
+  "key": "D# minor",
+  "loudness": -13.59,
+  "majorness": -0.0175,
+  "onsetStrength": 1.2625
+ },
+ "c53aa198-2bcf-4f6b-87db-a0464de2726f": {
+  "bpm": 152.0,
+  "brightness": 1876.2,
+  "key": "F minor",
+  "loudness": -24.17,
+  "majorness": -0.262,
+  "onsetStrength": 1.4202
+ },
+ "c73a49a2-f228-46c9-b5a6-40afab6ef29d": {
+  "bpm": 152.0,
+  "brightness": 2542.0,
+  "key": "E minor",
+  "loudness": -16.22,
+  "majorness": -0.0232,
+  "onsetStrength": 2.1166
+ },
+ "c7fda012-98b8-4408-a4dd-d5ab546ccb50": {
+  "bpm": 117.5,
+  "brightness": 3305.1,
+  "key": "C major",
+  "loudness": -16.51,
+  "majorness": 0.1261,
+  "onsetStrength": 1.0384
+ },
+ "cbbd1aaf-999d-4079-9166-cda14f76b4f0": {
+  "bpm": 161.5,
+  "brightness": 2346.4,
+  "key": "E major",
+  "loudness": -13.05,
+  "majorness": 0.0858,
+  "onsetStrength": 1.2317
+ },
+ "cbd6c614-8b6b-4c48-b1a8-e20d97b7333b": {
+  "bpm": 107.7,
+  "brightness": 2518.5,
+  "key": "B major",
+  "loudness": -20.74,
+  "majorness": 0.0381,
+  "onsetStrength": 1.4582
+ },
+ "ce4959d4-44ee-451f-aa8a-fb760ce97dae": {
+  "bpm": 117.5,
+  "brightness": 2504.6,
+  "key": "A minor",
+  "loudness": -19.24,
+  "majorness": -0.269,
+  "onsetStrength": 1.5106
+ },
+ "cfeca332-4dba-4138-96b7-6cc5e0006b7a": {
+  "bpm": 129.2,
+  "brightness": 2463.9,
+  "key": "E major",
+  "loudness": -14.3,
+  "majorness": 0.1582,
+  "onsetStrength": 1.0385
+ },
+ "d2a6da7d-7068-418d-a78d-74306f3fc6a9": {
+  "bpm": 117.5,
+  "brightness": 1666.7,
+  "key": "A# major",
+  "loudness": -19.89,
+  "majorness": 0.2471,
+  "onsetStrength": 1.1485
+ },
+ "d2c0d91b-1ce9-4f9c-9742-133ba3796f3e": {
+  "bpm": 89.1,
+  "brightness": 2131.1,
+  "key": "F minor",
+  "loudness": -9.65,
+  "majorness": -0.0693,
+  "onsetStrength": 1.4888
+ },
+ "d546a984-aae4-4a35-a053-62f0ab76efa1": {
+  "bpm": 123.0,
+  "brightness": 1014.0,
+  "key": "D# major",
+  "loudness": -21.12,
+  "majorness": 0.2199,
+  "onsetStrength": 1.0681
+ },
+ "d76d4fb1-7f0f-455b-90cc-eacb675ecaec": {
+  "bpm": 112.3,
+  "brightness": 2358.1,
+  "key": "F# major",
+  "loudness": -14.51,
+  "majorness": 0.1934,
+  "onsetStrength": 1.1466
+ },
+ "d79e9eac-2c17-4645-83b9-e009b14a00b7": {
+  "bpm": 143.6,
+  "brightness": 1877.2,
+  "key": "G minor",
+  "loudness": -11.21,
+  "majorness": -0.0776,
+  "onsetStrength": 1.1952
+ },
+ "d7a0e6ab-592d-43fc-8ed4-b55fa417c1ad": {
+  "bpm": 103.4,
+  "brightness": 1759.0,
+  "key": "E minor",
+  "loudness": -15.98,
+  "majorness": -0.1033,
+  "onsetStrength": 1.2287
+ },
+ "d7bc4212-b6bb-49fd-a454-c97949be4a7d": {
+  "bpm": 152.0,
+  "brightness": 1527.7,
+  "key": "G minor",
+  "loudness": -15.44,
+  "majorness": -0.203,
+  "onsetStrength": 0.9587
+ },
+ "dacad64d-a4f6-47c4-a9e5-b2c2e47ae4ba": {
+  "bpm": 95.7,
+  "brightness": 2002.9,
+  "key": "G# major",
+  "loudness": -12.92,
+  "majorness": 0.206,
+  "onsetStrength": 1.6892
+ },
+ "db716ce3-9c1b-485d-80b3-688e851efa3d": {
+  "bpm": 117.5,
+  "brightness": 1557.7,
+  "key": "C# minor",
+  "loudness": -11.37,
+  "majorness": -0.2304,
+  "onsetStrength": 1.1654
+ },
+ "dd6b8b28-261f-4e96-b406-a532981aa2f5": {
+  "bpm": 136.0,
+  "brightness": 1985.8,
+  "key": "A minor",
+  "loudness": -19.39,
+  "majorness": -0.1173,
+  "onsetStrength": 1.3445
+ },
+ "e0235576-f4dc-4c0f-b298-edc8026d3f08": {
+  "bpm": 123.0,
+  "brightness": 909.1,
+  "key": "F# minor",
+  "loudness": -18.29,
+  "majorness": -0.1613,
+  "onsetStrength": 0.9182
+ },
+ "e05b6b66-bf8d-4bd2-a700-4392849090f3": {
+  "bpm": 112.3,
+  "brightness": 2500.7,
+  "key": "A# minor",
+  "loudness": -17.62,
+  "majorness": -0.202,
+  "onsetStrength": 1.5019
+ },
+ "e0f0b012-6338-4011-a2f3-acac7290de51": {
+  "bpm": 73.8,
+  "brightness": 948.3,
+  "key": "A# minor",
+  "loudness": -20.16,
+  "majorness": -0.1207,
+  "onsetStrength": 1.5223
+ },
+ "e51bb852-e4c1-475c-a651-c73baf146699": {
+  "bpm": 136.0,
+  "brightness": 2015.4,
+  "key": "B major",
+  "loudness": -13.08,
+  "majorness": 0.1552,
+  "onsetStrength": 1.0538
+ },
+ "e5513751-3d02-4ef9-82c6-4abd895c1baf": {
+  "bpm": 123.0,
+  "brightness": 1294.4,
+  "key": "D minor",
+  "loudness": -13.78,
+  "majorness": -0.022,
+  "onsetStrength": 1.0752
+ },
+ "e73c3ad8-687c-4ed2-9bf8-d53d35cc6814": {
+  "bpm": 92.3,
+  "brightness": 2516.4,
+  "key": "C major",
+  "loudness": -17.02,
+  "majorness": 0.254,
+  "onsetStrength": 1.9261
+ },
+ "e94592b8-9d72-42d9-bb79-0a06b7c0f976": {
+  "bpm": 99.4,
+  "brightness": 1828.7,
+  "key": "F# minor",
+  "loudness": -16.68,
+  "majorness": -0.0688,
+  "onsetStrength": 1.0591
+ },
+ "e97868cc-9278-49a4-beb6-4b17a4fd8c66": {
+  "bpm": 103.4,
+  "brightness": 2471.7,
+  "key": "D major",
+  "loudness": -20.83,
+  "majorness": 0.1258,
+  "onsetStrength": 1.2583
+ },
+ "eb383d1a-4850-4865-8a02-59c7d85caf07": {
+  "bpm": 143.6,
+  "brightness": 2563.8,
+  "key": "F minor",
+  "loudness": -9.0,
+  "majorness": -0.2077,
+  "onsetStrength": 1.0707
+ },
+ "ebdda039-5a75-4881-bbb9-32083358db8e": {
+  "bpm": 103.4,
+  "brightness": 2393.3,
+  "key": "G major",
+  "loudness": -29.42,
+  "majorness": 0.1616,
+  "onsetStrength": 1.645
+ },
+ "ed0373b7-38e0-4a20-97a0-d430b40c49b4": {
+  "bpm": 95.7,
+  "brightness": 1188.2,
+  "key": "G minor",
+  "loudness": -14.07,
+  "majorness": -0.0707,
+  "onsetStrength": 1.4891
+ },
+ "ed7e8afc-a7e7-42d1-a566-d0fe97112adb": {
+  "bpm": 99.4,
+  "brightness": 2430.6,
+  "key": "F minor",
+  "loudness": -16.55,
+  "majorness": -0.0617,
+  "onsetStrength": 1.7658
+ },
+ "ee9f8987-27f9-4fcd-8b2f-4b078d870fc9": {
+  "bpm": 136.0,
+  "brightness": 2479.6,
+  "key": "B major",
+  "loudness": -22.16,
+  "majorness": 0.3459,
+  "onsetStrength": 0.9995
+ },
+ "f1804ef4-c1c4-47de-a35b-b364229d9e70": {
+  "bpm": 107.7,
+  "brightness": 1884.7,
+  "key": "D minor",
+  "loudness": -18.71,
+  "majorness": -0.242,
+  "onsetStrength": 1.1322
+ },
+ "f22391e4-f7e2-409c-b379-c70141b1b7cd": {
+  "bpm": 103.4,
+  "brightness": 1907.6,
+  "key": "E minor",
+  "loudness": -17.52,
+  "majorness": -0.1865,
+  "onsetStrength": 1.2408
+ },
+ "f27e8e09-b146-464c-ac91-bf1aee1a5e4c": {
+  "bpm": 123.0,
+  "brightness": 1401.5,
+  "key": "G minor",
+  "loudness": -10.36,
+  "majorness": -0.0423,
+  "onsetStrength": 3.1031
+ },
+ "f44126d6-73da-40bf-98e8-11f64db1f540": {
+  "bpm": 112.3,
+  "brightness": 2773.1,
+  "key": "G major",
+  "loudness": -23.97,
+  "majorness": 0.2587,
+  "onsetStrength": 1.5302
+ },
+ "f44ab981-af8a-4927-bd03-64fac3fea5ca": {
+  "bpm": 117.5,
+  "brightness": 2930.6,
+  "key": "A major",
+  "loudness": -8.65,
+  "majorness": 0.1177,
+  "onsetStrength": 1.1609
+ },
+ "f45d067f-4c5f-47a9-a65f-fafdd251dc00": {
+  "bpm": 123.0,
+  "brightness": 2222.4,
+  "key": "D major",
+  "loudness": -25.4,
+  "majorness": 0.0311,
+  "onsetStrength": 1.2712
+ },
+ "f69a1a0a-a583-4506-adc0-de1082c29738": {
+  "bpm": 92.3,
+  "brightness": 2024.8,
+  "key": "G# major",
+  "loudness": -20.41,
+  "majorness": 0.192,
+  "onsetStrength": 1.7555
+ },
+ "f6eadc43-83b0-4d4b-b272-322ffd12bc50": {
+  "bpm": 103.4,
+  "brightness": 1767.1,
+  "key": "C minor",
+  "loudness": -8.76,
+  "majorness": -0.1502,
+  "onsetStrength": 2.4826
+ },
+ "f727fe1f-5ae1-4ac8-94ba-bfd0d7c6965e": {
+  "bpm": 95.7,
+  "brightness": 2751.4,
+  "key": "C major",
+  "loudness": -12.31,
+  "majorness": 0.2596,
+  "onsetStrength": 1.1914
+ },
+ "f81cce17-6a0c-4027-abf2-c552a967ba8e": {
+  "bpm": 117.5,
+  "brightness": 2625.5,
+  "key": "G# minor",
+  "loudness": -11.21,
+  "majorness": -0.0824,
+  "onsetStrength": 0.9895
+ },
+ "f9d9b9ad-21f0-48f9-aa86-55b46b189ec5": {
+  "bpm": 123.0,
+  "brightness": 1229.1,
+  "key": "D# major",
+  "loudness": -10.36,
+  "majorness": 0.1014,
+  "onsetStrength": 0.9743
+ },
+ "fb42b3c3-b1ed-4dab-bae3-f253c1678140": {
+  "bpm": 123.0,
+  "brightness": 1248.1,
+  "key": "B minor",
+  "loudness": -26.44,
+  "majorness": -0.1532,
+  "onsetStrength": 0.9411
+ },
+ "fd0295f2-e08c-472c-b22c-b279c14731b8": {
+  "bpm": 99.4,
+  "brightness": 1599.7,
+  "key": "D major",
+  "loudness": -17.18,
+  "majorness": 0.1808,
+  "onsetStrength": 1.2454
+ },
+ "sample": {
+  "bpm": 143.6,
+  "brightness": 1020.3,
+  "key": "A minor",
+  "loudness": -14.17,
+  "majorness": -0.1022,
+  "onsetStrength": 1.538
+ }
+}

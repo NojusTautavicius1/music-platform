@@ -3,6 +3,7 @@ import { betaZodOutputFormat, betaZodTool } from "@anthropic-ai/sdk/helpers/beta
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { embedText } from "@/lib/ai/embeddings";
+import { MOODS } from "@/lib/audio/mood";
 
 // "Ask Sonara": Claude picks songs from the library through a few SQL-backed tools.
 // Replaces the old Ruby/Sinatra service, so the agent runs inside the Next.js app.
@@ -17,8 +18,8 @@ const take = (n?: number) => n ?? 5;
 const searchByMood = betaZodTool({
   name: "search_by_mood",
   description:
-    "Songs whose audio mood matches a word like happy, sad, energetic, calm, melancholic, romantic, uplifting. Returns [] when no song is tagged with that mood.",
-  inputSchema: z.object({ mood: z.string(), limit }),
+    "Songs with one of the audio moods measured from the recording: happy (energetic, major, bright), intense (energetic, darker), calm (quiet, warm) or melancholic (quiet, minor, dark).",
+  inputSchema: z.object({ mood: z.enum(MOODS), limit }),
   run: async ({ mood, limit }) =>
     JSON.stringify(
       await prisma.$queryRaw<SongHit[]>`
