@@ -2,9 +2,11 @@
 
 A personalized music streaming platform with AI-powered recommendations, daily mixes, and a natural-language music agent.
 
+**Live:** https://music-platform-woad-nine.vercel.app
+
 ## Stack
 
-- **Frontend/Backend**: Next.js 15 (App Router), TypeScript, Tailwind CSS v4
+- **Frontend/Backend**: Next.js 16 (App Router), TypeScript, Tailwind CSS v4
 - **Database**: PostgreSQL via Railway + Prisma ORM
 - **Auth**: Auth.js v5 (Google OAuth)
 - **Storage**: Uploadthing (audio + cover images)
@@ -70,7 +72,7 @@ Set all env vars in Vercel dashboard. `AUTH_URL` must match your exact Vercel do
 
 **Railway (music agent)**
 
-See [../music-agent/README.md](../music-agent/README.md).
+The Ruby/Sinatra music agent lives in a separate repository; point `MUSIC_AGENT_URL` at its public Railway domain.
 
 ## Architecture
 
